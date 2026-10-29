@@ -1,7 +1,7 @@
 // The email gate (Decisions 1, 2, 14): the request handlers behind api/signup, api/release and
 // api/download. Supabase and the mail sender come in as dependencies, so Vitest can stand in for
 // both at the boundary (Decision 27). The api/ files wire in the real ones.
-import { downloadEmail } from './download-email.js';
+import { downloadEmail, pagesFor } from './download-email.js';
 import { TOKEN, hashToken, newToken } from './tokens.js';
 import { unsubscribeFor } from './unsubscribe.js';
 
@@ -88,7 +88,8 @@ export async function handleSignup(request: Request, deps: GateDeps): Promise<Re
 
   let captured: Email | void;
   try {
-    captured = await deps.send(downloadEmail(email, `${deps.siteUrl}/download/${token}/`, deps.siteUrl, unsubscribeFor(deps.siteUrl, unsubscribe)));
+    const link = `${pagesFor(deps.siteUrl, lang)}/download/${token}/`;
+    captured = await deps.send(downloadEmail(email, lang, link, deps.siteUrl, unsubscribeFor(deps.siteUrl, unsubscribe, lang)));
   } catch (e) {
     console.error('download email failed:', (e as Error).message);
     return json({ error: 'email_failed' }, 502);

@@ -267,6 +267,88 @@ describe('news opt-in (Decision 3)', () => {
   });
 });
 
+// French emails (Decision 5, #14): the download email, re-sent links and the unsubscribe page
+// follow the language the person signed up in.
+const tokenLinkIn = (email: Email, base: string) => email.text.match(new RegExp(`${base}/download/([A-Za-z0-9_-]{43})/`));
+
+describe('emails in the signup language (Decision 5)', () => {
+  it('a signup from a French page gets the French download email, linking to the French pages', async () => {
+    const { deps, sent } = setup();
+    await handleSignup(post({ email: 'ada@example.com', lang: 'fr' }), deps);
+    const [email] = sent;
+    expect(email.subject).toBe('Votre lien de téléchargement CacheDrop');
+    expect(email.html).toContain('<html lang="fr">');
+    const [link, token] = tokenLinkIn(email, `${SITE}/fr`)!;
+    const unsubscribe = email.text.match(new RegExp(`${SITE}/fr/unsubscribe/([A-Za-z0-9_-]{43})/`))!;
+    for (const part of [email.text, email.html]) {
+      expect(part).toContain(link);
+      expect(part).toContain(unsubscribe[0]);
+      expect(part).toContain(`${SITE}/fr/privacy/`);
+      expect(part).toContain('Le lien fonctionne pendant 7 jours, sur n’importe quel Mac.');
+      expect(part).toContain('CacheDrop est un nettoyeur de stockage pour Mac');
+      expect(part).toContain('hello@cachedrop.io');
+      expect(part).not.toContain('CacheDrop is a Mac storage cleaner');
+      expect(part).not.toMatch(new RegExp(`${SITE}/(download|unsubscribe|privacy)/`));
+    }
+    expect(email.html).toContain('Télécharger CacheDrop');
+    expect(email.html).toContain('Se désabonner');
+    expect(email.html).toContain('Politique de confidentialité');
+    // The link is the same token the API serves; only the page around it is French.
+    expect((await handleDownload(get(`/api/download?token=${token}`), deps)).status).toBe(302);
+  });
+
+  it('a signup from an English page gets the English email, linking to the English pages', async () => {
+    const { deps, sent } = setup();
+    await handleSignup(post({ email: 'ada@example.com', lang: 'en' }), deps);
+    const [email] = sent;
+    expect(email.subject).toBe('Your CacheDrop download link');
+    expect(email.html).toContain('<html lang="en">');
+    for (const part of [email.text, email.html]) {
+      expect(part).not.toContain(`${SITE}/fr/`);
+      expect(part).toMatch(new RegExp(`${SITE}/download/[A-Za-z0-9_-]{43}/`));
+      expect(part).toMatch(new RegExp(`${SITE}/unsubscribe/[A-Za-z0-9_-]{43}/`));
+    }
+  });
+
+  it('the French one-click headers unsubscribe, and a GET opens the French page', async () => {
+    const { deps, sent, state } = setup();
+    await handleSignup(post({ email: 'ada@example.com', lang: 'fr' }), deps);
+    const [email] = sent;
+    expect(email.headers?.['List-Unsubscribe-Post']).toBe('List-Unsubscribe=One-Click');
+    const url = oneClickIn(email)!;
+    const [pageUrl, token] = email.text.match(new RegExp(`${SITE}/fr/unsubscribe/([A-Za-z0-9_-]{43})/`))!;
+    expect(url).toBe(`${SITE}/api/unsubscribe?token=${token}&lang=fr`);
+    const opened = await handleUnsubscribe(get(new URL(url).pathname + new URL(url).search), deps);
+    expect(opened.status).toBe(303);
+    expect(new URL(opened.headers.get('location')!, SITE).href).toBe(pageUrl);
+    expect(state.signups[0].unsubscribed).toBeUndefined();
+    expect((await handleUnsubscribe(oneClick(url), deps)).status).toBe(200);
+    expect(state.signups[0].unsubscribed).toBe(true);
+  });
+
+  it('a GET without a valid token goes to the unsubscribe page in its language', async () => {
+    const { deps } = setup();
+    const fr = await handleUnsubscribe(get('/api/unsubscribe?token=nope&lang=fr'), deps);
+    expect(fr.headers.get('location')).toBe('/fr/unsubscribe/');
+    const other = await handleUnsubscribe(get('/api/unsubscribe?token=nope&lang=de'), deps);
+    expect(other.headers.get('location')).toBe('/unsubscribe/');
+  });
+
+  it('a re-sent link follows a language change: English, then French, then English again', async () => {
+    const { deps, sent } = setup();
+    await handleSignup(post({ email: 'ada@example.com', lang: 'en' }), deps);
+    await handleSignup(post({ email: 'ada@example.com', lang: 'fr' }), deps);
+    await handleSignup(post({ email: 'ada@example.com', lang: 'en' }), deps);
+    expect(sent.map((e) => e.subject)).toEqual([
+      'Your CacheDrop download link',
+      'Votre lien de téléchargement CacheDrop',
+      'Your CacheDrop download link',
+    ]);
+    expect(tokenLinkIn(sent[1], `${SITE}/fr`)).not.toBeNull();
+    expect(tokenLinkIn(sent[2], SITE)).not.toBeNull();
+  });
+});
+
 async function signedUp(releases?: Release[]) {
   const s = setup(releases);
   await handleSignup(post({ email: 'ada@example.com' }), s.deps);
