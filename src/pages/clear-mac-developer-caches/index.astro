@@ -20,7 +20,7 @@ const faq: Array<[string, string]> = [
   ['Will deleting node_modules break my project?', 'No. As long as package.json and your lockfile are still there, <span class="ic">npm install</span> (or yarn or pnpm) restores the same dependencies.'],
   ['Does docker system prune delete my volumes?', 'Not by default. Volumes are only removed when you add the <span class="ic">--volumes</span> flag.'],
   ['Why does my Mac show developer files as “System Data”?', 'macOS Storage settings don’t break down caches inside your Library or project folders, so most developer build files are counted as System Data. A developer Mac cleaner like CacheDrop names each one and shows its size.'],
-  ['What does CacheDrop clean for developers?', 'Xcode DerivedData, old node_modules folders, unused Docker images and build cache, and Homebrew, npm and Dart package caches. You review every item before it’s cleared.'],
+  ['What does CacheDrop clean for developers?', 'Xcode DerivedData, old node_modules folders, unused Docker images and build cache, and Homebrew, npm and Yarn package caches. You review every item before it’s cleared.'],
 ];
 ---
 <Guide
@@ -28,7 +28,7 @@ const faq: Array<[string, string]> = [
   description="Delete Xcode DerivedData, clear old node_modules and Docker caches on your Mac. Manual Terminal steps, plus a free developer Mac cleaner that does it safely."
   path="/clear-mac-developer-caches/"
   crumb="Developer Storage Guide"
-  headline="Reclaim 50GB of forgotten code."
+  headline="Reclaim gigabytes of forgotten code."
   lede="If you write code on a Mac, your biggest space hog isn’t your files. It’s the build artifacts scattered across every old project."
   cta="Download CacheDrop (Free)"
   ctaNote="Developer Mac cleaner · macOS 14+ · Apple Silicon & Intel"
@@ -54,7 +54,7 @@ const faq: Array<[string, string]> = [
 <ul style="margin: var(--space-4) 0 0; padding: 0 0 0 var(--space-5); display: flex; flex-direction: column; gap: var(--space-1-5); font-size: 17px; line-height: 28px; color: var(--ink-body)">
 <li>Xcode DerivedData: intermediate build output and indexes</li>
 <li>Abandoned <span class="ic">node_modules</span> folders in old projects</li>
-<li>Docker images and build cache, plus Homebrew, npm and Dart package caches</li>
+<li>Docker images and build cache, plus Homebrew, npm and Yarn package caches</li>
 </ul>
 <p style="margin: 18px 0 0; font-size: 17px; line-height: 28px; color: var(--ink-body)">All three are rebuildable: your tools recreate them the next time you build or install. Deleting them frees disk space without touching your source code.</p>
 </section>
@@ -66,18 +66,18 @@ const faq: Array<[string, string]> = [
 <p style={guideP}>Quit Xcode first, then run this in Terminal. You can also open Xcode › Settings › Locations, click the arrow next to Derived Data, and move the folders to the Trash.</p>
 <CodeBlock label="Terminal" code="rm -rf ~/Library/Developer/Xcode/DerivedData/*" />
 <Kicker>With CacheDrop</Kicker>
-<p style={guideP}>CacheDrop shows DerivedData’s size in its Developer caches review, so you can see it and clear it in one click.</p>
+<p style={guideP}>CacheDrop shows DerivedData’s size under Developer caches and build files, so you can see it and clear it when you confirm.</p>
 </section>
 
 <section id="node-modules" style={guideSection}>
 <h3 style={h3}>2. Abandoned node_modules</h3>
-<p style={`${guideP}; text-wrap: pretty`}>You probably have dozens of old React or Node projects you haven’t touched in a year. Each <span class="ic">node_modules</span> folder can be 500MB+. CacheDrop finds them all and lets you drop them in one click.</p>
+<p style={`${guideP}; text-wrap: pretty`}>You probably have dozens of old React or Node projects you haven’t touched in a year. Each <span class="ic">node_modules</span> folder can be 500MB+. CacheDrop finds them in the folders you choose and lets you pick which to drop.</p>
 <Kicker>Find and clear node_modules manually</Kicker>
 <p style={guideP}>List every node_modules folder under a directory with its size. Swap in the folder where you keep projects:</p>
 <CodeBlock label="Terminal" code="find ~/Projects -name node_modules -type d -prune -exec du -sh {} +" />
 <p style={guideP}>Delete the ones you don’t need with <span class="ic">rm -rf path/to/project/node_modules</span>. If you return to a project, <span class="ic">npm install</span> brings them back.</p>
 <Kicker>With CacheDrop</Kicker>
-<p style={guideP}>CacheDrop scans the folders you choose and lists every node_modules folder with its size, so you can pick the ones to drop.</p>
+<p style={guideP}>CacheDrop scans the folders you choose and lists each node_modules folder with its size, so you can pick the ones to drop. It skips projects you changed this week, and what you drop goes to the Trash.</p>
 </section>
 
 <section id="docker" style={guideSection}>
@@ -110,7 +110,7 @@ const faq: Array<[string, string]> = [
 </table>
 </div>
 <Kicker>With CacheDrop</Kicker>
-<p style={guideP}>CacheDrop groups these caches under Developer caches and build files, shows the total, and clears them together. No commands to remember.</p>
+<p style={guideP}>CacheDrop groups the Docker, Homebrew and npm caches under Developer caches and build files, shows the total, and clears them together. No commands to remember.</p>
 </section>
 </Guide>
 

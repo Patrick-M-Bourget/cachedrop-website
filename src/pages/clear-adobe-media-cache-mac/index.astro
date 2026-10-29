@@ -22,7 +22,7 @@ const faq: Array<[string, string]> = [
   ['What are .cfa and .pek files?', '<span class="ic">.cfa</span> files are conformed audio: versions of your clips’ audio that Adobe apps can play back quickly. <span class="ic">.pek</span> files store peak data used to draw audio waveforms. Both are safe to delete.'],
   ['Will deleting Final Cut Pro render files delete my edits?', 'No. Your projects, timelines and original media stay in the library. Final Cut Pro re-renders effects and transitions when it needs them again.'],
   ['Why is my Mac still full after deleting old projects?', 'Deleting a project doesn’t remove the caches it created. Media cache files, After Effects disk cache and render files stay behind in your Library until you clear them.'],
-  ['Which apps does CacheDrop clear caches for?', 'Adobe Premiere Pro, After Effects and Photoshop (every installed version), plus Final Cut Pro render files. You review each item before anything is cleared.'],
+  ['Which apps does CacheDrop clear caches for?', 'Adobe Premiere Pro, After Effects and Media Encoder, which share one media cache. For Final Cut Pro, it shows each library’s size and how to delete its render files in Final Cut. You review each item before anything is cleared.'],
 ];
 ---
 <Guide
@@ -40,7 +40,7 @@ const faq: Array<[string, string]> = [
   faqTitle="Creator storage FAQ"
   faq={faq}
   other={{ eyebrow: 'Also write code?', title: 'How to delete Xcode DerivedData and old node_modules', href: '/clear-mac-developer-caches/', link: 'Read the developer guide' }}
-  closing={{ title: 'Keep the drive you have.', body: 'CacheDrop finds Adobe media cache and Final Cut Pro render files in one scan. Free while in beta.' }}
+  closing={{ title: 'Keep the drive you have.', body: 'CacheDrop finds Adobe media cache and your Final Cut Pro libraries in one scan. Free while in beta.' }}
   trademarks="Adobe, Premiere Pro, After Effects and Photoshop are trademarks of Adobe. Final Cut Pro, Apple, Mac and macOS are trademarks of Apple Inc."
 >
 <Toc items={[
@@ -63,11 +63,11 @@ const faq: Array<[string, string]> = [
 <li>Go to Settings › Media Cache (Preferences › Media Cache in older versions).</li>
 <li>Click “Delete”.</li>
 </ol>
-<p style={note}>Note: This only deletes caches for the open version of Premiere.</p>
+<p style={note}>Note: Adobe suggests doing this right after you start Premiere, before you open a project.</p>
 </div>
 <div style={ours}>
 <h3 style={h3}>The CacheDrop way:</h3>
-<p style={cardP}>CacheDrop scans your entire Library for every version of Adobe Premiere, After Effects, and Photoshop you’ve ever installed, and drops the caches in one click.</p>
+<p style={cardP}>CacheDrop finds the media cache that Premiere Pro, After Effects and Media Encoder share, and clears it when you confirm. No need to open Premiere.</p>
 <a class="textlink" href="/download/" style={getLink}>Get CacheDrop free
 <Fragment set:html={arrow} /></a>
 </div>
@@ -76,7 +76,7 @@ const faq: Array<[string, string]> = [
 
 <section id="fcpx" style={section}>
 <h2 style={guideH2}>Final Cut Pro Render Files</h2>
-<p style={`${guideP}; text-wrap: pretty`}>FCPX stores render files directly inside the Library bundle. CacheDrop safely analyzes your FCPX libraries and lets you strip out the heavy render files while keeping your project timeline intact.</p>
+<p style={`${guideP}; text-wrap: pretty`}>FCPX stores render files directly inside the Library bundle. CacheDrop finds your FCPX libraries, shows how much space each one takes, and points you to the Final Cut command that strips out the render files.</p>
 <p style={guideP}>That’s why a finished Final Cut Pro library can take up far more space than its source media. The render files sit inside the <span class="ic">.fcpbundle</span>, where Finder doesn’t show them.</p>
 
 <div style={pair}>
@@ -90,8 +90,8 @@ const faq: Array<[string, string]> = [
 <p style={note}>One library at a time, and only libraries you open.</p>
 </div>
 <div style={ours}>
-<h3 style={h3}>Clear them with CacheDrop</h3>
-<p style={cardP}>CacheDrop lists the render files in each library it finds, with their size. Clear the heavy ones and your timelines, media and edits stay exactly as they were.</p>
+<h3 style={h3}>Find them with CacheDrop</h3>
+<p style={cardP}>CacheDrop lists each Final Cut Pro library it finds with its size, so you know which ones to clean in Final Cut. It never changes a library itself.</p>
 <a class="textlink" href="/download/" style={getLink}>Get CacheDrop free
 <Fragment set:html={arrow} /></a>
 </div>

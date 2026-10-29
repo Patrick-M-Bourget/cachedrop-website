@@ -65,6 +65,71 @@ export const copyFixes: Record<string, CopyFix[]> = {
       why: 'RESET.md Decision 3.',
     },
   ],
+  'clear-mac-developer-caches/index.html': [
+    {
+      from: 'Reclaim 50GB of forgotten code.',
+      to: 'Reclaim gigabytes of forgotten code.',
+      why: 'No measurement backs 50GB; the owner’s field scan found 3.5 GB of build folders and 17 GB of updater and package caches.',
+    },
+    {
+      from: 'Homebrew, npm and Dart package caches',
+      to: 'Homebrew, npm and Yarn package caches',
+      why: 'The app has no Dart or .pub-cache rule; it has npm, Yarn and Homebrew rules (Catalog.swift).',
+    },
+    {
+      from: 'CacheDrop shows DerivedData’s size in its Developer caches review, so you can see it and clear it in one click.',
+      to: 'CacheDrop shows DerivedData’s size under Developer caches and build files, so you can see it and clear it when you confirm.',
+      why: 'The category is “Developer caches and build files” (CatalogCleanup.swift); cleaning goes through a confirmed review.',
+    },
+    {
+      from: 'CacheDrop finds them all and lets you drop them in one click.',
+      to: 'CacheDrop finds them in the folders you choose and lets you pick which to drop.',
+      why: 'Build folders are found only in folders added under Locations & access and are ticked one by one (ProjectBuilds.swift).',
+    },
+    {
+      from: 'lists every node_modules folder with its size, so you can pick the ones to drop.',
+      to: 'lists each node_modules folder with its size, so you can pick the ones to drop. It skips projects you changed this week, and what you drop goes to the Trash.',
+      why: 'Projects changed in the last 7 days are held, and build folders are moved to the Trash (ProjectBuilds.swift).',
+    },
+    {
+      from: 'CacheDrop groups these caches under Developer caches',
+      to: 'CacheDrop groups the Docker, Homebrew and npm caches under Developer caches',
+      why: '“These caches” included Dart’s .pub-cache, which the app doesn’t clean.',
+    },
+  ],
+  'clear-adobe-media-cache-mac/index.html': [
+    {
+      from: 'Note: This only deletes caches for the open version of Premiere.',
+      to: 'Note: Adobe suggests doing this right after you start Premiere, before you open a project.',
+      why: 'Adobe documents the cache as one shared folder, not per version; its help says to delete all files right after starting Premiere.',
+    },
+    {
+      from: 'CacheDrop scans your entire Library for every version of Adobe Premiere, After Effects, and Photoshop you’ve ever installed, and drops the caches in one click.',
+      to: 'CacheDrop finds the media cache that Premiere Pro, After Effects and Media Encoder share, and clears it when you confirm. No need to open Premiere.',
+      why: 'One rule covers the shared Adobe/Common media cache; there is no Photoshop rule and no per-version scan (AppDataCaches.swift).',
+    },
+    {
+      from: 'CacheDrop safely analyzes your FCPX libraries and lets you strip out the heavy render files while keeping your project timeline intact.',
+      to: 'CacheDrop finds your FCPX libraries, shows how much space each one takes, and points you to the Final Cut command that strips out the render files.',
+      why: 'Final Cut Pro libraries are guidance only: sized whole, never changed (GuidanceCatalog.swift).',
+    },
+    { from: 'Clear them with CacheDrop', to: 'Find them with CacheDrop', why: 'As above.' },
+    {
+      from: 'CacheDrop lists the render files in each library it finds, with their size. Clear the heavy ones and your timelines, media and edits stay exactly as they were.',
+      to: 'CacheDrop lists each Final Cut Pro library it finds with its size, so you know which ones to clean in Final Cut. It never changes a library itself.',
+      why: 'As above.',
+    },
+    {
+      from: 'Adobe Premiere Pro, After Effects and Photoshop (every installed version), plus Final Cut Pro render files.',
+      to: 'Adobe Premiere Pro, After Effects and Media Encoder, which share one media cache. For Final Cut Pro, it shows each library’s size and how to delete its render files in Final Cut.',
+      why: 'AppDataCaches.swift and GuidanceCatalog.swift.',
+    },
+    {
+      from: 'Adobe media cache and Final Cut Pro render files in one scan',
+      to: 'Adobe media cache and your Final Cut Pro libraries in one scan',
+      why: 'As above.',
+    },
+  ],
 };
 
 /** The handoff page with its agreed copy fixes applied. Throws when a fix no longer matches, so a stale entry can't pass silently. */
