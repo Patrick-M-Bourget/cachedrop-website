@@ -65,7 +65,11 @@ test('lists every provider and says which are outside Quebec', async ({ page }) 
 
 test('states how long each kind of data is kept', async ({ page }) => {
   const text = await sectionText(page, 'How long we keep it');
-  expect(text).toContain('until you unsubscribe or ask us to delete it');
+  // Decision 32: an unsubscribe leaves a do-not-email marker; only a deletion request removes it.
+  expect(text).toContain('until you ask us to delete them');
+  expect(text).not.toContain('until you unsubscribe');
+  expect(text).toContain('If you unsubscribe, we keep only your email address, marked so we never email you again.');
+  expect(text).toContain('Write to privacy@cachedrop.io and we delete it completely.');
   expect(text).toContain('30 days after');
   expect(text).toContain('with the feedback');
 });

@@ -17,6 +17,7 @@ export const pages: PageUnderTest[] = [
   { path: '/clear-mac-developer-caches/', handoff: 'clear-mac-developer-caches/index.html', screenshots: 'developer-guide' },
   { path: '/clear-adobe-media-cache-mac/', handoff: 'clear-adobe-media-cache-mac/index.html', screenshots: 'creator-guide' },
   { path: '/privacy/' }, // no handoff original: token and modal tests only
+  { path: '/unsubscribe/' }, // new (Decision 4); vercel.json serves it at /unsubscribe/<token>/
   // The email form (Decision 1) is new; it keeps the handoff download page's head.
   { path: '/download/', head: 'download/index.html' },
   // The token page, which vercel.json serves at /download/<token>/. Without a token it renders the handoff as is.
