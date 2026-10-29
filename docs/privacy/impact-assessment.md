@@ -26,9 +26,18 @@ Low-sensitivity information only:
 
 No payment details, no passwords, no health or financial information, no account.
 
-**Stored in Quebec:** Supabase `prod` and `dev` in `ca-central-1`, AWS Montreal (Decision 13). This is where signups, feedback, specs, tokens and download counts live.
-
 ## Providers outside Quebec
+
+### Supabase
+
+Decision 31 amends 13: the projects are in the United States, not Montreal.
+
+- **Data:** the most sensitive set on this list, because it is stored rather than passed through: signup email addresses, the optional "What's filling your Mac?" answer, the news opt-in, feedback (rating, message, page, optional email), optional specs, download tokens, download counts, and the released DMGs.
+- **Why:** the site's database and file storage (Decisions 13, 15).
+- **Where:** United States. `cachedrop-dev` is in `us-east-1` (AWS N. Virginia) and `cachedrop-prod` in `us-west-2` (AWS Oregon). The owner chose to keep them there (Decision 31).
+- **Technical safeguards:** the service key lives only in the Vercel functions (Decision 12, CLAUDE.md); browsers never touch Supabase. Row Level Security is on with no policies and no grants to the public roles, so only the service key can read or write. The `releases` bucket is private: files are reachable only with the service key or a short-lived signed URL. These are in the releases migration (#7); the signups and feedback tables must follow the same pattern when they are added. HTTPS only.
+- **Contractual safeguards:** Supabase's Data Processing Agreement. **Owner to confirm** that it has been accepted for the organisation that holds both projects.
+- **Conclusion (draft):** acceptable, given the access controls above and the DPA once confirmed. The stored set is still low-sensitivity, but it is the largest and longest-kept, so it carries most of this assessment's weight.
 
 ### Vercel
 
@@ -87,6 +96,7 @@ Most of these providers are United States companies. US law can give US authorit
 - [ ] The lawyer reviews this assessment and the policy (Decision 22).
 - [ ] Each provider's data processing terms are read and recorded here.
 - [ ] Vercel function region and Resend region are checked.
+- [ ] The owner confirms Supabase's Data Processing Agreement is accepted (Decision 31).
 - [ ] Feedback retention: the decisions set none (specs are kept with their feedback). The owner picks a period, or "until deleted on request".
 - [ ] The specs checkbox starts unchecked (Decision 10, #11), and its label matches what is sent: today it says "Mac model, macOS version" but `site.js` sends the user agent, platform and language.
 - [ ] The PO box address replaces the placeholder in the policy (Decision 21).
