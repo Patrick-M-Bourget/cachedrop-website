@@ -1,6 +1,7 @@
 ---
 // Site footer from the handoff. The "Cleaning Guides" anchors are exact-match on
 // purpose (HANDOFF.md §4); don't rename them.
+// The "Privacy Policy" link in the bottom row is Decision 19; the handoff has none.
 import BrandMark from './BrandMark.astro';
 
 interface Props {
@@ -41,7 +42,7 @@ const { overview = false, trademarks = 'Apple, Mac, and macOS are trademarks of 
 </div>
 <div style="margin-top: var(--space-14); padding-top: var(--space-6); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3); font-size: 12px; color: var(--ink-secondary)">
 <span>© 2026 CacheDrop. {trademarks}</span>
-<span>Public beta</span>
+<span style="display: flex; gap: var(--space-4)"><a class="flink" href="/privacy/">Privacy Policy</a><span>Public beta</span></span>
 </div>
 </div>
 </footer>
