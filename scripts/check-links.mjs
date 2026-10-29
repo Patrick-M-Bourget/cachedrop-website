@@ -8,8 +8,6 @@ const PORT = 5799;
 // Pages the site links to that later tickets build. Add one per line; remove it when its page lands.
 // The French twins of #13's later PRs (Decision 5): the footer's language switch already links to them.
 const PENDING = /** @type {string[]} */ ([
-  '/fr/clear-mac-developer-caches/',
-  '/fr/clear-adobe-media-cache-mac/',
   '/fr/privacy/',
   '/fr/download/',
   '/fr/unsubscribe/',

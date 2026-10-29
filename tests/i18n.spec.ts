@@ -47,6 +47,41 @@ for (const { en, fr, canonical, pending } of pairs) {
   });
 }
 
+/**
+ * Page addresses in the page's JSON-LD: every https://cachedrop.io URL except the shared
+ * Organization (one entity in both languages) and asset files like the logo.
+ */
+async function jsonLdPageUrls(page: Page) {
+  const docs = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const urls: string[] = [];
+  const walk = (node: unknown): void => {
+    if (typeof node === 'string') {
+      if (node.startsWith(SITE) && !node.includes('/assets/')) urls.push(node);
+    } else if (Array.isArray(node)) node.forEach(walk);
+    else if (node && typeof node === 'object') {
+      const o = node as Record<string, unknown>;
+      if (o['@type'] === 'Organization' || String(o['@id'] ?? '').endsWith('#org')) return;
+      Object.values(o).forEach(walk);
+    }
+  };
+  docs.forEach((d) => walk(JSON.parse(d)));
+  return urls;
+}
+
+for (const { en, fr, canonical } of pairs.filter((p) => !p.pending)) {
+  test(`JSON-LD on ${fr} points at French addresses, and on ${en} at English ones`, async ({ page }) => {
+    await page.goto(fr);
+    const french = await jsonLdPageUrls(page);
+    await page.goto(en);
+    const english = await jsonLdPageUrls(page);
+    test.skip(!french.length && !english.length, 'no structured data on this page');
+    expect(french).toContain(`${SITE}${canonical.fr}`);
+    for (const url of french) expect(url).toMatch(new RegExp(`^${SITE}/fr/`));
+    expect(english).toContain(`${SITE}${canonical.en}`);
+    for (const url of english) expect(url).not.toMatch(new RegExp(`^${SITE}/fr/`));
+  });
+}
+
 test('the sitemap leaves out every page that is not indexed, in both languages', async () => {
   const xml = await readFile('dist/sitemap.xml', 'utf8');
   for (const { canonical } of pairs.filter((p) => !p.indexed)) {

@@ -26,6 +26,8 @@ export const pages: PageUnderTest[] = [
   { path: '/download/link/', handoff: 'download/index.html', screenshots: 'download' },
   // French (Decision 5). No handoff originals: token, modal, footer, FAQ and analytics tests.
   { path: '/fr/', lang: 'fr' },
+  { path: '/fr/clear-mac-developer-caches/', lang: 'fr' },
+  { path: '/fr/clear-adobe-media-cache-mac/', lang: 'fr' },
 ];
 
 /**
@@ -44,8 +46,8 @@ const pair = (en: string, indexed: boolean, canonical = en, pending?: true): Pai
 
 export const pairs: Pair[] = [
   pair('/', true),
-  pair('/clear-mac-developer-caches/', true, undefined, true),
-  pair('/clear-adobe-media-cache-mac/', true, undefined, true),
+  pair('/clear-mac-developer-caches/', true),
+  pair('/clear-adobe-media-cache-mac/', true),
   pair('/privacy/', true, undefined, true),
   pair('/download/', false, undefined, true),
   pair('/download/link/', false, '/download/', true),

@@ -1,0 +1,213 @@
+---
+// The developer guide, built at /clear-mac-developer-caches/ and under /fr/ (Decision 5). The
+// markup is shared; `copy` holds each language's strings. Strings with <span class="ic"> are HTML.
+import Guide from '../../../layouts/Guide.astro';
+import Toc from '../../../components/Toc.astro';
+import CodeBlock from '../../../components/CodeBlock.astro';
+import Kicker from '../../../components/Kicker.astro';
+import { guideH2, guideP, guideSection } from '../../../components/guide-styles';
+import { langOf, langPaths } from '../../../i18n';
+
+export const getStaticPaths = langPaths;
+
+const h3 = 'margin: 0; font-size: 24px; line-height: 30px; font-weight: 600; letter-spacing: -0.015em';
+const cell = 'padding: var(--space-3) var(--space-4)';
+const rule = 'border-bottom: 1px solid var(--line)';
+const caches = [
+  ['Homebrew', '~/Library/Caches/Homebrew', 'brew cleanup --prune=all'],
+  ['npm', '~/.npm', 'npm cache clean --force'],
+  ['Dart / Flutter', '~/.pub-cache', 'dart pub cache clean'],
+];
+
+const copy = {
+  en: {
+    guide: {
+      title: 'Clear Xcode DerivedData, node_modules & Docker Cache on Mac',
+      description: 'Delete Xcode DerivedData, clear old node_modules and Docker caches on your Mac. Manual Terminal steps, plus a free developer Mac cleaner that does it safely.',
+      crumb: 'Developer Storage Guide',
+      headline: 'Reclaim gigabytes of forgotten code.',
+      lede: 'If you write code on a Mac, your biggest space hog isn’t your files. It’s the build artifacts scattered across every old project.',
+      cta: 'Download CacheDrop (Free)',
+      ctaNote: 'Developer Mac cleaner · macOS 14+ · Apple Silicon & Intel',
+      updated: 'October 2026',
+      readTime: '6 min read',
+      faqTitle: 'Developer storage FAQ',
+      // One list feeds both the visible FAQ and the FAQPage JSON-LD (answers lose their tags there).
+      faq: [
+        ['Is it safe to delete Xcode DerivedData?', 'Yes. DerivedData holds build products, logs and indexes that Xcode recreates automatically. Your next build and code indexing will take longer once while Xcode rebuilds them.'],
+        ['Will deleting node_modules break my project?', 'No. As long as package.json and your lockfile are still there, <span class="ic">npm install</span> (or yarn or pnpm) restores the same dependencies.'],
+        ['Does docker system prune delete my volumes?', 'Not by default. Volumes are only removed when you add the <span class="ic">--volumes</span> flag.'],
+        ['Why does my Mac show developer files as “System Data”?', 'macOS Storage settings don’t break down caches inside your Library or project folders, so most developer build files are counted as System Data. A developer Mac cleaner like CacheDrop names each one and shows its size.'],
+        ['What does CacheDrop clean for developers?', 'Xcode DerivedData, old node_modules folders, unused Docker images and build cache, and Homebrew, npm and Yarn package caches. You review every item before it’s cleared.'],
+      ] as Array<[string, string]>,
+      other: { eyebrow: 'Also edit video?', title: 'How to clear Adobe media cache and Final Cut Pro render files', href: '/clear-adobe-media-cache-mac/', link: 'Read the creator guide' },
+      closing: { title: 'Skip the Terminal.', body: 'CacheDrop finds DerivedData, node_modules and Docker caches in one scan. Free while in beta.' },
+      trademarks: 'Apple, Mac, macOS and Xcode are trademarks of Apple Inc.',
+    },
+    toc: ['How to delete Xcode DerivedData', 'How to clear old node_modules folders on a Mac', 'How to clear Docker and package manager caches'],
+    what: {
+      title: 'What is eating your Mac’s storage?',
+      intro: 'When you check macOS storage, developer environments are usually grouped into a massive, unhelpful “System Data” block. CacheDrop specifically targets:',
+      items: ['Xcode DerivedData: intermediate build output and indexes', 'Abandoned <span class="ic">node_modules</span> folders in old projects', 'Docker images and build cache, plus Homebrew, npm and Yarn package caches'],
+      outro: 'All three are rebuildable: your tools recreate them the next time you build or install. Deleting them frees disk space without touching your source code.',
+    },
+    derived: {
+      title: '1. Xcode DerivedData',
+      intro: 'Xcode generates massive amounts of intermediate build information. CacheDrop safely clears <span class="ic">~/Library/Developer/Xcode/DerivedData</span> without touching your actual code.',
+      manual: 'Delete DerivedData manually',
+      how: 'Quit Xcode first, then run this in Terminal. You can also open Xcode › Settings › Locations, click the arrow next to Derived Data, and move the folders to the Trash.',
+      ours: 'CacheDrop shows DerivedData’s size under Developer caches and build files, so you can see it and clear it when you confirm.',
+    },
+    node: {
+      title: '2. Abandoned node_modules',
+      intro: 'You probably have dozens of old React or Node projects you haven’t touched in a year. Each <span class="ic">node_modules</span> folder can be 500MB+. CacheDrop finds them in the folders you choose and lets you pick which to drop.',
+      manual: 'Find and clear node_modules manually',
+      list: 'List every node_modules folder under a directory with its size. Swap in the folder where you keep projects:',
+      remove: 'Delete the ones you don’t need with <span class="ic">rm -rf path/to/project/node_modules</span>. If you return to a project, <span class="ic">npm install</span> brings them back.',
+      ours: 'CacheDrop scans the folders you choose and lists each node_modules folder with its size, so you can pick the ones to drop. It skips projects you changed this week, and what you drop goes to the Trash.',
+    },
+    docker: {
+      title: '3. Docker Caches &amp; Package Managers',
+      intro: 'Clear out unused Docker images, Homebrew caches, <span class="ic">.pub-cache</span>, and <span class="ic">npm</span> leftovers that are quietly eating your SSD.',
+      manual: 'Clear Docker cache manually',
+      how: 'This removes stopped containers, unused networks, dangling images and build cache. Add <span class="ic">-a</span> to also remove every image no container is using. Volumes are kept unless you add <span class="ic">--volumes</span>.',
+      packages: 'Package manager caches',
+      head: ['Tool', 'Cache location', 'Clear it with'],
+      ours: 'CacheDrop groups the Docker, Homebrew and npm caches under Developer caches and build files, shows the total, and clears them together. No commands to remember.',
+    },
+    withUs: 'With CacheDrop',
+  },
+  fr: {
+    guide: {
+      title: 'Vider DerivedData de Xcode, node_modules et le cache Docker sur Mac',
+      description: 'Supprimez les DerivedData de Xcode, les vieux node_modules et les caches Docker de votre Mac. Les commandes Terminal à la main, plus un nettoyeur gratuit pour développeurs qui le fait sans risque.',
+      crumb: 'Guide de stockage pour développeurs',
+      headline: 'Récupérez des gigaoctets de code oublié.',
+      lede: 'Si vous codez sur un Mac, ce qui prend le plus de place, ce ne sont pas vos fichiers. Ce sont les artefacts de compilation éparpillés dans chacun de vos vieux projets.',
+      cta: 'Télécharger CacheDrop (gratuit)',
+      ctaNote: 'Nettoyeur Mac pour développeurs · macOS 14+ · Apple Silicon et Intel',
+      updated: 'octobre 2026',
+      readTime: '6 min de lecture',
+      faqTitle: 'FAQ sur le stockage pour développeurs',
+      faq: [
+        ['Peut-on supprimer les DerivedData de Xcode sans risque?', 'Oui. DerivedData contient des produits de compilation, des journaux et des index que Xcode recrée automatiquement. Votre prochaine compilation et l’indexation du code prendront plus de temps une fois, le temps que Xcode les reconstruise.'],
+        ['Supprimer node_modules va-t-il briser mon projet?', 'Non. Tant que package.json et votre fichier de verrouillage sont toujours là, <span class="ic">npm install</span> (ou yarn ou pnpm) restaure les mêmes dépendances.'],
+        ['docker system prune supprime-t-il mes volumes?', 'Pas par défaut. Les volumes ne sont supprimés que si vous ajoutez l’option <span class="ic">--volumes</span>.'],
+        ['Pourquoi mon Mac affiche-t-il les fichiers de développement dans « Données système »?', 'Parce que les réglages de stockage de macOS ne détaillent pas les caches de votre dossier Bibliothèque ni ceux de vos dossiers de projets. La plupart des fichiers de compilation sont donc comptés dans les Données système. Un nettoyeur Mac pour développeurs comme CacheDrop nomme chacun d’eux et montre sa taille.'],
+        ['Que nettoie CacheDrop pour les développeurs?', 'Les DerivedData de Xcode, les vieux dossiers node_modules, les images et le cache de compilation Docker inutilisés, et les caches de paquets Homebrew, npm et Yarn. Vous vérifiez chaque élément avant qu’il soit vidé.'],
+      ] as Array<[string, string]>,
+      other: { eyebrow: 'Vous faites aussi du montage vidéo?', title: 'Comment vider le cache de média Adobe et les fichiers de rendu de Final Cut Pro', href: '/clear-adobe-media-cache-mac/', link: 'Lire le guide pour créateurs' },
+      closing: { title: 'Oubliez le Terminal.', body: 'CacheDrop trouve DerivedData, node_modules et les caches Docker en une seule analyse. Gratuit pendant la bêta.' },
+      trademarks: 'Apple, Mac, macOS et Xcode sont des marques de commerce d’Apple Inc.',
+    },
+    toc: ['Comment supprimer les DerivedData de Xcode', 'Comment vider les vieux dossiers node_modules sur un Mac', 'Comment vider les caches Docker et des gestionnaires de paquets'],
+    what: {
+      title: 'Qu’est-ce qui remplit le stockage de votre Mac?',
+      intro: 'Quand vous consultez le stockage de macOS, les environnements de développement sont souvent regroupés dans un énorme bloc « Données système » qui ne vous apprend rien. CacheDrop cible précisément :',
+      items: ['Les DerivedData de Xcode : les produits de compilation intermédiaires et les index', 'Les dossiers <span class="ic">node_modules</span> abandonnés dans de vieux projets', 'Les images et le cache de compilation Docker, plus les caches de paquets Homebrew, npm et Yarn'],
+      outro: 'Les trois sont recréables : vos outils les recréent à la prochaine compilation ou installation. Les supprimer libère de l’espace disque sans toucher à votre code source.',
+    },
+    derived: {
+      title: '1. DerivedData de Xcode',
+      intro: 'Xcode génère d’énormes quantités de données de compilation intermédiaires. CacheDrop vide sans risque <span class="ic">~/Library/Developer/Xcode/DerivedData</span> sans toucher à votre code.',
+      manual: 'Supprimer DerivedData à la main',
+      how: 'Quittez d’abord Xcode, puis lancez cette commande dans Terminal. Vous pouvez aussi ouvrir Xcode › Settings › Locations, cliquer sur la flèche à côté de Derived Data et mettre les dossiers à la Corbeille.',
+      ours: 'CacheDrop montre la taille de DerivedData sous Developer caches and build files, pour que vous puissiez la voir et la vider quand vous confirmez.',
+    },
+    node: {
+      title: '2. node_modules abandonnés',
+      intro: 'Vous avez probablement des dizaines de vieux projets React ou Node auxquels vous n’avez pas touché depuis un an. Chaque dossier <span class="ic">node_modules</span> peut dépasser 500 Mo. CacheDrop les trouve dans les dossiers que vous choisissez et vous laisse choisir ceux à supprimer.',
+      manual: 'Trouver et vider node_modules à la main',
+      list: 'Listez chaque dossier node_modules d’un répertoire avec sa taille. Remplacez le chemin par le dossier où vous gardez vos projets :',
+      remove: 'Supprimez ceux dont vous n’avez pas besoin avec <span class="ic">rm -rf path/to/project/node_modules</span>. Si vous revenez à un projet, <span class="ic">npm install</span> les réinstalle.',
+      ours: 'CacheDrop analyse les dossiers que vous choisissez et liste chaque dossier node_modules avec sa taille, pour que vous choisissiez ceux à supprimer. Il laisse de côté les projets modifiés cette semaine, et ce que vous supprimez va à la Corbeille.',
+    },
+    docker: {
+      title: '3. Caches Docker et gestionnaires de paquets',
+      intro: 'Videz les images Docker inutilisées, les caches Homebrew, <span class="ic">.pub-cache</span> et les restes de <span class="ic">npm</span> qui occupent discrètement votre SSD.',
+      manual: 'Vider le cache Docker à la main',
+      how: 'Cette commande supprime les conteneurs arrêtés, les réseaux inutilisés, les images orphelines et le cache de compilation. Ajoutez <span class="ic">-a</span> pour supprimer aussi toutes les images qu’aucun conteneur n’utilise. Les volumes sont conservés, sauf si vous ajoutez <span class="ic">--volumes</span>.',
+      packages: 'Caches des gestionnaires de paquets',
+      head: ['Outil', 'Emplacement du cache', 'Commande pour le vider'],
+      ours: 'CacheDrop regroupe les caches Docker, Homebrew et npm sous Developer caches and build files, affiche le total et les vide ensemble. Aucune commande à retenir.',
+    },
+    withUs: 'Avec CacheDrop',
+  },
+};
+const t = copy[langOf(Astro.url)];
+---
+<Guide {...t.guide} path="/clear-mac-developer-caches/" dateModified="2026-10-29">
+<Toc items={[
+  ['#derived-data', t.toc[0]],
+  ['#node-modules', t.toc[1]],
+  ['#docker', t.toc[2]],
+  ['#faq', t.guide.faqTitle],
+]} />
+
+<section style="padding-top: var(--space-16)">
+<h2 style={guideH2}>{t.what.title}</h2>
+<p style="margin: 18px 0 0; font-size: 17px; line-height: 28px; color: var(--ink-body); text-wrap: pretty">{t.what.intro}</p>
+<ul style="margin: var(--space-4) 0 0; padding: 0 0 0 var(--space-5); display: flex; flex-direction: column; gap: var(--space-1-5); font-size: 17px; line-height: 28px; color: var(--ink-body)">
+{t.what.items.map((item) => <li set:html={item}></li>)}
+</ul>
+<p style="margin: 18px 0 0; font-size: 17px; line-height: 28px; color: var(--ink-body)">{t.what.outro}</p>
+</section>
+
+<section id="derived-data" style={guideSection}>
+<h3 style={h3}>{t.derived.title}</h3>
+<p style={`${guideP}; text-wrap: pretty`} set:html={t.derived.intro}></p>
+<Kicker>{t.derived.manual}</Kicker>
+<p style={guideP}>{t.derived.how}</p>
+<CodeBlock label="Terminal" code="rm -rf ~/Library/Developer/Xcode/DerivedData/*" />
+<Kicker>{t.withUs}</Kicker>
+<p style={guideP}>{t.derived.ours}</p>
+</section>
+
+<section id="node-modules" style={guideSection}>
+<h3 style={h3}>{t.node.title}</h3>
+<p style={`${guideP}; text-wrap: pretty`} set:html={t.node.intro}></p>
+<Kicker>{t.node.manual}</Kicker>
+<p style={guideP}>{t.node.list}</p>
+<CodeBlock label="Terminal" code="find ~/Projects -name node_modules -type d -prune -exec du -sh {} +" />
+<p style={guideP} set:html={t.node.remove}></p>
+<Kicker>{t.withUs}</Kicker>
+<p style={guideP}>{t.node.ours}</p>
+</section>
+
+<section id="docker" style={guideSection}>
+<h3 style={h3} set:html={t.docker.title}></h3>
+<p style={`${guideP}; text-wrap: pretty`} set:html={t.docker.intro}></p>
+<Kicker>{t.docker.manual}</Kicker>
+<p style={guideP} set:html={t.docker.how}></p>
+<CodeBlock label="Terminal" code="docker system prune" />
+<Kicker>{t.docker.packages}</Kicker>
+<div style="overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-lg)">
+<table style="width: 100%; min-width: 560px; border-collapse: collapse; font-size: 14px; line-height: 20px; text-align: left">
+<thead>
+<tr style="background: var(--surface-elevated)">
+{t.docker.head.map((h) => <th scope="col" style={`${cell}; font-weight: 600; ${rule}`}>{h}</th>)}
+</tr>
+</thead>
+<tbody>
+{caches.map(([tool, where, how], i) => {
+  const last = i === caches.length - 1;
+  const td = `${cell}; font-size: 13px; color: var(--ink-body)${last ? '' : `; ${rule}`}`;
+  return (
+<tr>
+<th scope="row" style={`${cell}; font-weight: 500${last ? '' : `; ${rule}`}`}>{tool}</th>
+<td class="mono" style={td}>{where}</td>
+<td class="mono" style={td}>{how}</td>
+</tr>
+  );
+})}
+</tbody>
+</table>
+</div>
+<Kicker>{t.withUs}</Kicker>
+<p style={guideP} set:html={t.docker.ours}></p>
+</section>
+</Guide>
+
+<style is:global>
+.ic{white-space:nowrap}
+</style>

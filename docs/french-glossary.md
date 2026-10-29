@@ -36,6 +36,13 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | developer | développeur | |
 | package cache | cache de paquets | |
 | logs | journaux | |
+| lockfile | fichier de verrouillage | |
+| dangling images (Docker) | images orphelines | |
+| break (a project) | briser | Quebec usage; France says « casser ». |
+| build artifacts | artefacts de compilation | |
+| scan | analyse | « en une seule analyse ». |
+| Developer caches and build files (app category) | stays in English | The app's own label, as it appears in the app. |
+| ~/Library | dossier Bibliothèque | Finder's French name in prose; paths stay `~/Library/…`. |
 | cookies | témoins | OQLF; the reader knows them as cookies too. |
 | app | application | OQLF prefers it to « app ». |
 | bug | bogue | OQLF. |
