@@ -1,7 +1,7 @@
 ---
 // The product shot on the homepage: a static mock of the app's early "Storage overview".
 // Decision 24 replaces it with a real light/dark screenshot of the shipping Overview at launch.
-// #8A8A90 and the 7px/9px radii have no token in the design system, so they stay literal.
+// Its muted grey and small radii aren't in the design system; they are site tokens in src/styles/tokens.css.
 // The mock shows the app as it ships, in English, on the French page too; only its label is translated.
 import { langOf } from '../i18n';
 
@@ -24,7 +24,7 @@ const label = {
 <div class="win-side" style="flex: 0 0 220px; min-height: 540px; padding: var(--space-4) var(--space-2-5); display: flex; flex-direction: column; justify-content: space-between; background: var(--window-sidebar); border-right: 1px solid var(--line)">
 <div style="display: flex; flex-direction: column; gap: var(--space-5)">
 <div style="display: flex; flex-direction: column; gap: var(--space-0-5); font-size: 13px">
-<div style="padding: 0 var(--space-2-5) var(--space-1-5); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #8A8A90">Storage</div>
+<div style="padding: 0 var(--space-2-5) var(--space-1-5); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--window-muted)">Storage</div>
 <div style="display: flex; align-items: center; gap: var(--space-2-5); padding: var(--space-1-5) var(--space-2-5); border-radius: var(--radius-sm); background: var(--window-selected); color: var(--ink); font-weight: 500">
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke: var(--accent)"><rect x="3" y="7" width="18" height="10" rx="3"></rect><path d="M11 12h6"></path><path d="M7 12h.01"></path></svg>
 <span>Overview</span>
@@ -47,7 +47,7 @@ const label = {
 </div>
 </div>
 <div style="display: flex; flex-direction: column; gap: var(--space-0-5); font-size: 13px">
-<div style="padding: 0 var(--space-2-5) var(--space-1-5); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #8A8A90">Settings</div>
+<div style="padding: 0 var(--space-2-5) var(--space-1-5); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--window-muted)">Settings</div>
 <div style="display: flex; align-items: center; gap: var(--space-2-5); padding: var(--space-1-5) var(--space-2-5); color: var(--ink-secondary)">
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6H9l2 2h8.5A1.5 1.5 0 0 1 21 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z"></path></svg>
 <span>Locations &amp; access</span>
@@ -60,7 +60,7 @@ const label = {
 <span>This Mac</span>
 </div>
 <div style="font-size: 11px; line-height: 15px; color: var(--ink-secondary)">31.29 GB available of 245.11 GB</div>
-<div style="height: 4px; border-radius: var(--radius-full); background: var(--track); overflow: hidden"><div style="width: 87%; height: 100%; border-radius: var(--radius-full); background: #8A8A90"></div></div>
+<div style="height: 4px; border-radius: var(--radius-full); background: var(--track); overflow: hidden"><div style="width: 87%; height: 100%; border-radius: var(--radius-full); background: var(--window-muted)"></div></div>
 </div>
 </div>
 
@@ -95,7 +95,7 @@ const label = {
 
 <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); padding-bottom: 14px; border-bottom: 1px solid var(--line); font-size: 12px">
 <div style="display: flex; gap: var(--space-1-5); color: var(--ink-secondary)"><span style="font-weight: 500; color: var(--ink)">Scanned locations</span><span>·</span><span>4 recognized cache locations</span></div>
-<span style="padding: var(--space-1) var(--space-2-5); border-radius: 7px; border: 1px solid var(--line); background: var(--surface-elevated); font-size: 11px">Scan a folder…</span>
+<span style="padding: var(--space-1) var(--space-2-5); border-radius: var(--radius-window-control); border: 1px solid var(--line); background: var(--surface-elevated); font-size: 11px">Scan a folder…</span>
 </div>
 
 <div style="display: flex; flex-direction: column; gap: var(--space-2-5)">
@@ -105,7 +105,7 @@ const label = {
 </div>
 <div style="padding: var(--space-3); border-radius: var(--radius-lg); background: var(--surface-elevated); border: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: var(--space-3)">
 <div style="display: flex; align-items: center; gap: var(--space-3); min-width: 0">
-<div style="flex: none; width: var(--tile-sm); height: var(--tile-sm); border-radius: 9px; background: var(--cat-dev-soft); color: var(--cat-dev); display: flex; align-items: center; justify-content: center">
+<div style="flex: none; width: var(--tile-sm); height: var(--tile-sm); border-radius: var(--radius-window-tile); background: var(--cat-dev-soft); color: var(--cat-dev); display: flex; align-items: center; justify-content: center">
 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M7 10l3 2-3 2"></path><path d="M13 15h4"></path></svg>
 </div>
 <div style="min-width: 0"><div style="font-size: 13px; font-weight: 500">Developer caches and build files</div><div style="font-size: 11px; color: var(--ink-secondary)">Package caches and build files that tools rebuild</div></div>
@@ -114,7 +114,7 @@ const label = {
 </div>
 <div style="padding: var(--space-3); border-radius: var(--radius-lg); background: var(--surface-elevated); border: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: var(--space-3)">
 <div style="display: flex; align-items: center; gap: var(--space-3); min-width: 0">
-<div style="flex: none; width: var(--tile-sm); height: var(--tile-sm); border-radius: 9px; background: var(--cat-downloads-soft); color: var(--cat-downloads); display: flex; align-items: center; justify-content: center">
+<div style="flex: none; width: var(--tile-sm); height: var(--tile-sm); border-radius: var(--radius-window-tile); background: var(--cat-downloads-soft); color: var(--cat-downloads); display: flex; align-items: center; justify-content: center">
 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4z"></path><path d="M4 8l8 4 8-4"></path><path d="M12 12v8"></path></svg>
 </div>
 <div style="min-width: 0"><div style="font-size: 13px; font-weight: 500">Downloads to review</div><div style="font-size: 11px; color: var(--ink-secondary)">Installers and large files you haven’t opened lately</div></div>
