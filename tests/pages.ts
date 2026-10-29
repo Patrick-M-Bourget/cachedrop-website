@@ -12,4 +12,5 @@ export type PageUnderTest = {
 
 export const pages: PageUnderTest[] = [
   { path: '/', handoff: 'index.html', screenshots: 'home' },
+  { path: '/privacy/' }, // no handoff original: token and modal tests only
 ];
