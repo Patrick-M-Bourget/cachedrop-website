@@ -56,6 +56,63 @@ for (const p of pages) {
   });
 }
 
+// Submitting (Decisions 6, 10). The static preview has no functions, so /api/feedback is stubbed
+// here; tests/feedback-journey.spec.ts runs the real one on a Vercel preview.
+test.describe('submitting feedback', () => {
+  async function stub(page: import('@playwright/test').Page, status = 200) {
+    const sent: Array<Record<string, unknown>> = [];
+    await page.route('**/api/feedback', async (route) => {
+      sent.push(route.request().postDataJSON());
+      await route.fulfill({ status, contentType: 'application/json', body: status === 200 ? '{"ok":true}' : '{"error":"invalid"}' });
+    });
+    await page.goto('/clear-mac-developer-caches/#feedback');
+    await page.reload();
+    return sent;
+  }
+
+  test('the specs box starts unticked, and says what it sends', async ({ page }) => {
+    await stub(page);
+    const box = page.getByRole('checkbox', { name: /Send anonymous system specs/ });
+    await expect(box).not.toBeChecked();
+    await expect(page.locator('label[for=fb-specs]')).toHaveText('Send anonymous system specs (browser user agent, platform and language)');
+  });
+
+  test('sends no specs unless the box is ticked', async ({ page }) => {
+    const sent = await stub(page);
+    await page.getByRole('button', { name: 'Happy', exact: true }).click();
+    await page.getByLabel('Email (optional)').fill('ada@example.com');
+    await page.getByLabel('What should we change?').fill('More guides please');
+    await page.getByRole('button', { name: 'Submit Feedback' }).click();
+    await expect(page.getByText('Thanks, that helps.')).toBeVisible();
+    expect(sent).toEqual([{ rating: 'happy', email: 'ada@example.com', message: 'More guides please', page: '/clear-mac-developer-caches/', specs: null }]);
+  });
+
+  test('sends the browser user agent, platform and language when the box is ticked', async ({ page }) => {
+    const sent = await stub(page);
+    await page.getByLabel('What should we change?').fill('Crashed on scan');
+    await page.getByRole('checkbox', { name: /Send anonymous system specs/ }).check();
+    await page.getByRole('button', { name: 'Submit Feedback' }).click();
+    await expect(page.getByText('Thanks, that helps.')).toBeVisible();
+    const ua = await page.evaluate(() => ({ userAgent: navigator.userAgent, platform: navigator.platform, language: navigator.language }));
+    expect(sent[0].specs).toEqual(ua);
+  });
+
+  test('shows the existing error copy when the server refuses', async ({ page }) => {
+    await stub(page, 400);
+    await page.getByLabel('What should we change?').fill('Hi');
+    await page.getByRole('button', { name: 'Submit Feedback' }).click();
+    await expect(page.getByRole('alert')).toHaveText('We couldn’t send that. Check your connection and try again.');
+    await expect(page.getByText('Thanks, that helps.')).toBeHidden();
+  });
+
+  test('keeps the fields within what the server accepts, and links to the privacy policy', async ({ page }) => {
+    await stub(page);
+    await expect(page.getByLabel('What should we change?')).toHaveAttribute('maxlength', '5000');
+    await expect(page.getByLabel('Email (optional)')).toHaveAttribute('maxlength', '254');
+    await expect(page.getByRole('dialog').getByRole('link', { name: 'Privacy Policy' })).toHaveAttribute('href', '/privacy/');
+  });
+});
+
 // The guides' code blocks copy their command through site.js and say so.
 test('a Copy button copies its command and confirms', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);

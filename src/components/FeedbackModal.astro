@@ -1,7 +1,8 @@
 ---
 // The feedback modal from the handoff, on every page. Opened by any [data-feedback]
-// link; behaviour (focus trap, Escape, backdrop click) lives in /assets/site.js.
-// Submitting is not wired yet: the feedback-loop ticket points it at a Vercel function.
+// link; behaviour (focus trap, Escape, backdrop click, submitting to /api/feedback) lives in
+// /assets/site.js. The specs box starts unticked and names what it sends (Decision 10); the
+// maxlengths match what api/feedback accepts.
 ---
 <style is:global>
 .fb-scrim{position:fixed;inset:0;z-index:var(--z-modal);display:flex;align-items:center;justify-content:center;padding:var(--space-4);background:var(--overlay);backdrop-filter:var(--backdrop-modal);-webkit-backdrop-filter:var(--backdrop-modal);font-family:var(--font-sans);color:var(--ink)}
@@ -22,6 +23,8 @@
 .fb-primary[disabled]{opacity:.6;cursor:progress}
 .fb-close{flex:none;width:var(--control-sm);height:var(--control-sm);border:0;border-radius:var(--radius-sm);background:transparent;color:var(--ink-secondary);display:flex;align-items:center;justify-content:center;cursor:pointer}
 .fb-close:hover{background:var(--surface-subtle);color:var(--ink)}
+.fb-link{font-size:13px;color:var(--accent-text);text-decoration:none}
+.fb-link:hover{text-decoration:underline}
 .fb-scrim button:focus-visible,.fb-scrim input[type=checkbox]:focus-visible{outline:none;box-shadow:var(--focus-ring)}
 </style>
 <div class="fb-scrim" id="feedback" hidden>
@@ -54,17 +57,18 @@
 </fieldset>
 <div style="display:flex;flex-direction:column;gap:var(--space-1-5)">
 <label for="fb-email" style="font-size:13px;font-weight:500">Email <span style="font-weight:400;color:var(--ink-secondary)">(optional)</span></label>
-<input id="fb-email" name="email" class="fb-field" type="email" autocomplete="email" placeholder="you@example.com" style="height:var(--control-md);padding:0 var(--space-3);border:0;border-radius:var(--radius-md);background:var(--surface);box-shadow:0 0 0 1px var(--line-strong);font:inherit;font-size:14px;color:var(--ink)">
+<input id="fb-email" name="email" class="fb-field" type="email" maxlength="254" autocomplete="email" placeholder="you@example.com" style="height:var(--control-md);padding:0 var(--space-3);border:0;border-radius:var(--radius-md);background:var(--surface);box-shadow:0 0 0 1px var(--line-strong);font:inherit;font-size:14px;color:var(--ink)">
 </div>
 <div style="display:flex;flex-direction:column;gap:var(--space-1-5)">
 <label for="fb-notes" style="font-size:13px;font-weight:500">What should we change?</label>
-<textarea id="fb-notes" name="message" class="fb-field fb-ta" placeholder="Or report a bug… (Markdown supported)" style="height:120px;padding:var(--space-2-5) var(--space-3);border:0;border-radius:var(--radius-md);background:var(--surface);box-shadow:0 0 0 1px var(--line-strong);font:inherit;font-size:14px;line-height:20px;color:var(--ink);resize:vertical"></textarea>
+<textarea id="fb-notes" name="message" class="fb-field fb-ta" maxlength="5000" placeholder="Or report a bug… (Markdown supported)" style="height:120px;padding:var(--space-2-5) var(--space-3);border:0;border-radius:var(--radius-md);background:var(--surface);box-shadow:0 0 0 1px var(--line-strong);font:inherit;font-size:14px;line-height:20px;color:var(--ink);resize:vertical"></textarea>
 <p data-fb-error hidden role="alert" style="margin:0;font-size:13px;line-height:18px;color:var(--danger-ink)"></p>
 </div>
 <label for="fb-specs" style="display:flex;align-items:flex-start;gap:var(--space-2-5);font-size:13px;line-height:18px;color:var(--ink-body);cursor:pointer">
-<input id="fb-specs" name="includeSpecs" type="checkbox" checked style="margin:1px 0 0;width:16px;height:16px;accent-color:var(--accent)">
-<span>Send anonymous system specs <span style="color:var(--ink-secondary)">(Mac model, macOS version)</span></span>
+<input id="fb-specs" name="includeSpecs" type="checkbox" style="flex:none;margin:1px 0 0;width:16px;height:16px;accent-color:var(--accent)">
+<span>Send anonymous system specs <span style="color:var(--ink-secondary)">(browser user agent, platform and language)</span></span>
 </label>
+<a class="fb-link" href="/privacy/" style="align-self:flex-start;margin:calc(-1 * var(--space-3)) 0 0 26px;line-height:18px">Privacy Policy</a>
 <div style="display:flex;justify-content:flex-end;gap:var(--space-2);padding-top:var(--space-1)">
 <button type="button" class="fb-btn fb-ghost" data-fb-close>Cancel</button>
 <button type="submit" class="fb-btn fb-primary">Submit Feedback</button>
