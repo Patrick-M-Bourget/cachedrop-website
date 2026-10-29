@@ -123,6 +123,46 @@ describe('feedback (POST /api/feedback)', () => {
   });
 });
 
+describe('a token page (Decision 2: the link is the key)', () => {
+  const TOKEN = 'T'.repeat(43);
+
+  it.each([
+    [`/download/${TOKEN}/`, '/download/[token]/'],
+    [`/download/${TOKEN}`, '/download/[token]/'],
+    [`/fr/download/${TOKEN}/`, '/fr/download/[token]/'],
+  ])('never stores or files the live token from %s', async (page, redacted) => {
+    const { deps, db, github } = setup();
+    expect((await handleFeedback(post({ ...FULL, page }), deps)).status).toBe(200);
+    expect(db.rows[0].page).toBe(redacted);
+    expect(github.created[0].body).toContain(`**Page:** \`${redacted}\``);
+    expect(github.created[0].body).not.toContain(TOKEN);
+  });
+
+  it('accepts the redacted path the browser sends', async () => {
+    const { deps, db } = setup();
+    expect((await handleFeedback(post({ ...FULL, page: '/fr/download/[token]/' }), deps)).status).toBe(200);
+    expect(db.rows[0].page).toBe('/fr/download/[token]/');
+  });
+
+  it('leaves the download page itself alone', async () => {
+    const { deps, db } = setup();
+    await handleFeedback(post({ ...FULL, page: '/download/' }), deps);
+    expect(db.rows[0].page).toBe('/download/');
+  });
+
+  it('redacts a token already stored before this fix when the retry files it', async () => {
+    const { deps, db, github } = setup();
+    github.fail = true;
+    await handleFeedback(post(FULL), deps);
+    github.fail = false;
+    db.rows[0].page = `/download/${TOKEN}/`;
+    db.now += 11 * MINUTE;
+    await retryFeedback(cron(), { ...deps, cronSecret: 'cron-secret' });
+    expect(github.created[0].body).toContain('**Page:** `/download/[token]/`');
+    expect(github.created[0].body).not.toContain(TOKEN);
+  });
+});
+
 describe('bot check and rate limit (Decision 12)', () => {
   it('checks the token with the client IP before saving or filing', async () => {
     const { deps, db, turnstile } = setup();

@@ -71,6 +71,30 @@ test.describe('submitting feedback', () => {
     return sent;
   }
 
+  test('sends a token page as /download/[token]/, never the live token', async ({ page }) => {
+    const token = 'T'.repeat(43);
+    for (const [path, redacted] of [[`/download/${token}/`, '/download/[token]/'], [`/fr/download/${token}/`, '/fr/download/[token]/']]) {
+      const sent: Array<Record<string, unknown>> = [];
+      // The token page as vercel.json's rewrite serves it; its own API calls are not under test.
+      await page.route(/\/download\/[A-Za-z0-9_-]{43}\/$/, async (route) => {
+        const url = new URL(route.request().url());
+        await route.fulfill({ response: await route.fetch({ url: url.href.replace(token, 'link') }) });
+      });
+      await page.route('**/api/release?*', (route) => route.fulfill({ status: 503, json: { error: 'no_release' } }));
+      await page.route('**/api/download?*', (route) => route.abort());
+      await page.route('**/api/feedback', async (route) => {
+        sent.push(route.request().postDataJSON());
+        await route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
+      });
+      await page.goto(`${path}#feedback`);
+      await page.getByRole('dialog').getByRole('textbox').last().fill('Hi');
+      await page.getByRole('dialog').locator('[type=submit]').click();
+      await expect.poll(() => sent.length).toBe(1);
+      expect(sent[0].page).toBe(redacted);
+      await page.unrouteAll();
+    }
+  });
+
   test('the specs box starts unticked, and says what it sends', async ({ page }) => {
     await stub(page);
     const box = page.getByRole('checkbox', { name: /Send anonymous system specs/ });

@@ -72,7 +72,8 @@
         rating: rating,
         email: form.email.value.trim(),
         message: message,
-        page: location.pathname,
+        // A token page's path holds a live download link: send it as /download/[token]/.
+        page: location.pathname.replace(/^(\/fr)?\/download\/[^/]+(\/.*)?$/, '$1/download/[token]/'),
         specs: form.includeSpecs.checked ? { userAgent: navigator.userAgent, platform: navigator.platform, language: navigator.language } : null
       };
       submit.disabled = true;

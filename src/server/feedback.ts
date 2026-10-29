@@ -120,7 +120,7 @@ export function issueFor(f: Feedback): IssueDraft {
   const lines = [
     marker(f.id),
     `**Rating:** ${f.rating ? `${RATING_NAMES[f.rating]} ${RATING_EMOJI[f.rating]}` : 'none'}`,
-    `**Page:** \`${f.page}\``,
+    `**Page:** \`${redactPage(f.page)}\``,
     `**Email:** ${f.hasEmail ? `given (stored with feedback ${f.id}, not shown here)` : 'not given'}`,
     '',
   ];
@@ -145,6 +145,13 @@ const MAX_BODY_BYTES = 32 * 1024;
 
 // A site path as location.pathname sends it: no scheme, no host, nothing that is Markdown.
 const PAGE = /^\/[A-Za-z0-9\-._~/%]*$/;
+// A token page, /download/<token>/ or /fr/download/<token>/: the token is a live download link
+// (Decision 2), so it is never stored or filed. site.js sends the redacted path already; this
+// catches a request that doesn't.
+const TOKEN_PAGE = /^(\/fr)?\/download\/[^/]+(\/.*)?$/;
+const REDACTED_PAGE = /^(\/fr)?\/download\/\[token\]\/$/;
+/** The page with any download token swapped for [token]. */
+export const redactPage = (page: string) => page.replace(TOKEN_PAGE, '$1/download/[token]/');
 // Printable text on one line: no control characters.
 const ONE_LINE = /^[^\p{Cc}]*$/u;
 
@@ -178,11 +185,13 @@ function parse(body: unknown): Submission | undefined {
   const message = (body.message ?? '').trim();
   if (message.length > MAX_MESSAGE || (!message && !rating)) return undefined;
 
-  if (typeof body.page !== 'string' || body.page.length > MAX_PAGE || !PAGE.test(body.page)) return undefined;
+  if (typeof body.page !== 'string' || body.page.length > MAX_PAGE) return undefined;
+  const page = redactPage(body.page);
+  if (!PAGE.test(page) && !REDACTED_PAGE.test(page)) return undefined;
 
   const specs = parseSpecs(body.specs);
   if (specs === undefined) return undefined;
-  return { rating, email, message, page: body.page, specs };
+  return { rating, email, message, page, specs };
 }
 
 /**
