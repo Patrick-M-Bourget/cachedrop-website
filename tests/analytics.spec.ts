@@ -3,9 +3,10 @@ import { readFile } from 'node:fs/promises';
 import { pages } from './pages';
 
 // Decision 16: Vercel Web Analytics counts page views without cookies, and no download token
-// ever reaches it. The seam is what Vercel's own script sends: the static build serves no
-// /_vercel/insights/script.js, so each test serves a copy of Vercel's published script there and
-// records the page views it posts to /_vercel/insights/view. public/assets/analytics.js redacts.
+// ever reaches it. The seam is what Vercel's own script sends: @vercel/analytics/astro injects
+// /_vercel/insights/script.js, which the static build doesn't serve, so each test serves a copy of
+// Vercel's published script there and records the page views it posts to /_vercel/insights/view.
+// The webAnalyticsBeforeSend in src/layouts/Base.astro redacts.
 // The copy is https://va.vercel-scripts.com/v1/script.js as of 2026-10-29 (the CDN challenges
 // scripted fetches, so tests can't fetch it live). Refresh it with curl if Vercel changes it.
 
@@ -35,7 +36,7 @@ async function recordViews(page: Page) {
 async function viewsWithoutToken(views: string[], count: number) {
   await expect.poll(() => views.length).toBe(count);
   for (const body of views) expect(body).not.toContain(TOKEN);
-  return views.map((body) => JSON.parse(body) as { o: string; r?: string });
+  return views.map((body) => JSON.parse(body) as { o: string; r?: string; sdkn?: string; dp?: string });
 }
 
 /** Serves the built token page at /download/<token>/, as vercel.json's rewrite does. */
@@ -57,8 +58,23 @@ test.describe('every page counts one page view at its own address, without cooki
       await page.goto(p.path);
       const [view] = await viewsWithoutToken(views, 1);
       expect(view.o).toBe(new URL(p.path, baseURL).href);
+      // Sent through the official package's Astro component, not a hand-written loader.
+      expect(view.sdkn).toBe('@vercel/analytics/astro');
       expect(await context.cookies()).toEqual([]);
     });
+  }
+});
+
+// Decision 11: the analytics package ships framework adapters, but the pages load no React.
+test('the pages ship no React runtime', async ({ request }) => {
+  for (const p of pages) {
+    const html = await (await request.get(p.path)).text();
+    expect(html).not.toContain('<astro-island');
+    // The scripts, not the copy: the guides mention React projects.
+    const inline = [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+    const srcs = [...html.matchAll(/<script[^>]*\ssrc="([^"]+)"/g)].map((m) => m[1]);
+    const loaded = await Promise.all(srcs.map(async (src) => (await request.get(src)).text()));
+    for (const script of [...inline, ...loaded]) expect(script).not.toMatch(/react/i);
   }
 });
 
