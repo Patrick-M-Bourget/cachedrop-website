@@ -11,6 +11,9 @@ const OIDC = process.env.VERCEL_OIDC_TOKEN;
 test.skip(!PREVIEW, 'set PREVIEW_URL to run the journey against a preview');
 
 const protection = (): Record<string, string> => (OIDC ? { 'x-vercel-trusted-oidc-idp-token': OIDC } : {});
+/** A rate-limit key of its own, so a run never shares a limit with people or other runs (#12). */
+const ownLimit = (name: string) => ({ 'x-rate-limit-key': `feedback-journey-${name}-${Date.now()}-${Math.random()}` });
+const PASS = 'XXXX.DUMMY.TOKEN.XXXX';
 
 type Captured = { title: string; body: string; labels: string[] };
 
@@ -22,7 +25,7 @@ test('modal → saved → the issue it would file: labelled, with specs, without
     async (route) => {
       const headers = { ...route.request().headers(), ...protection() };
       if (new URL(route.request().url()).pathname !== '/api/feedback') return route.continue({ headers });
-      const response = await route.fetch({ headers });
+      const response = await route.fetch({ headers: { ...headers, ...ownLimit('page') } });
       answers.push({ status: response.status(), body: await response.json() });
       return route.fulfill({ response });
     },
@@ -52,12 +55,41 @@ test('modal → saved → the issue it would file: labelled, with specs, without
 
 test('the function refuses malformed and oversized payloads', async ({ request }) => {
   const post = (data: string) =>
-    request.post('/api/feedback', { headers: { ...protection(), 'content-type': 'application/json' }, data });
-  expect((await post(JSON.stringify({ rating: 'ecstatic', message: 'x', page: '/', specs: null }))).status()).toBe(400);
+    request.post('/api/feedback', { headers: { ...protection(), 'content-type': 'application/json', ...ownLimit('bad') }, data });
+  expect((await post(JSON.stringify({ rating: 'ecstatic', message: 'x', page: '/', specs: null, turnstile: PASS }))).status()).toBe(400);
   expect((await post('not json')).status()).toBe(400);
-  expect((await post(JSON.stringify({ rating: 'happy', message: 'x'.repeat(40_000), page: '/', specs: null }))).status()).toBe(413);
+  expect((await post(JSON.stringify({ rating: 'happy', message: 'x'.repeat(40_000), page: '/', specs: null, turnstile: PASS }))).status()).toBe(413);
 });
 
 test('the retry refuses anyone but Vercel Cron', async ({ request }) => {
   expect((await request.get('/api/feedback-retry', { headers: protection() })).status()).toBe(401);
+});
+
+// The bot check and rate limit on the real function (Decision 12). The preview holds Cloudflare's
+// always-pass secret; the x-turnstile-test header swaps in its always-fail or spent secret.
+test.describe('bot check and rate limit', () => {
+  const NOTE = { rating: 'happy', message: 'Journey test: bot check', page: '/', specs: null };
+  const send = (request: import('@playwright/test').APIRequestContext, extra: object, headers: Record<string, string>) =>
+    request.post('/api/feedback', { headers: { ...protection(), ...headers }, data: { ...NOTE, ...extra } });
+
+  for (const [name, extra, headers] of [
+    ['no token', {}, {}],
+    ['the always-fail key', { turnstile: PASS }, { 'x-turnstile-test': 'fail' }],
+    ['the spent-token key', { turnstile: PASS }, { 'x-turnstile-test': 'spent' }],
+  ] as const) {
+    test(`refuses feedback with ${name}`, async ({ request }) => {
+      const res = await send(request, extra, { ...ownLimit('bot'), ...headers });
+      expect(res.status()).toBe(403);
+      expect(await res.json()).toEqual({ error: 'bot_check' });
+    });
+  }
+
+  test('allows 10 notes an hour from one place, then refuses the 11th with the wait', async ({ request }) => {
+    const limit = ownLimit('limit');
+    for (let i = 0; i < 10; i++) expect((await send(request, { turnstile: PASS }, limit)).status()).toBe(200);
+    const res = await send(request, { turnstile: PASS }, limit);
+    expect(res.status()).toBe(429);
+    expect(Number(res.headers()['retry-after'])).toBeGreaterThan(0);
+    expect((await res.json()).error).toBe('rate_limited');
+  });
 });

@@ -24,11 +24,16 @@ test.describe.configure({ mode: 'serial' });
 
 const protection = (): Record<string, string> => (OIDC ? { 'x-vercel-trusted-oidc-idp-token': OIDC } : {});
 
+/** A rate-limit key of its own, so a run never shares a limit with people or other runs (#12). */
+const ownLimit = (name: string) => ({ 'x-rate-limit-key': `gate-journey-${name}-${Date.now()}-${Math.random()}` });
+
 /**
  * Adds the protection header to requests for the preview, and asks /api/signup to capture the
- * email. Returns the captured emails as the signup responses carry them.
+ * email, under a rate-limit key of this test's own. Returns the captured emails as the signup
+ * responses carry them. The form's Turnstile token comes from Cloudflare's always-pass test key.
  */
 async function authorise(page: Page) {
+  const limit = ownLimit('page');
   const origin = new URL(PREVIEW!).origin;
   const inbox: Array<{ status: number; body: { captured?: { to: string; subject: string; text: string } } }> = [];
   await page.route(
@@ -36,7 +41,7 @@ async function authorise(page: Page) {
     async (route) => {
       const headers = { ...route.request().headers(), ...protection() };
       if (new URL(route.request().url()).pathname !== '/api/signup') return route.continue({ headers });
-      const response = await route.fetch({ headers: { ...headers, 'x-capture-email': '1' } });
+      const response = await route.fetch({ headers: { ...headers, 'x-capture-email': '1', ...limit } });
       inbox.push({ status: response.status(), body: await response.json() });
       return route.fulfill({ response });
     },
@@ -177,4 +182,39 @@ test('an unknown link shows the expired state with the form', async ({ page }) =
 test('an unknown token gets no file', async ({ request }) => {
   const res = await request.get(`/api/download?token=${'A'.repeat(43)}`, { headers: protection(), maxRedirects: 0 });
   expect(res.status()).toBe(404);
+});
+
+// The bot check and rate limit on the real function (Decision 12). The preview holds Cloudflare's
+// always-pass secret; the x-turnstile-test header swaps in its always-fail or spent secret.
+test.describe('bot check and rate limit', () => {
+  const PASS = 'XXXX.DUMMY.TOKEN.XXXX';
+  const signup = (request: import('@playwright/test').APIRequestContext, email: string, extra: object, headers: Record<string, string>) =>
+    request.post('/api/signup', { headers: { ...protection(), 'x-capture-email': '1', ...headers }, data: { email, ...extra } });
+
+  for (const [name, extra, headers] of [
+    ['no token', {}, {}],
+    ['the always-fail key', { turnstile: PASS }, { 'x-turnstile-test': 'fail' }],
+    ['the spent-token key', { turnstile: PASS }, { 'x-turnstile-test': 'spent' }],
+  ] as const) {
+    test(`refuses a signup with ${name}, and saves nothing`, async ({ request }) => {
+      const email = newEmail(`bot-${name.replace(/\W+/g, '-')}`);
+      const res = await signup(request, email, extra, { ...ownLimit('bot'), ...headers });
+      expect(res.status()).toBe(403);
+      expect(await res.json()).toEqual({ error: 'bot_check' });
+      if (dev) expect((await dev.from('signups').select('id').eq('email', email)).data).toEqual([]);
+    });
+  }
+
+  test('allows 5 signups an hour from one place, then refuses the 6th with the wait', async ({ request }) => {
+    const limit = ownLimit('limit');
+    for (let i = 0; i < 5; i++) expect((await signup(request, newEmail(`limit${i}`), { turnstile: PASS }, limit)).status()).toBe(200);
+    const email = newEmail('limit-over');
+    const res = await signup(request, email, { turnstile: PASS }, limit);
+    expect(res.status()).toBe(429);
+    const wait = Number(res.headers()['retry-after']);
+    expect(wait).toBeGreaterThan(0);
+    expect(wait).toBeLessThanOrEqual(3600);
+    expect(await res.json()).toEqual({ error: 'rate_limited', retryAfter: wait });
+    if (dev) expect((await dev.from('signups').select('id').eq('email', email)).data).toEqual([]);
+  });
 });

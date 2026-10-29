@@ -15,8 +15,9 @@ const ONE_CLICK = { 'content-type': 'application/x-www-form-urlencoded', ...prot
 /** Signs up a fresh address and returns the captured email's unsubscribe link and one-click URL. */
 async function signUp(request: APIRequestContext) {
   const res = await request.post('/api/signup', {
-    headers: { ...protection(), 'x-capture-email': '1' },
-    data: { email: `unsubscribe-journey+${Date.now()}@example.com` },
+    // Previews hold Turnstile's always-pass key, and this run counts under its own rate-limit key (#12).
+    headers: { ...protection(), 'x-capture-email': '1', 'x-rate-limit-key': `unsubscribe-journey-${Date.now()}-${Math.random()}` },
+    data: { email: `unsubscribe-journey+${Date.now()}@example.com`, turnstile: 'XXXX.DUMMY.TOKEN.XXXX' },
   });
   expect(res.status()).toBe(200);
   const { captured } = await res.json();
