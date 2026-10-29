@@ -1,13 +1,9 @@
-/* CacheDrop site behaviour: feedback modal, copy buttons, download start. No dependencies. */
+/* CacheDrop site behaviour: feedback modal and copy buttons. No dependencies. */
 (function () {
   'use strict';
 
-  // ---- Configuration: set these before launch -------------------------------------------
   // The Vercel function that saves feedback and files it as an issue (api/feedback.ts).
   var FEEDBACK_ENDPOINT = window.CACHEDROP_FEEDBACK_ENDPOINT || '/api/feedback';
-  // The signed, notarized .dmg. The download page starts it on load.
-  var DMG_URL = window.CACHEDROP_DMG_URL || '[DMG_URL]';
-  // ---------------------------------------------------------------------------------------
 
   // Feedback modal
   var scrim = document.getElementById('feedback');
@@ -108,11 +104,4 @@
     function ok() { b.textContent = b.getAttribute('data-copied'); setTimeout(function () { b.textContent = label; }, 1600); }
     if (navigator.clipboard) navigator.clipboard.writeText(text).then(ok, function () {});
   });
-
-  // Download page: start the .dmg and wire the retry link
-  var retry = document.querySelector('[data-dmg]');
-  if (retry && DMG_URL.charAt(0) !== '[') {
-    retry.href = DMG_URL;
-    setTimeout(function () { window.location.href = DMG_URL; }, 400);
-  }
 })();
