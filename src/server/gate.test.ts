@@ -57,8 +57,8 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
       if (fn === 'unsubscribe') {
         const id = unsubscribeTokens.get((args as { p_token_hash: string }).p_token_hash);
         const s = signups.find((x) => x.id === id);
-        // Only the address stays marked (Decision 32): the opt-in goes with it.
-        if (s) Object.assign(s, { unsubscribed: true, news: false, newsAt: null });
+        // Only the address stays marked (Decision 32): the opt-in and the language go with it (Decision 34).
+        if (s) Object.assign(s, { unsubscribed: true, news: false, newsAt: null, lang: 'en' });
         return { data: !!s, error: null };
       }
       throw new Error(`unexpected rpc ${fn}`);
@@ -534,6 +534,14 @@ describe('unsubscribe', () => {
     await handleSignup(post({ email: 'ada@example.com', news: true }), deps);
     expect((await handleUnsubscribe(oneClick(oneClickIn(sent[0])!), deps)).status).toBe(200);
     expect(state.signups[0]).toMatchObject({ unsubscribed: true, news: false, newsAt: null });
+  });
+
+  it('resets the stored language to English with the unsubscribe (Decision 34)', async () => {
+    const { deps, sent, state } = setup();
+    await handleSignup(post({ email: 'ada@example.com', lang: 'fr' }), deps);
+    expect(state.signups[0].lang).toBe('fr');
+    expect((await handleUnsubscribe(oneClick(oneClickIn(sent[0])!), deps)).status).toBe(200);
+    expect(state.signups[0]).toMatchObject({ unsubscribed: true, lang: 'en' });
   });
 
   it('a fresh news tick on a later request clears the unsubscribe (Decision 32)', async () => {

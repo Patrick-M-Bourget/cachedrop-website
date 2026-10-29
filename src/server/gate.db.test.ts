@@ -189,6 +189,15 @@ describe.skipIf(!run)('unsubscribe and re-consent on the dev database', () => {
     expect(await subscribed(email)).toBe(false);
   });
 
+  it('resets the stored language to English with the rest of the marker (Decision 34)', async () => {
+    const email = newEmail('unsublang');
+    await requestIn(email, 'fr', true);
+    expect(await langOf(email)).toBe('fr');
+    await unsubscribe(email);
+    expect(await langOf(email)).toBe('en');
+    expect(await subscribed(email)).toBe(false);
+  });
+
   it('a fresh tick on a later request clears the unsubscribe, so emails resume', async () => {
     const email = newEmail('reconsent');
     await request(email, true);
