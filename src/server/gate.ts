@@ -15,7 +15,7 @@ export type TokenLookup = { status: 'ok' | 'unknown' | 'expired' | 'no_release';
 
 /** The slice of the supabase-js client the gate uses. */
 export interface GateDb {
-  rpc(fn: 'request_download', args: { p_email: string; p_filling: string | null; p_token_hash: string }): Result<unknown>;
+  rpc(fn: 'request_download', args: { p_email: string; p_filling: string | null; p_news: boolean; p_token_hash: string }): Result<unknown>;
   rpc(fn: 'download_for_token', args: { p_token_hash: string; p_count: boolean }): Result<TokenLookup[]>;
   storage: {
     from(bucket: string): {
@@ -47,9 +47,13 @@ const hashToken = (token: string) => createHash('sha256').update(token).digest('
 // One @, something on each side, a dot in the domain, no spaces. The emailed link is the real check.
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** POST /api/signup with JSON `{ email, filling? }`: saves the signup and emails a download link. */
+/**
+ * POST /api/signup with JSON `{ email, filling?, news? }`: saves the signup (or finds the one for
+ * this email) and emails a new download link. Only `news: true` counts as the news opt-in, and a
+ * later request without it never turns an existing yes off (Decision 3).
+ */
 export async function handleSignup(request: Request, deps: GateDeps): Promise<Response> {
-  let body: { email?: unknown; filling?: unknown };
+  let body: { email?: unknown; filling?: unknown; news?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -60,7 +64,12 @@ export async function handleSignup(request: Request, deps: GateDeps): Promise<Re
   const filling = FILLING.find((f) => f === body.filling) ?? null;
 
   const token = randomBytes(32).toString('base64url');
-  const saved = await deps.db.rpc('request_download', { p_email: email, p_filling: filling, p_token_hash: hashToken(token) });
+  const saved = await deps.db.rpc('request_download', {
+    p_email: email,
+    p_filling: filling,
+    p_news: body.news === true,
+    p_token_hash: hashToken(token),
+  });
   if (saved.error) return json({ error: 'unavailable' }, 503);
 
   let captured: Email | void;
