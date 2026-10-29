@@ -66,7 +66,10 @@ export function downloadEmail(
     `${c.unsubscribe}${c.colon} ${unsubscribe.link}`,
   ].join('\n');
 
-  // Plain markup with inline styles, which is what mail clients render reliably.
+  // Plain markup with inline styles, which is what mail clients render reliably. Email can't use
+  // CSS variables, so each colour is a light-mode token from handoff/design-system/tokens.css:
+  //   #1D1D1F --ink               #6E6E73 --ink-secondary   #FFFFFF --surface, --on-accent (button text)
+  //   #0071E3 --accent (button)   #0066CC --accent-text     #E5E7EB --line (the rule)
   const p = 'margin:0 0 16px;font-size:15px;line-height:23px;color:#1D1D1F';
   const small = 'margin:0 0 6px;font-size:12px;line-height:18px;color:#6E6E73';
   const html = `<!doctype html>
