@@ -56,21 +56,13 @@ for (const p of pages) {
   });
 }
 
-// The homepage has no code blocks; the guides do. This drives site.js's Copy
-// behaviour with a code-block button like the guides use.
+// The guides' code blocks copy their command through site.js and say so.
 test('a Copy button copies its command and confirms', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.goto('/');
-  await page.evaluate(() => {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.setAttribute('data-copy', 'rm -rf ~/Library/Developer/Xcode/DerivedData');
-    b.textContent = 'Copy';
-    document.body.append(b);
-  });
-  const button = page.getByRole('button', { name: 'Copy', exact: true });
-  await button.click();
-  await expect(page.getByRole('button', { name: 'Copied' })).toBeVisible();
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('rm -rf ~/Library/Developer/Xcode/DerivedData');
-  await expect(page.getByRole('button', { name: 'Copy', exact: true })).toBeVisible({ timeout: 3000 });
+  await page.goto('/clear-mac-developer-caches/');
+  const block = page.locator('#derived-data');
+  await block.getByRole('button', { name: 'Copy', exact: true }).click();
+  await expect(block.getByRole('button', { name: 'Copied' })).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('rm -rf ~/Library/Developer/Xcode/DerivedData/*');
+  await expect(block.getByRole('button', { name: 'Copy', exact: true })).toBeVisible({ timeout: 3000 });
 });
