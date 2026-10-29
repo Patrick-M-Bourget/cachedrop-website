@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 4321;
+// PORT lets parallel worktrees each run their own preview instead of reusing another's.
+const PORT = Number(process.env.PORT ?? 4321);
 
 export default defineConfig({
   testDir: 'tests',
