@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/download/:token([A-Za-z0-9_-]{43})/", "destination": "/download/link/" },
+    { "source": "/download/:token([A-Za-z0-9_-]{43})", "destination": "/download/link/" }
+  ]
+}
