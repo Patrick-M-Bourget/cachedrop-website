@@ -123,12 +123,14 @@ test.describe('no download token reaches analytics', () => {
       const views = await recordViews(page);
       await serveTokenPage(page, { status, json: { error: 'gone' } });
       await page.goto(`/download/${TOKEN}/`);
-      await expect(page).toHaveURL(/\/download\/$/);
+      // #9: a dead link lands on the form's expired state. Only utm_* parameters are reported.
+      const form = `${baseURL}/download/`;
+      await expect(page).toHaveURL(/\/download\/\?link=expired$/);
       expect(await page.evaluate(() => document.referrer)).not.toContain(TOKEN);
       // The token page may redirect before its own page view goes out; either way, no token.
-      await expect.poll(() => views.some((body) => JSON.parse(body).o === `${baseURL}/download/`)).toBe(true);
+      await expect.poll(() => views.some((body) => JSON.parse(body).o === form)).toBe(true);
       const sent = await viewsWithoutToken(views, views.length);
-      for (const v of sent) expect([`${baseURL}/download/[token]/`, `${baseURL}/download/`]).toContain(v.o);
+      for (const v of sent) expect([`${baseURL}/download/[token]/`, form]).toContain(v.o);
     });
   }
 });
