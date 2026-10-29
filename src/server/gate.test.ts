@@ -10,7 +10,7 @@ type Release = { id: number; version: string; filename: string; is_latest: boole
 // email-gate migration: one signup per email, tokens stored as hashes that expire after 7 days,
 // and download_for_token counting starts on the latest release.
 function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename: 'CacheDrop-1.2.0.dmg', is_latest: true, download_starts: 0 }]) {
-  const signups: Array<{ id: number; email: string; filling: string | null }> = [];
+  const signups: Array<{ id: number; email: string; filling: string | null; news: boolean; newsAt: number | null }> = [];
   const tokens = new Map<string, { signupId: number; expiresAt: number }>();
   const signed: Array<{ path: string; expiresIn: number; download: unknown }> = [];
   const state = { signups, tokens, releases, signed, now: Date.now(), fail: false };
@@ -18,11 +18,14 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
     async rpc(fn: string, args: Record<string, unknown>) {
       if (state.fail) return { data: null, error: { message: 'connection reset' } };
       if (fn === 'request_download') {
-        const { p_email, p_filling, p_token_hash } = args as { p_email: string; p_filling: string | null; p_token_hash: string };
+        const { p_email, p_filling, p_token_hash, p_news } = args as { p_email: string; p_filling: string | null; p_token_hash: string; p_news: boolean };
         if (p_email !== p_email.toLowerCase()) return { data: null, error: { message: 'check constraint' } };
         if (!/^[0-9a-f]{64}$/.test(p_token_hash)) return { data: null, error: { message: 'check constraint' } };
+        if (typeof p_news !== 'boolean') return { data: null, error: { message: 'function request_download does not exist' } };
         let s = signups.find((x) => x.email === p_email);
-        if (!s) signups.push((s = { id: signups.length + 1, email: p_email, filling: p_filling }));
+        if (!s) signups.push((s = { id: signups.length + 1, email: p_email, filling: p_filling, news: false, newsAt: null }));
+        // A tick turns the opt-in on; no tick never turns it off (Decision 3).
+        if (p_news && !s.news) Object.assign(s, { news: true, newsAt: state.now });
         tokens.set(p_token_hash, { signupId: s.id, expiresAt: state.now + 7 * DAY });
         return { data: null, error: null };
       }
@@ -81,7 +84,19 @@ describe('signup', () => {
     expect(sent[0].to).toBe('ada@example.com');
     expect(linkIn(sent[0])?.[0]).toMatch(new RegExp(`^${SITE}/download/[A-Za-z0-9_-]{43}/$`));
     expect(sent[0].html).toContain(linkIn(sent[0])![0]);
-    expect(state.signups).toEqual([{ id: 1, email: 'ada@example.com', filling: 'development' }]);
+    expect(state.signups).toEqual([{ id: 1, email: 'ada@example.com', filling: 'development', news: false, newsAt: null }]);
+  });
+
+  it('keeps one signup for an email submitted twice and sends a working link each time', async () => {
+    const { deps, sent, state } = setup();
+    await handleSignup(post({ email: 'ada@example.com' }), deps);
+    await handleSignup(post({ email: ' ADA@example.com' }), deps);
+
+    expect(state.signups).toHaveLength(1);
+    expect(sent.map((e) => e.to)).toEqual(['ada@example.com', 'ada@example.com']);
+    const [a, b] = sent.map((e) => linkIn(e)![1]);
+    expect(a).not.toBe(b);
+    for (const token of [a, b]) expect((await handleDownload(get(`/api/download?token=${token}`), deps)).status).toBe(302);
   });
 
   it.each([['not-an-email'], ['ada@example'], ['a b@example.com'], [''], [42], [`${'a'.repeat(250)}@example.com`]])(
@@ -161,6 +176,40 @@ describe('signup', () => {
     const capturing = await (await handleSignup(post({ email: 'ada@example.com' }), { ...deps, send: async (e: Email) => e })).json();
     expect(capturing.captured.to).toBe('ada@example.com');
     expect(capturing.captured.text).toMatch(/\/download\/[A-Za-z0-9_-]{43}\//);
+  });
+});
+
+describe('news opt-in (Decision 3)', () => {
+  it('records a tick as a yes, with when it was given', async () => {
+    const { deps, state } = setup();
+    const res = await handleSignup(post({ email: 'ada@example.com', news: true }), deps);
+    expect(res.status).toBe(200);
+    expect(state.signups[0]).toMatchObject({ news: true, newsAt: state.now });
+  });
+
+  it.each([[undefined], [false], ['yes'], [1]])('records no yes when the box is left unticked (news: %j)', async (news) => {
+    const { deps, sent, state } = setup();
+    await handleSignup(post({ email: 'ada@example.com', news }), deps);
+    expect(state.signups[0]).toMatchObject({ news: false, newsAt: null });
+    expect(sent).toHaveLength(1);
+  });
+
+  it('turns on with a tick on a later visit', async () => {
+    const { deps, state } = setup();
+    await handleSignup(post({ email: 'ada@example.com' }), deps);
+    state.now += DAY;
+    await handleSignup(post({ email: 'ada@example.com', news: true }), deps);
+    expect(state.signups).toHaveLength(1);
+    expect(state.signups[0]).toMatchObject({ news: true, newsAt: state.now });
+  });
+
+  it('never turns an existing yes off when a later visit leaves it unticked', async () => {
+    const { deps, state } = setup();
+    await handleSignup(post({ email: 'ada@example.com', news: true }), deps);
+    const givenAt = state.now;
+    state.now += DAY;
+    await handleSignup(post({ email: 'ada@example.com', news: false }), deps);
+    expect(state.signups[0]).toMatchObject({ news: true, newsAt: givenAt });
   });
 });
 

@@ -81,8 +81,9 @@ const guideLink = 'color: var(--accent-text); font-weight: 500';
   document.querySelector('[data-dmg]').href = start;
   fetch('/api/release?token=' + token)
     .then(function (res) {
-      // An unknown or expired link goes back to the form for a new one (#9 adds the expired message).
-      if (res.status === 404 || res.status === 410) return location.replace('/download/');
+      // An unknown or expired link shows "This link has expired" with the form for a new one.
+      // replace() keeps the dead token out of the history.
+      if (res.status === 404 || res.status === 410) return location.replace('/download/?link=expired');
       if (!res.ok) return;
       return res.json().then(function (release) {
         document.querySelectorAll('[data-filename]').forEach(function (el) { el.textContent = release.filename; });
