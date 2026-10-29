@@ -81,10 +81,10 @@ test('explains your rights, including a complaint to the CAI', async ({ page }) 
   }
 });
 
-test('marks the mailing address as a placeholder (Decision 21)', async ({ page }) => {
-  const placeholder = page.locator('[data-placeholder="mailing-address"]');
-  await expect(placeholder).toBeVisible();
-  await expect(placeholder).toContainText('placeholder');
+test('has no mailing address or placeholder for one (Decision 33)', async ({ page }) => {
+  await expect(page.locator('[data-placeholder="mailing-address"]')).toHaveCount(0);
+  const text = await sectionText(page, 'Contact us');
+  expect(text).not.toMatch(/placeholder|mailing address|postal box/i);
 });
 
 test('says what the spam check uses, and that the IP address is never stored (Decision 12)', async ({ page }) => {

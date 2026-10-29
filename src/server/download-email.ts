@@ -1,7 +1,6 @@
 // The download email (Decisions 2, 3). Transactional: the link, what CacheDrop is, who sent it and
-// the privacy policy. Nothing promotional. The mailing address joins the sender line once the PO
-// box exists (Decision 21, launch-blocking). Like every email, it carries the unsubscribe link and
-// one-click headers (Decision 4).
+// the privacy policy. Nothing promotional. No mailing address for the beta (Decision 33).
+// Like every email, it carries the unsubscribe link and one-click headers (Decision 4).
 import type { Email } from './gate.ts';
 
 export function downloadEmail(

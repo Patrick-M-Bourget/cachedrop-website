@@ -99,4 +99,3 @@ Most of these providers are United States companies. US law can give US authorit
 - [ ] The owner confirms Supabase's Data Processing Agreement is accepted (Decision 31).
 - [ ] Feedback retention: the decisions set none (specs are kept with their feedback). The owner picks a period, or "until deleted on request".
 - [ ] The specs checkbox starts unchecked (Decision 10, #11), and its label matches what is sent: today it says "Mac model, macOS version" but `site.js` sends the user agent, platform and language.
-- [ ] The PO box address replaces the placeholder in the policy (Decision 21).
