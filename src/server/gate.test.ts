@@ -552,6 +552,30 @@ describe('unsubscribe', () => {
     expect(state.signups[0].unsubscribed).toBe(true);
   });
 
+  it('the no-JavaScript confirm form unsubscribes and lands on a confirmation page in its language', async () => {
+    const { deps, sent, state } = await signedUp();
+    const token = unsubscribeLinkIn(sent[0])![1];
+    // vercel.json rewrites the form's /unsubscribe/<token>/confirm to this.
+    const res = await handleUnsubscribe(oneClick(`${SITE}/api/unsubscribe?token=${token}&form=1`, ''), deps);
+    expect(res.status).toBe(303);
+    expect(res.headers.get('location')).toBe('/unsubscribe/done/');
+    expect(state.signups[0].unsubscribed).toBe(true);
+    const fr = await handleUnsubscribe(oneClick(`${SITE}/api/unsubscribe?token=${token}&lang=fr&form=1`, ''), deps);
+    expect(fr.headers.get('location')).toBe('/fr/unsubscribe/done/');
+  });
+
+  it('the no-JavaScript confirm form lands on a page that says what went wrong', async () => {
+    const { deps, sent, state } = await signedUp();
+    const forged = await handleUnsubscribe(oneClick(`${SITE}/api/unsubscribe?token=${'A'.repeat(43)}&form=1`, ''), deps);
+    expect([forged.status, forged.headers.get('location')]).toEqual([303, '/unsubscribe/invalid/']);
+    const malformed = await handleUnsubscribe(oneClick(`${SITE}/api/unsubscribe?token=nope&lang=fr&form=1`, ''), deps);
+    expect([malformed.status, malformed.headers.get('location')]).toEqual([303, '/fr/unsubscribe/invalid/']);
+    state.fail = true;
+    const token = unsubscribeLinkIn(sent[0])![1];
+    const down = await handleUnsubscribe(oneClick(`${SITE}/api/unsubscribe?token=${token}&form=1`, ''), deps);
+    expect([down.status, down.headers.get('location')]).toEqual([303, '/unsubscribe/error/']);
+  });
+
   it('gives each email its own token, and never stores the token itself', async () => {
     const { deps, sent, state } = await signedUp();
     await handleSignup(post({ email: 'ada@example.com' }), deps);

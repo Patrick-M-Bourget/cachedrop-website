@@ -10,6 +10,9 @@
 //   `List-Unsubscribe=One-Click` to it (RFC 8058 §3.2) and get an empty 200, never a redirect
 //   (§3.1). A GET changes nothing and sends the browser to the page, so a link scanner that
 //   prefetches URLs can't unsubscribe anyone.
+// - Without JavaScript the page shows a confirm button instead. Its form POSTs to
+//   /unsubscribe/<token>/confirm, which vercel.json rewrites to /api/unsubscribe?token=&form=1;
+//   that answers with a 303 to /unsubscribe/done/ (or invalid/, error/), a page the person can see.
 // A French email's links carry its language (Decision 5): the page is /fr/unsubscribe/<token>/,
 // and List-Unsubscribe adds &lang=fr so a GET lands on the French page.
 import { pagesFor } from './download-email.js';
@@ -33,13 +36,17 @@ export async function handleUnsubscribe(request: Request, deps: { db: GateDb }):
   const params = new URL(request.url).searchParams;
   const token = params.get('token') ?? '';
   const valid = TOKEN.test(token);
-  if (request.method !== 'POST') {
-    const page = `${pagesFor('', params.get('lang') === 'fr' ? 'fr' : 'en')}/unsubscribe/${valid ? `${token}/` : ''}`;
-    return new Response(null, { status: 303, headers: { location: page, 'cache-control': 'no-store' } });
-  }
-  const empty = (status: number) => new Response(null, { status, headers: { 'cache-control': 'no-store' } });
-  if (!valid) return empty(404);
+  const pages = `${pagesFor('', params.get('lang') === 'fr' ? 'fr' : 'en')}/unsubscribe/`;
+  const goTo = (location: string) => new Response(null, { status: 303, headers: { location, 'cache-control': 'no-store' } });
+  if (request.method !== 'POST') return goTo(`${pages}${valid ? `${token}/` : ''}`);
+  // The no-JavaScript form lands on a page; everything else gets the bare status (RFC 8058 §3.1).
+  const form = params.get('form') === '1';
+  const answer = (status: 200 | 404 | 503) =>
+    form
+      ? goTo(`${pages}${status === 200 ? 'done' : status === 404 ? 'invalid' : 'error'}/`)
+      : new Response(null, { status, headers: { 'cache-control': 'no-store' } });
+  if (!valid) return answer(404);
   const { data, error } = await deps.db.rpc('unsubscribe', { p_token_hash: hashToken(token) });
-  if (error) return empty(503);
-  return empty(data ? 200 : 404);
+  if (error) return answer(503);
+  return answer(data ? 200 : 404);
 }

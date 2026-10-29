@@ -55,3 +55,48 @@ test('is kept out of search results', async ({ page }) => {
   await open(page, 200);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
 });
+
+// Without JavaScript the page can't POST by itself, so it shows a confirm button instead. Its form
+// posts to /unsubscribe/<token>/confirm, which vercel.json rewrites to /api/unsubscribe with the
+// token; the API answers with a redirect to a confirmation page.
+test.describe('without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  const cases = [
+    { lang: 'en', base: '', ask: 'Unsubscribe from CacheDrop emails', button: 'Unsubscribe', done: 'You’re unsubscribed.', pending: 'Unsubscribing…' },
+    { lang: 'fr', base: '/fr', ask: 'Se désabonner des courriels de CacheDrop', button: 'Me désabonner', done: 'Désabonnement confirmé.', pending: 'Désabonnement en cours…' },
+  ];
+  for (const c of cases) {
+    test(`${c.lang}: a confirm button posts the token and lands on a visible confirmation`, async ({ page }) => {
+      await page.route(/\/unsubscribe\/[A-Za-z0-9_-]{43}\/$/, async (route) => {
+        const built = await route.fetch({ url: new URL(`${c.base}/unsubscribe/`, route.request().url()).href });
+        await route.fulfill({ response: built });
+      });
+      const posts: string[] = [];
+      await page.route('**/confirm', async (route) => {
+        posts.push(`${route.request().method()} ${new URL(route.request().url()).pathname}`);
+        await route.fulfill({ status: 303, headers: { location: `${c.base}/unsubscribe/done/` } });
+      });
+      await page.goto(`${c.base}/unsubscribe/${TOKEN}/`);
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText(c.ask);
+      await expect(page.getByText(c.pending)).toBeHidden();
+      await page.getByRole('button', { name: c.button }).click();
+      await expect(page).toHaveURL(new RegExp(`${c.base}/unsubscribe/done/$`));
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText(c.done);
+      expect(posts).toEqual([`POST ${c.base}/unsubscribe/${TOKEN}/confirm`]);
+    });
+  }
+
+  test('the result pages say what happened, without a script', async ({ page }) => {
+    for (const [path, heading] of [
+      ['/unsubscribe/done/', 'You’re unsubscribed.'],
+      ['/unsubscribe/invalid/', 'This unsubscribe link doesn’t work.'],
+      ['/unsubscribe/error/', 'Something went wrong.'],
+      ['/fr/unsubscribe/done/', 'Désabonnement confirmé.'],
+    ]) {
+      await page.goto(path);
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading);
+      await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
+    }
+  });
+});

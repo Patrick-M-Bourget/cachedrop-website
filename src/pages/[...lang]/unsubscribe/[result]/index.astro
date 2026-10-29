@@ -1,0 +1,12 @@
+---
+// /unsubscribe/done/, /unsubscribe/invalid/ and /unsubscribe/error/, in English and French: where
+// the no-JavaScript confirm form lands (src/server/unsubscribe.ts redirects here).
+import Unsubscribe from '../../../../components/Unsubscribe.astro';
+import { langPaths } from '../../../../i18n';
+
+export const getStaticPaths = () =>
+  langPaths().flatMap(({ params }) => (['done', 'invalid', 'error'] as const).map((result) => ({ params: { ...params, result } })));
+
+const { result } = Astro.params as { result: 'done' | 'invalid' | 'error' };
+---
+<Unsubscribe state={result} />
