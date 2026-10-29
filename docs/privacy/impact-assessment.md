@@ -1,6 +1,6 @@
 # Privacy impact assessment: providers outside Quebec
 
-**Status: draft** for the owner and the lawyer (Decisions 20, 22). Not legal advice. Written 2026-10-29 from `docs/DECISIONS.md`; launch blocks on it (Decision 26).
+**Status: draft, accepted by the owner** without a lawyer's review (Decisions 20, 35). Not legal advice. Written 2026-10-29 from `docs/DECISIONS.md`; launch blocks on it (Decision 26).
 
 ## Why this exists
 
@@ -11,7 +11,7 @@ Law 25 (art. 17 of the private-sector Act) asks for an assessment before persona
 - the protection measures, contractual ones included,
 - the legal framework where it goes.
 
-The transfer must also be covered by a written agreement that reflects the result. **To confirm with the lawyer:** that the providers' standard terms (below) count as that agreement.
+The transfer must also be covered by a written agreement that reflects the result. The owner accepted the draft's view that the providers' standard terms (below) count as that agreement (Decision 35).
 
 ## What the site handles
 
@@ -45,7 +45,7 @@ Decision 31 amends 13: the projects are in the United States, not Montreal.
 - **Why:** hosts the site, runs the functions that hold the Supabase service key (Decision 12), counts visits (Decision 16).
 - **Where:** Vercel's global edge network; functions run in the region the project sets (to check: default is the United States).
 - **Technical safeguards:** functions pass form data to Supabase and don't store it. Analytics uses no cookies, and `beforeSend` strips the token from `/download/<token>` URLs (Decision 16). Secrets live only in Vercel's environment (CLAUDE.md). HTTPS only.
-- **Contractual safeguards:** to check: Vercel's Data Processing Addendum and its privacy terms, on the Pro plan used at launch (Decision 17).
+- **Contractual safeguards:** to check: Vercel's Data Processing Addendum and its privacy terms, on the Hobby plan, which the site keeps at launch (Decision 35).
 - **Conclusion (draft):** acceptable. The data is low-sensitivity, mostly in transit, and analytics is anonymous by design.
 
 ### Resend
@@ -71,7 +71,7 @@ Two purposes (Decision 29 amends 18).
 - **Where:** Cloudflare's global network.
 - **Technical safeguards:** Turnstile runs only on forms: Cloudflare's script loads on `/download/` and, elsewhere, only when the feedback modal opens. Its widget stays invisible unless Cloudflare needs a click. Email Routing forwards and doesn't keep a mailbox (to check in Cloudflare's docs). DNS-only records for the site (Decision 29), so site traffic doesn't go through Cloudflare.
 - **Contractual safeguards:** to check: Cloudflare's Data Processing Addendum, on the Free plan.
-- **Conclusion (draft):** acceptable, with one point for the lawyer: whether forwarded privacy requests need anything more, such as replying from a provider in Canada.
+- **Conclusion (draft):** acceptable. The owner accepted it without settling whether forwarded privacy requests need anything more, such as replying from a provider in Canada (Decision 35).
 
 ### GitHub
 
@@ -85,7 +85,7 @@ Two purposes (Decision 29 amends 18).
 
 ## The legal framework where the data goes
 
-Most of these providers are United States companies. US law can give US authorities access to data those companies hold (for example, the CLOUD Act). Given the low sensitivity of the data, this draft treats that risk as acceptable. **For the lawyer to confirm.**
+Most of these providers are United States companies. US law can give US authorities access to data those companies hold (for example, the CLOUD Act). Given the low sensitivity of the data, this draft treats that risk as acceptable, and the owner accepted it (Decision 35).
 
 ## Launch dependencies
 
@@ -93,7 +93,7 @@ Most of these providers are United States companies. US law can give US authorit
 
 ## Open items before launch
 
-- [ ] The lawyer reviews this assessment and the policy (Decision 22).
+- [x] The owner accepted this assessment and the policy without a lawyer's review (Decision 35).
 - [ ] Each provider's data processing terms are read and recorded here.
 - [ ] Vercel function region and Resend region are checked.
 - [ ] The owner confirms Supabase's Data Processing Agreement is accepted (Decision 31).

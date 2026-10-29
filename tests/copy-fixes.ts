@@ -2,8 +2,19 @@
 // The head diff and the same-browser screenshot compare the build with the handoff
 // original after these replacements, so every other byte of copy still has to match.
 // Each `from` is replaced everywhere in its page, which keeps visible FAQ text and the
-// FAQPage JSON-LD in step. Checked against mac-cleaner main at 5bf77c7 on 2026-10-29.
+// FAQPage JSON-LD in step. Checked against mac-cleaner main at 5bf77c7 on 2026-10-29;
+// the platform fixes against b70960d (Decision 35).
 export type CopyFix = { from: string; to: string; why: string };
+
+/** Why the platform claim changed. When mac-cleaner #322 or #323 lands, the copy and these fixes change back. */
+const PLATFORM =
+  'mac-cleaner’s Release build is ARCHS = arm64 with MACOSX_DEPLOYMENT_TARGET = 26.0 (CacheDrop.xcodeproj, b70960d), so it runs on Apple Silicon with macOS 26 or later. #322 (lower the minimum) and #323 (Intel) are open.';
+
+/** The footer’s Platform column, on every handoff page. */
+const footerPlatform: CopyFix[] = [
+  { from: '<span>Apple Silicon &amp; Intel</span>', to: '<span>Apple Silicon</span>', why: PLATFORM },
+  { from: '<span>macOS 14 Sonoma and later</span>', to: '<span>macOS 26 or later</span>', why: PLATFORM },
+];
 
 export const copyFixes: Record<string, CopyFix[]> = {
   'index.html': [
@@ -64,6 +75,19 @@ export const copyFixes: Record<string, CopyFix[]> = {
       to: 'alone. It deletes only files apps make again, like caches, and sends your own files to the Trash.',
       why: 'RESET.md Decision 3.',
     },
+    { from: '"operatingSystem": "macOS 14 or later"', to: '"operatingSystem": "macOS 26 or later"', why: PLATFORM },
+    { from: 'macOS 14+ on Apple Silicon &amp; Intel', to: 'macOS 26+ on Apple Silicon', why: PLATFORM },
+    {
+      from: 'It’s a universal app for Apple Silicon and Intel Macs running macOS 14 Sonoma or later.',
+      to: 'It runs on Apple Silicon Macs with macOS 26 or later.',
+      why: PLATFORM,
+    },
+    {
+      from: 'One universal app for Apple Silicon and Intel Macs on macOS 14 or later.',
+      to: 'For Apple Silicon Macs on macOS 26 or later.',
+      why: PLATFORM,
+    },
+    ...footerPlatform,
   ],
   'clear-mac-developer-caches/index.html': [
     {
@@ -96,6 +120,8 @@ export const copyFixes: Record<string, CopyFix[]> = {
       to: 'CacheDrop groups the Docker, Homebrew and npm caches under Developer caches',
       why: '“These caches” included Dart’s .pub-cache, which the app doesn’t clean.',
     },
+    { from: 'macOS 14+ · Apple Silicon &amp; Intel', to: 'macOS 26+ · Apple Silicon', why: PLATFORM },
+    ...footerPlatform,
   ],
   'clear-adobe-media-cache-mac/index.html': [
     {
@@ -129,6 +155,18 @@ export const copyFixes: Record<string, CopyFix[]> = {
       to: 'Adobe media cache and your Final Cut Pro libraries in one scan',
       why: 'As above.',
     },
+    { from: 'Final Cut Pro · macOS 14+', to: 'Final Cut Pro · macOS 26+ · Apple Silicon', why: PLATFORM },
+    ...footerPlatform,
+  ],
+  'download/index.html': [
+    {
+      from: 'Download the free CacheDrop beta for Mac: a universal app for Apple Silicon and Intel Macs on macOS 14 or later.',
+      to: 'Download the free CacheDrop beta for Apple Silicon Macs on macOS 26 or later.',
+      why: PLATFORM,
+    },
+    { from: '<span>Universal: Apple Silicon &amp; Intel</span>', to: '<span>Apple Silicon</span>', why: PLATFORM },
+    { from: '<span>macOS 14 Sonoma or later</span>', to: '<span>macOS 26 or later</span>', why: PLATFORM },
+    ...footerPlatform,
   ],
 };
 

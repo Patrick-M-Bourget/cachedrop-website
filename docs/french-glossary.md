@@ -70,5 +70,4 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | trademarks | marques de commerce | Canadian legal term. |
 | Overview (footer link) | Aperçu | |
 | system specs | caractéristiques du système | |
-| macOS 14 Sonoma or later | macOS 14 Sonoma ou version ultérieure | |
-| Apple Silicon & Intel | Apple Silicon et Intel | |
+| macOS 26 or later | macOS 26 ou version ultérieure | |
