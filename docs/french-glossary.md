@@ -1,6 +1,6 @@
 # French glossary
 
-The terms and conventions the French pages at `/fr/` use (Decision 5). Claude drafted the French; the owner reviews it before launch. Change a term here first, then in every page that uses it. The emails (#14) use the same terms.
+The terms and conventions the French pages at `/fr/` use (Decision 5). Claude drafted the French, and it ships as drafted (Decision 34); the owner can review it here at any time. Change a term here first, then in every page that uses it, and keep the French emails (#14) in step. Lines marked *Owner* are choices worth a look.
 
 The target is Quebec French, following the Office québécois de la langue française (OQLF) where its usage differs from France's.
 
