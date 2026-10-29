@@ -31,5 +31,14 @@
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/clear-adobe-media-cache-mac/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/clear-adobe-media-cache-mac/"/>
   </url>
-  <url><loc>https://cachedrop.io/privacy/</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://cachedrop.io/privacy/</loc><lastmod>2026-10-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/privacy/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/privacy/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/privacy/"/>
+  </url>
+  <url><loc>https://cachedrop.io/fr/privacy/</loc><lastmod>2026-10-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/privacy/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/privacy/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/privacy/"/>
+  </url>
 </urlset>

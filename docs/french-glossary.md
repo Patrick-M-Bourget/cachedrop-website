@@ -55,7 +55,14 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | email (a message) | courriel | |
 | spam folder | dossier de courrier indésirable | Apple Mail's name. |
 | download link | lien de téléchargement | |
-| unsubscribe | se désabonner | |
+| unsubscribe | se désabonner | The page says « Désabonnement confirmé. », which avoids choosing a gender for « vous êtes désabonné(e) ». |
+| Check your inbox | Vérifiez vos courriels | |
+| disk image | image disque | |
+| Locations & access (app section) | stays in English | The app's own label. |
+| repository (GitHub) | dépôt | |
+| issue (GitHub) | ticket (issue) | |
+| spam protection | protection contre les pourriels | « vérification antipourriel » for Turnstile. |
+| Submit Feedback | Envoyer mon avis | Distinct from the form's « Envoyer le lien de téléchargement ». |
 | news emails | courriels de nouvelles | |
 | privacy policy | politique de confidentialité | |
 | personal information | renseignements personnels | Law 25's term. |

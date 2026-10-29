@@ -16,7 +16,7 @@ async function head(page: Page) {
   }));
 }
 
-for (const { en, fr, canonical, pending } of pairs) {
+for (const { en, fr, canonical } of pairs) {
   test.describe(`${en} and ${fr}`, () => {
     // Both pages of a pair list the same alternates, so each points at the other (reciprocal).
     const alternates = [
@@ -29,8 +29,6 @@ for (const { en, fr, canonical, pending } of pairs) {
       await page.goto(en);
       expect(await head(page)).toEqual({ lang: 'en', canonical: `${SITE}${canonical.en}`, ogUrl: `${SITE}${canonical.en}`, ogLocale: null, alternates });
     });
-
-    if (pending) return; // the French twin comes in a later PR of #13
 
     test('the French page is in French at its own address and points back', async ({ page }) => {
       await page.goto(fr);
@@ -68,7 +66,7 @@ async function jsonLdPageUrls(page: Page) {
   return urls;
 }
 
-for (const { en, fr, canonical } of pairs.filter((p) => !p.pending)) {
+for (const { en, fr, canonical } of pairs) {
   test(`JSON-LD on ${fr} points at French addresses, and on ${en} at English ones`, async ({ page }) => {
     await page.goto(fr);
     const french = await jsonLdPageUrls(page);
@@ -92,7 +90,7 @@ test('the sitemap leaves out every page that is not indexed, in both languages',
 
 test('the sitemap lists each indexed page in both languages, with alternates', async () => {
   const xml = await readFile('dist/sitemap.xml', 'utf8');
-  for (const { canonical } of pairs.filter((p) => p.indexed && !p.pending)) {
+  for (const { canonical } of pairs.filter((p) => p.indexed)) {
     for (const loc of [canonical.en, canonical.fr]) {
       const entry = xml.match(new RegExp(`<url><loc>${SITE}${loc}</loc>[\\s\\S]*?</url>`))?.[0];
       expect(entry, loc).toBeTruthy();

@@ -5,6 +5,10 @@
     { "source": "/download/:token([A-Za-z0-9_-]{43})/", "destination": "/download/link/" },
     { "source": "/download/:token([A-Za-z0-9_-]{43})", "destination": "/download/link/" },
     { "source": "/unsubscribe/:token([A-Za-z0-9_-]{43})/", "destination": "/unsubscribe/" },
-    { "source": "/unsubscribe/:token([A-Za-z0-9_-]{43})", "destination": "/unsubscribe/" }
+    { "source": "/unsubscribe/:token([A-Za-z0-9_-]{43})", "destination": "/unsubscribe/" },
+    { "source": "/fr/download/:token([A-Za-z0-9_-]{43})/", "destination": "/fr/download/link/" },
+    { "source": "/fr/download/:token([A-Za-z0-9_-]{43})", "destination": "/fr/download/link/" },
+    { "source": "/fr/unsubscribe/:token([A-Za-z0-9_-]{43})/", "destination": "/fr/unsubscribe/" },
+    { "source": "/fr/unsubscribe/:token([A-Za-z0-9_-]{43})", "destination": "/fr/unsubscribe/" }
   ]
 }

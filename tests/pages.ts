@@ -28,30 +28,30 @@ export const pages: PageUnderTest[] = [
   { path: '/fr/', lang: 'fr' },
   { path: '/fr/clear-mac-developer-caches/', lang: 'fr' },
   { path: '/fr/clear-adobe-media-cache-mac/', lang: 'fr' },
+  { path: '/fr/privacy/', lang: 'fr' },
+  { path: '/fr/unsubscribe/', lang: 'fr' },
+  { path: '/fr/download/', lang: 'fr' },
+  { path: '/fr/download/link/', lang: 'fr' },
 ];
 
-/**
- * Each English page and its French twin: where each is built and its canonical address.
- * `pending` marks a twin a later PR of #13 builds: the English side is checked already.
- */
-export type Pair = { en: string; fr: string; canonical: { en: string; fr: string }; indexed: boolean; pending?: true };
+/** Each English page and its French twin: where each is built and its canonical address. */
+export type Pair = { en: string; fr: string; canonical: { en: string; fr: string }; indexed: boolean };
 
-const pair = (en: string, indexed: boolean, canonical = en, pending?: true): Pair => ({
+const pair = (en: string, indexed: boolean, canonical = en): Pair => ({
   en,
   fr: `/fr${en}`,
   canonical: { en: canonical, fr: `/fr${canonical}` },
   indexed,
-  ...(pending && { pending }),
 });
 
 export const pairs: Pair[] = [
   pair('/', true),
   pair('/clear-mac-developer-caches/', true),
   pair('/clear-adobe-media-cache-mac/', true),
-  pair('/privacy/', true, undefined, true),
-  pair('/download/', false, undefined, true),
-  pair('/download/link/', false, '/download/', true),
-  pair('/unsubscribe/', false, undefined, true),
+  pair('/privacy/', true),
+  pair('/download/', false),
+  pair('/download/link/', false, '/download/'),
+  pair('/unsubscribe/', false),
 ];
 
 /** The shared interface's accessible names in each language, as the per-page tests look them up. */
@@ -73,7 +73,7 @@ export const ui = {
     dialog: 'Donnez-nous votre avis',
     veryUnhappy: 'Très insatisfait',
     close: 'Fermer',
-    submit: 'Envoyer',
+    submit: 'Envoyer mon avis',
     rating: 'Votre note',
   },
 } as const;

@@ -48,7 +48,7 @@ test.describe('the form', () => {
     await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeFocused();
     await expect(page.getByText('We sent a download link to ada@example.com.')).toBeVisible();
     await expect(page.getByLabel('Email', { exact: true })).toBeHidden();
-    expect(requests).toEqual([{ email: 'ada@example.com', filling: 'video-photo', news: false }]);
+    expect(requests).toEqual([{ email: 'ada@example.com', filling: 'video-photo', news: false, lang: 'en' }]);
   });
 
   test('sends no answer when the question is skipped', async ({ page }) => {
@@ -57,7 +57,7 @@ test.describe('the form', () => {
     await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
     await page.getByLabel('Email', { exact: true }).press('Enter');
     await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
-    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false }]);
+    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false, lang: 'en' }]);
   });
 
   test('catches an incomplete email before sending anything', async ({ page }) => {
@@ -106,7 +106,7 @@ test.describe('the form', () => {
     await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
     await page.getByRole('button', { name: 'Send Download Link' }).click();
     await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
-    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false }]);
+    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false, lang: 'en' }]);
   });
 
   test('sends news: true only when the box is ticked, and starts unticked again for a different email', async ({ page }) => {
@@ -117,7 +117,7 @@ test.describe('the form', () => {
     await page.getByRole('button', { name: 'Send Download Link' }).click();
     await page.getByRole('button', { name: 'Use a Different Email' }).click();
     await expect(page.getByRole('checkbox', { name: NEWS, exact: true })).not.toBeChecked();
-    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: true }]);
+    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: true, lang: 'en' }]);
   });
 
   test('links to the privacy policy (Decision 19)', async ({ page }) => {
@@ -174,7 +174,7 @@ test.describe('the token page', () => {
       await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
       await page.getByRole('button', { name: 'Send Download Link' }).click();
       await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
-      expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false }]);
+      expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false, lang: 'en' }]);
     });
   }
 
