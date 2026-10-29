@@ -43,6 +43,9 @@ test('lists every provider and says which are outside Quebec', async ({ page }) 
   expect(text).toContain('Montreal');
   expect(text).toContain('outside Quebec');
   expect(text).toContain('forwards email'); // Decision 29: Cloudflare Email Routing
+  // Decision 30: the policy describes the launch state, where feedback issues are private.
+  expect(text).toContain('private GitHub repository');
+  expect(text).not.toMatch(/\bpublic\b/i);
 });
 
 test('states how long each kind of data is kept', async ({ page }) => {
