@@ -40,7 +40,12 @@ test('lists what is collected and why', async ({ page }) => {
 test('lists every provider and says which are outside Quebec', async ({ page }) => {
   const text = await sectionText(page, 'Who handles your information');
   for (const provider of ['Supabase', 'Vercel', 'Resend', 'Cloudflare', 'GitHub']) expect(text, provider).toContain(provider);
-  expect(text).toContain('Montreal');
+  // Decision 31 (amends 13): Supabase is in AWS US regions, so it is listed as outside Quebec.
+  const supabase = (await page.locator('#providers li', { hasText: 'Supabase' }).innerText()).replace(/\s+/g, ' ');
+  expect(supabase).toContain('Outside Quebec');
+  expect(supabase).toContain('United States');
+  expect(text).not.toContain('Montreal');
+  expect(text).not.toMatch(/\bin Quebec\b/);
   expect(text).toContain('outside Quebec');
   expect(text).toContain('forwards email'); // Decision 29: Cloudflare Email Routing
   // Decision 30: the policy describes the launch state, where feedback issues are private.
