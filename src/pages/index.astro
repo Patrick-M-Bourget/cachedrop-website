@@ -5,15 +5,15 @@ import Footer from '../components/Footer.astro';
 import AppWindow from '../components/AppWindow.astro';
 
 const description =
-  'Free up space on your Mac. CacheDrop finds hidden caches, Xcode DerivedData, node_modules and render files, and clears them safely. Free beta.';
+  'Free up space on your Mac. CacheDrop finds hidden caches, Xcode DerivedData, node_modules and video caches, and clears them safely. Free beta.';
 
 // One list feeds both the visible FAQ and the FAQPage JSON-LD, so they can't drift apart.
 const faq = [
-  ['What is CacheDrop?', 'CacheDrop is a native Mac storage cleaner for developers and video editors. It finds hidden caches, Xcode DerivedData, old node_modules folders and video render files, shows how much space each one takes, and clears what you approve.'],
-  ['How do I free up space on my Mac?', 'Start with the files you can’t see. Caches, build files and render data can take tens of gigabytes, and macOS hides them inside “System Data”. CacheDrop scans for them, lets you review what it found, and clears it in one click.'],
+  ['What is CacheDrop?', 'CacheDrop is a native Mac storage cleaner for developers and video editors. It finds hidden caches, Xcode DerivedData, old node_modules folders and video editing caches, shows how much space each one takes, and clears what you approve.'],
+  ['How do I free up space on my Mac?', 'Start with the files you can’t see. Caches, build files and render data can take tens of gigabytes, and macOS hides them inside “System Data”. CacheDrop scans for them, lets you review what it found, and clears it when you confirm.'],
   ['What is System Data on a Mac, and can I delete it?', 'System Data is where macOS counts files that don’t fit its other categories, including app caches, logs and developer build files. Much of it is safe to remove because apps rebuild it. CacheDrop only targets those rebuildable parts.'],
-  ['Is it safe to delete caches on a Mac?', 'Yes, for caches that apps regenerate: the app simply rebuilds them the next time it needs them. CacheDrop only recommends rebuildable caches and shows you each one before anything moves.'],
-  ['How do I clear my Mac’s disk without losing files?', 'Clear caches and build output, not documents. CacheDrop leaves your code, projects and timelines alone, and sends what it clears to the Trash.'],
+  ['Is it safe to delete caches on a Mac?', 'Yes, for caches that apps regenerate: the app simply rebuilds them the next time it needs them. CacheDrop recommends caches that rebuild themselves and shows you each one before anything is cleared.'],
+  ['How do I clear my Mac’s disk without losing files?', 'Clear caches and build output, not documents. CacheDrop leaves your code, projects and timelines alone. It deletes only files apps make again, like caches, and sends your own files to the Trash.'],
   ['Is CacheDrop free, and which Macs does it support?', 'It’s free for a limited time during the public beta. It’s a universal app for Apple Silicon and Intel Macs running macOS 14 Sonoma or later.'],
 ];
 
@@ -51,8 +51,8 @@ const sectionH2 = 'margin: 0; font-size: clamp(28px, 3.4vw, 40px); line-height: 
 const primaryLg = 'display: inline-flex; align-items: center; gap: var(--space-2-5); height: var(--control-lg); padding: 0 var(--space-6); border-radius: var(--radius-full); background: var(--accent); font-size: 15px; font-weight: 500; box-shadow: var(--shadow-button)';
 const steps = [
   ['01', 'Only what tools rebuild', 'Package caches, build files and render data that your apps regenerate on their own. Your code, projects and timelines stay put.'],
-  ['02', 'You review first', 'Every recommendation shows its size and the files inside before anything moves.'],
-  ['03', 'Sent to the Trash, not erased', 'Cleaned items go to the Trash, so changing your mind is one drag away.'],
+  ['02', 'You review first', 'Every recommendation shows its size and where it lives before anything moves.'],
+  ['03', 'Your files go to the Trash', 'Caches that apps rebuild are deleted. Your files go to the Trash, so changing your mind is one drag away.'],
 ];
 ---
 <Base title="Mac Storage Cleaner – Free Up Space on Your Mac | CacheDrop" description={description} path="/" jsonLd={jsonLd}>
@@ -82,7 +82,7 @@ const steps = [
 <div style="max-width: var(--lede-max); margin-bottom: var(--space-14)">
 <p style={eyebrow}>Built for workstations</p>
 <h2 style={sectionH2}>Built for the heavy lifters.</h2>
-<p style="margin: var(--space-4) 0 0; font-size: 17px; line-height: 27px; color: var(--ink-secondary); text-wrap: pretty">CacheDrop is a Mac storage cleaner made for developers and video editors. Generic cleaners clear browser cookies and miss the real weight. CacheDrop goes after compiler caches, render files and stale container images: the files that grow quietly with every project.</p>
+<p style="margin: var(--space-4) 0 0; font-size: 17px; line-height: 27px; color: var(--ink-secondary); text-wrap: pretty">CacheDrop is a Mac storage cleaner made for developers and video editors. Generic cleaners clear browser cookies and miss the real weight. CacheDrop goes after compiler caches, media caches and stale container images: the files that grow quietly with every project.</p>
 </div>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-6)">
 
@@ -107,10 +107,10 @@ const steps = [
 </div>
 <div style="flex: 1">
 <h3 style={cardTitle}>Clear Creator Caches</h3>
-<p style={cardBody}>Strip out massive Final Cut Pro render files and hidden Adobe media caches without losing your project timelines.</p>
+<p style={cardBody}>Clear hidden Adobe media caches and size up Final Cut Pro libraries full of render files, without losing your timelines.</p>
 </div>
 <div style={chips}>
-{['.cfa / .pek', 'Media Cache', 'FCPX Render Files'].map((c) => <span class="mono" style={chip}>{c}</span>)}
+{['.cfa / .pek', 'Media Cache', 'FCPX Libraries'].map((c) => <span class="mono" style={chip}>{c}</span>)}
 </div>
 <a class="textlink" href="/clear-adobe-media-cache-mac/" style={cardLink}>How to clear Adobe media cache
 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></a>
@@ -122,10 +122,10 @@ const steps = [
 </div>
 <div style="flex: 1">
 <h3 style={cardTitle}>Reclaim Mac Disk Space</h3>
-<p style={cardBody}>Safely purge massive application logs, system caches, and partial downloads clogging your hard drive.</p>
+<p style={cardBody}>Safely purge massive application logs, app caches, and leftover update downloads clogging your hard drive.</p>
 </div>
 <div style={chips}>
-{['~/Library/Caches', '~/Library/Logs', 'Partial downloads'].map((c) => <span class="mono" style={chip}>{c}</span>)}
+{['~/Library/Caches', '~/Library/Logs', 'Update downloads'].map((c) => <span class="mono" style={chip}>{c}</span>)}
 </div>
 </article>
 
