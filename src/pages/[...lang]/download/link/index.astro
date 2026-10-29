@@ -12,6 +12,7 @@ import Base from '../../../../layouts/Base.astro';
 import Nav from '../../../../components/Nav.astro';
 import Footer from '../../../../components/Footer.astro';
 import { downloadHead, downloadMeta, guideLinks } from '../_head.ts';
+import { titleMd } from '../../../../components/guide-styles';
 import { langOf, langPaths, localize } from '../../../../i18n';
 
 export const getStaticPaths = langPaths;
@@ -53,7 +54,6 @@ const expiredForm = `${localize(lang, '/download/')}?link=expired`;
 
 const card = 'padding: var(--space-8); border: 1px solid var(--line); border-radius: var(--radius-2xl); background: var(--surface); box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: var(--space-3)';
 const stepN = 'font-size: 13px; color: var(--ink-secondary)';
-const stepTitle = 'margin: 0; font-size: 18px; line-height: 24px; font-weight: 600; letter-spacing: -0.01em';
 const stepBody = 'margin: 0; font-size: 15px; line-height: 23px; color: var(--ink-soft)';
 const guideLink = 'color: var(--accent-text); font-weight: 500';
 ---
@@ -80,7 +80,7 @@ const guideLink = 'color: var(--accent-text); font-weight: 500';
 {t.steps.map(([title, body], i) => (
 <li style={card}>
 <span class="mono" style={stepN}>{`0${i + 1}`}</span>
-<h2 style={stepTitle}>{title}</h2>
+<h2 style={titleMd}>{title}</h2>
 <p style={stepBody} set:html={body}></p>
 </li>
 ))}
@@ -88,7 +88,7 @@ const guideLink = 'color: var(--accent-text); font-weight: 500';
 
 <div style="margin-top: var(--space-8); width: 100%; padding: var(--space-8); border-radius: var(--radius-2xl); background: var(--surface-subtle); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-5); text-align: left">
 <div style="max-width: 560px">
-<h2 style={stepTitle}>{t.help}</h2>
+<h2 style={titleMd}>{t.help}</h2>
 <p style="margin: var(--space-1-5) 0 0; font-size: 15px; line-height: 23px; color: var(--ink-soft)">{t.helpBody}</p>
 </div>
 <a class="btn-ghost" href="#feedback" data-feedback style="display: inline-flex; align-items: center; height: var(--tap-min); padding: 0 var(--space-5); border-radius: var(--radius-full); border: 1px solid var(--line-strong); background: var(--surface); font-size: 15px; font-weight: 500">{t.feedback}</a>

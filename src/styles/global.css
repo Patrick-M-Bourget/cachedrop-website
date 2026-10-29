@@ -8,7 +8,7 @@ a:hover{color:var(--accent-text)}
 a.btn-primary,a.btn-primary:hover{color:var(--on-accent)}
 .btn-primary{transition:filter .15s, transform .1s}
 .btn-primary:hover{filter:brightness(1.08)}
-.btn-primary:active{transform:translateY(1px)}
+.btn-primary:active,.gate-btn:active{transform:translateY(1px)}
 .btn-ghost{transition:background .15s}
 .btn-ghost:hover{background:var(--surface-subtle);color:var(--ink)}
 .flink{color:var(--ink-secondary)}

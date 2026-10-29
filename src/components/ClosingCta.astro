@@ -1,0 +1,34 @@
+---
+// The closing call to action at the foot of the homepage and of each guide: a title, a line, the
+// large download button, and anything the page adds after it (the homepage's feedback link).
+// The two handoff pages size it differently, so `size` keeps each one's own spacing and type.
+import { primaryLg } from './guide-styles';
+
+interface Props {
+  title: string;
+  body: string;
+  href: string;
+  cta: string;
+  size: 'home' | 'guide';
+}
+const { title, body, href, cta, size } = Astro.props;
+const home = size === 'home';
+
+const section = home
+  ? 'background: var(--surface-subtle); padding: var(--space-30) var(--space-6); text-align: center'
+  : 'margin-top: var(--space-30); background: var(--surface-subtle); padding: var(--space-28) var(--space-6); text-align: center';
+const h2 = `margin: 0; font-size: ${home ? 'clamp(32px, 4.4vw, 52px)' : 'clamp(30px, 4vw, 48px)'}; line-height: 1.1; font-weight: 600; letter-spacing: -0.035em`;
+const p = `margin: ${home ? '18px' : 'var(--space-4)'} 0 0; font-size: 17px; line-height: 27px; color: var(--ink-secondary)`;
+const button = `margin-top: ${home ? '36px' : 'var(--space-8)'}; ${primaryLg}`;
+---
+<section style={section}>
+<div style="max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; align-items: center">
+<h2 style={h2}>{title}</h2>
+<p style={p}>{body}</p>
+<a class="btn-primary" href={href} style={button}>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg>
+<span>{cta}</span>
+</a>
+<slot />
+</div>
+</section>

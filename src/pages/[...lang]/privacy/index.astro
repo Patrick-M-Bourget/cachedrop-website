@@ -7,6 +7,7 @@
 import Base from '../../../layouts/Base.astro';
 import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
+import { guideH2, guideP } from '../../../components/guide-styles';
 import { langOf, langPaths, localize } from '../../../i18n';
 
 export const getStaticPaths = langPaths;
@@ -129,8 +130,8 @@ const jsonLd = {
 const ids = ['responsible', 'collect', 'providers', 'retention', 'rights', 'contact'];
 const toc = ids.map((id, i) => [id, t.toc[i]]);
 
-const h2 = 'margin: 0; font-size: clamp(26px, 3vw, 34px); line-height: 1.2; font-weight: 600; letter-spacing: -0.025em';
-const body = 'margin: var(--space-4) 0 0; font-size: 17px; line-height: 28px; color: var(--ink-body); text-wrap: pretty';
+const h2 = guideH2;
+const body = `${guideP}; margin-top: var(--space-4); text-wrap: pretty`;
 const list = 'margin: var(--space-4) 0 0; padding: 0 0 0 var(--space-5); display: flex; flex-direction: column; gap: var(--space-2-5); font-size: 17px; line-height: 28px; color: var(--ink-body)';
 const section = 'padding-top: var(--space-18)';
 const lead = 'font-weight: 600; color: var(--ink)';

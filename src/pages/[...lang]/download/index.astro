@@ -13,6 +13,7 @@ import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
 import BotCheck from '../../../components/BotCheck.astro';
 import { downloadHead, downloadMeta, guideLinks } from './_head.ts';
+import { titleMd } from '../../../components/guide-styles';
 import { langOf, langPaths, localize } from '../../../i18n';
 
 export const getStaticPaths = langPaths;
@@ -84,7 +85,6 @@ const guideLink = 'color: var(--accent-text); font-weight: 500';
 .gate-check input{margin:1px 0 0;width:16px;height:16px;accent-color:var(--accent);flex:none}
 .gate-check input:focus-visible{outline:none;box-shadow:var(--focus-ring)}
 .gate-btn{display:inline-flex;align-items:center;justify-content:center;height:var(--control-md);padding:0 var(--space-4);border:0;border-radius:var(--radius-md);font:inherit;font-size:14px;font-weight:500;cursor:pointer;transition:filter .15s,background-color .15s,transform .1s}
-.gate-btn:active{transform:translateY(1px)}
 .gate-btn:focus-visible{outline:none;box-shadow:var(--focus-ring)}
 .gate-primary{background:var(--accent);color:var(--on-accent);box-shadow:var(--shadow-button)}
 .gate-primary:hover{background:var(--accent-hover)}
@@ -143,7 +143,7 @@ if (new URLSearchParams(location.search).get('link') === 'expired') {
 
 <div data-gate-done hidden aria-live="polite" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-3); padding: var(--space-6) 0 var(--space-2)">
 <div style="width: var(--control-lg); height: var(--control-lg); border-radius: var(--radius-full); background: var(--success-soft); color: var(--success-ink); display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
-<h2 data-gate-done-title tabindex="-1" style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 600; letter-spacing: -0.01em; outline: none">{t.sentTitle}</h2>
+<h2 data-gate-done-title tabindex="-1" style={`${titleMd}; outline: none`}>{t.sentTitle}</h2>
 <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-secondary)">{t.sentBefore}<span data-gate-sent-to style="font-weight: 500; color: var(--ink); overflow-wrap: anywhere"></span>{t.sentAfter}</p>
 <button type="button" class="gate-btn gate-quiet" data-gate-again style="margin-top: var(--space-1)">{t.again}</button>
 </div>

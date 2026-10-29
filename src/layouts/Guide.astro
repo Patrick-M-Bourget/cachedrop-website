@@ -6,7 +6,8 @@
 import Base from './Base.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import { guideH2, primaryLg, arrowLink } from '../components/guide-styles';
+import { guideH2, primaryLg, arrowLink, faqItem, faqQuestion } from '../components/guide-styles';
+import ClosingCta from '../components/ClosingCta.astro';
 import { langOf, localize } from '../i18n';
 
 interface Props {
@@ -109,8 +110,8 @@ const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" strok
 <h2 style={guideH2}>{p.faqTitle}</h2>
 <div style="margin-top: var(--space-6); display: flex; flex-direction: column">
 {p.faq.map(([q, a], i) => (
-<div style={`padding: var(--space-6) 0; border-top: 1px solid var(--line)${i === p.faq.length - 1 ? '; border-bottom: 1px solid var(--line)' : ''}`}>
-<h3 style="margin: 0; font-size: 18px; line-height: 26px; font-weight: 600; letter-spacing: -0.01em">{q}</h3>
+<div style={faqItem(i, p.faq.length)}>
+<h3 style={faqQuestion}>{q}</h3>
 <p style="margin: var(--space-2) 0 0; font-size: 16px; line-height: 26px; color: var(--ink-body)" set:html={a}></p>
 </div>
 ))}
@@ -127,16 +128,7 @@ const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" strok
 </aside>
 </div>
 
-<section style="margin-top: var(--space-30); background: var(--surface-subtle); padding: var(--space-28) var(--space-6); text-align: center">
-<div style="max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; align-items: center">
-<h2 style="margin: 0; font-size: clamp(30px, 4vw, 48px); line-height: 1.1; font-weight: 600; letter-spacing: -0.035em">{p.closing.title}</h2>
-<p style="margin: var(--space-4) 0 0; font-size: 17px; line-height: 27px; color: var(--ink-secondary)">{p.closing.body}</p>
-<a class="btn-primary" href={downloadHref} style={`margin-top: var(--space-8); ${primaryLg}`}>
-<Fragment set:html={download} />
-<span>{p.cta}</span>
-</a>
-</div>
-</section>
+<ClosingCta size="guide" title={p.closing.title} body={p.closing.body} href={downloadHref} cta={p.cta} />
 </main>
 
 <Footer path={p.path} overview trademarks={p.trademarks} />

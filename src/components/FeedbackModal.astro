@@ -5,6 +5,7 @@
 // maxlengths match what api/feedback accepts. site.js reads its messages from the data-msg-* attributes.
 // The bot check (Decision 12) starts when the modal opens.
 import BotCheck from './BotCheck.astro';
+import { titleMd } from './guide-styles';
 import { langOf, localize } from '../i18n';
 
 const copy = {
@@ -84,7 +85,7 @@ const emoji = [['angry', '😡'], ['meh', '😕'], ['neutral', '😐'], ['happy'
 <div role="dialog" aria-modal="true" aria-labelledby="fb-title" class="fb-card">
 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-4)">
 <div>
-<h2 id="fb-title" style="margin:0;font-size:18px;line-height:24px;font-weight:600;letter-spacing:-0.01em">{t.title}</h2>
+<h2 id="fb-title" style={titleMd}>{t.title}</h2>
 <p style="margin:var(--space-1) 0 0;font-size:14px;line-height:20px;color:var(--ink-secondary)">{t.question}</p>
 </div>
 <button type="button" class="fb-close" data-fb-close aria-label={t.close}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
