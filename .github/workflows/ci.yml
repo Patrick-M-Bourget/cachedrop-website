@@ -27,12 +27,37 @@ jobs:
       - name: JSON-LD validation
         run: npm run check:jsonld
       - run: npx playwright install --with-deps chromium
-      - name: Playwright (head diff, screenshots, tokens, modal)
-        run: npm test
+      - name: Playwright (head diff, same-browser screenshots, tokens, modal)
+        run: npm test -- --grep-invert "reference render"
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+  # The reference PNGs in handoff/screenshots/ were rendered on a Mac. Linux text rasterising
+  # differs by more than a real layout change, so the comparison against them runs on macOS.
+  reference-renders:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install chromium
+      - name: Playwright (screenshots against handoff/screenshots/)
+        run: npm test -- --grep "reference render"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-reference
           path: |
             playwright-report/
             test-results/
