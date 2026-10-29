@@ -72,6 +72,13 @@ describe('mailerFor', () => {
     expect(resend.calls).toHaveLength(1);
   });
 
+  it('never captures without VERCEL_ENV, even with CAPTURE_EMAIL=1', async () => {
+    const resend = fakeResend();
+    const env = { RESEND_API_KEY: 're_test', CAPTURE_EMAIL: '1' };
+    expect(await mailerFor(req(CAPTURE), env, resend.fetch)(EMAIL)).toBeUndefined();
+    expect(resend.calls).toHaveLength(1);
+  });
+
   it('never captures in production, even with CAPTURE_EMAIL=1', async () => {
     const resend = fakeResend();
     const env = { RESEND_API_KEY: 're_test', VERCEL_ENV: 'production', CAPTURE_EMAIL: '1' };

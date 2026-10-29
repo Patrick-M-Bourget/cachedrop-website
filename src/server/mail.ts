@@ -1,7 +1,7 @@
 // Sending email through Resend's REST API (Decision 14), and the capture mode previews use so
 // Playwright can read the download link (Decision 27). Production never captures.
 import type { Email } from './gate.ts';
-import type { Env } from './shared.ts';
+import { isTestDeployment, type Env } from './shared.js';
 
 export const FROM = 'CacheDrop <hello@cachedrop.io>';
 /** A signup request with this header gets the email back instead of it being sent, on a capturing preview. */
@@ -9,7 +9,7 @@ export const CAPTURE_HEADER = 'x-capture-email';
 
 /** The mail sender for one signup request. */
 export function mailerFor(request: Request, env: Env, fetch: typeof globalThis.fetch): (email: Email) => Promise<Email | void> {
-  const capture = env.CAPTURE_EMAIL === '1' && env.VERCEL_ENV !== 'production' && request.headers.get(CAPTURE_HEADER) === '1';
+  const capture = env.CAPTURE_EMAIL === '1' && isTestDeployment(env) && request.headers.get(CAPTURE_HEADER) === '1';
   if (capture) return async (email) => email;
 
   return async (email) => {

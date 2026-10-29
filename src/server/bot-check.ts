@@ -4,7 +4,7 @@
 // (hit_rate_limit), keyed by a keyed hash of the IP: the raw IP is never stored.
 import { createHmac } from 'node:crypto';
 import { isIP } from 'node:net';
-import { json, type Env, type Result } from './shared.js';
+import { isTestDeployment, json, type Env, type Result } from './shared.js';
 
 /** Cloudflare's published test secret keys (developers.cloudflare.com/turnstile/troubleshooting/testing/). */
 export const TEST_SECRETS = {
@@ -26,10 +26,10 @@ export type Verdict = 'ok' | 'failed' | 'unavailable';
 export type Verify = (token: string, ip: string | null) => Promise<Verdict>;
 
 /**
- * Test mode: a deployment that isn't production and holds the always-pass test secret, i.e. a
- * preview or local dev. Production holds the real secret, so it never qualifies.
+ * Test mode: a preview or local dev deployment that holds the always-pass test secret. Production
+ * holds the real secret, and a deployment without VERCEL_ENV never qualifies.
  */
-const testMode = (env: Env) => env.VERCEL_ENV !== 'production' && env.TURNSTILE_SECRET_KEY === TEST_SECRETS.pass;
+const testMode = (env: Env) => isTestDeployment(env) && env.TURNSTILE_SECRET_KEY === TEST_SECRETS.pass;
 
 /** The Turnstile check for one request. Anything but a clear yes from Cloudflare is not a pass. */
 export function turnstileFor(request: Request, env: Env, fetch: typeof globalThis.fetch): Verify {

@@ -1,8 +1,8 @@
 // Filing feedback as mac-cleaner issues through GitHub's REST API (Decisions 6, 8), and the test
-// mode every non-production deployment uses, which never touches mac-cleaner (Decision 30: the
+// mode previews and local dev use, which never touches mac-cleaner (Decision 30: the
 // repo is public until launch). The token is fine-grained: mac-cleaner only, Issues read and write.
 import { marker, type IssueDraft, type Issues } from './feedback.js';
-import type { Env } from './shared.ts';
+import { isTestDeployment, type Env } from './shared.js';
 
 export const REPO = 'Patrick-M-Bourget/mac-cleaner';
 const API = `https://api.github.com/repos/${REPO}/issues`;
@@ -10,9 +10,9 @@ const PAGE_SIZE = 100;
 /** Feedback arrives a few a day; ten pages of issues is far more than one retry window holds. */
 const MAX_PAGES = 10;
 
-/** mac-cleaner's issues for this deployment: real in production, test mode everywhere else. */
+/** mac-cleaner's issues for this deployment: test mode on a preview or local dev, real everywhere else. */
 export function issuesFor(env: Env, fetch: typeof globalThis.fetch): Issues {
-  if (env.VERCEL_ENV !== 'production') return { create: async (draft) => ({ captured: draft }), findByFeedbackId: async () => null };
+  if (isTestDeployment(env)) return { create: async (draft) => ({ captured: draft }), findByFeedbackId: async () => null };
   return githubIssues(env.GITHUB_FEEDBACK_TOKEN, fetch);
 }
 

@@ -60,6 +60,12 @@ describe('the Turnstile check', () => {
     expect(await turnstileFor(header, { TURNSTILE_SECRET_KEY: '0x4AAA-real-secret', VERCEL_ENV: 'preview' }, cf.fetch)('t', null)).toBe('ok');
     expect(cf.calls.map((c) => c.get('secret'))).toEqual([TEST_SECRETS.pass, '0x4AAA-real-secret']);
   });
+
+  it('ignores that header without VERCEL_ENV', async () => {
+    const cf = fakeSiteverify();
+    expect(await turnstileFor(req({ [TEST_HEADER]: 'fail' }), { TURNSTILE_SECRET_KEY: TEST_SECRETS.pass }, cf.fetch)('t', null)).toBe('ok');
+    expect(cf.calls.map((c) => c.get('secret'))).toEqual([TEST_SECRETS.pass]);
+  });
 });
 
 // The same checks against Cloudflare itself, with its published test secret keys. Skipped offline
@@ -99,5 +105,6 @@ describe('the rate-limit key', () => {
     const asked = req({ 'x-real-ip': '203.0.113.7', 'x-rate-limit-key': 'journey-123' });
     expect(rateLimitKey(asked, preview)).toBe(ipHash('test:journey-123', PEPPER));
     expect(rateLimitKey(asked, { ...preview, VERCEL_ENV: 'production' })).toBe(ipHash('203.0.113.7', PEPPER));
+    expect(rateLimitKey(asked, { ...preview, VERCEL_ENV: undefined })).toBe(ipHash('203.0.113.7', PEPPER));
   });
 });

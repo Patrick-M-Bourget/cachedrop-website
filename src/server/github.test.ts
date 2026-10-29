@@ -70,11 +70,17 @@ describe('issuesFor in production', () => {
 });
 
 describe('issuesFor outside production (test mode)', () => {
-  it.each([['preview'], ['development'], [undefined]])('on %s, never calls GitHub and returns the draft', async (env) => {
+  it.each([['preview'], ['development']])('on %s, never calls GitHub and returns the draft', async (env) => {
     const gh = fakeGitHub();
     const issues = issuesFor({ VERCEL_ENV: env, GITHUB_FEEDBACK_TOKEN: 'github_pat_test' }, gh.fetch);
     expect(await issues.create(DRAFT)).toEqual({ captured: DRAFT });
     expect(await issues.findByFeedbackId(7, '2026-10-29T12:00:00.000Z')).toBeNull();
     expect(gh.calls).toEqual([]);
+  });
+
+  it('fails closed without VERCEL_ENV: files for real instead of quietly capturing', async () => {
+    const gh = fakeGitHub({ status: 201, body: { number: 42 } });
+    expect(await issuesFor({ GITHUB_FEEDBACK_TOKEN: 'github_pat_test' }, gh.fetch).create(DRAFT)).toEqual({ number: 42 });
+    expect(gh.calls).toHaveLength(1);
   });
 });

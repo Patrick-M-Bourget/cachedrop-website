@@ -7,6 +7,13 @@ export type Result<T> = Promise<{ data: T | null; error: { message: string } | n
 /** The Vercel environment, or the slice of it a test passes in. */
 export type Env = Record<string, string | undefined>;
 
+/**
+ * A preview or local dev deployment, where test modes (email capture, the Turnstile test header,
+ * GitHub test mode) may switch on. Only an exact VERCEL_ENV of preview or development counts, so a
+ * missing or unexpected value fails closed and behaves like production.
+ */
+export const isTestDeployment = (env: Env) => env.VERCEL_ENV === 'preview' || env.VERCEL_ENV === 'development';
+
 /** A JSON answer that no cache keeps. */
 export const json = (body: unknown, status = 200, headers: Record<string, string> = {}) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', ...headers } });
