@@ -61,3 +61,25 @@ test('a forged token unsubscribes nobody', async ({ request, page }) => {
   await page.goto(`/unsubscribe/${forged}/`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('This unsubscribe link doesn’t work.');
 });
+
+test.describe('without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('the confirm button unsubscribes through the vercel.json rewrite and lands on the confirmation', async ({ page, request }) => {
+    const { link } = await signUp(request);
+    await page.route((url) => url.origin === link.origin, (route) => route.continue({ headers: { ...route.request().headers(), ...protection() } }));
+    await page.goto(link.pathname);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Unsubscribe from CacheDrop emails');
+    await page.getByRole('button', { name: 'Unsubscribe' }).click();
+    await expect(page).toHaveURL(/\/unsubscribe\/done\/$/);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('You’re unsubscribed.');
+  });
+
+  test('a forged token lands on the page that says the link doesn’t work', async ({ page }) => {
+    await page.route((url) => url.origin === new URL(PREVIEW!).origin, (route) => route.continue({ headers: { ...route.request().headers(), ...protection() } }));
+    await page.goto(`/unsubscribe/${'A'.repeat(43)}/`);
+    await page.getByRole('button', { name: 'Unsubscribe' }).click();
+    await expect(page).toHaveURL(/\/unsubscribe\/invalid\/$/);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('This unsubscribe link doesn’t work.');
+  });
+});
