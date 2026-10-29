@@ -26,8 +26,10 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
         if (typeof p_news !== 'boolean') return { data: null, error: { message: 'function request_download does not exist' } };
         let s = signups.find((x) => x.email === p_email);
         if (!s) signups.push((s = { id: signups.length + 1, email: p_email, filling: p_filling, news: false, newsAt: null }));
-        // A tick turns the opt-in on; no tick never turns it off (Decision 3).
+        // A tick turns the opt-in on; no tick never turns it off (Decision 3). A tick is also fresh
+        // consent after an unsubscribe (Decision 32).
         if (p_news && !s.news) Object.assign(s, { news: true, newsAt: state.now });
+        if (p_news) delete s.unsubscribed;
         tokens.set(p_token_hash, { signupId: s.id, expiresAt: state.now + 7 * DAY });
         return { data: null, error: null };
       }
@@ -52,7 +54,8 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
       if (fn === 'unsubscribe') {
         const id = unsubscribeTokens.get((args as { p_token_hash: string }).p_token_hash);
         const s = signups.find((x) => x.id === id);
-        if (s) s.unsubscribed = true;
+        // Only the address stays marked (Decision 32): the opt-in goes with it.
+        if (s) Object.assign(s, { unsubscribed: true, news: false, newsAt: null });
         return { data: !!s, error: null };
       }
       throw new Error(`unexpected rpc ${fn}`);
@@ -407,5 +410,27 @@ describe('unsubscribe', () => {
     const res = await handleSignup(post({ email: 'ada@example.com' }), { ...deps, db });
     expect(res.status).toBe(503);
     expect(sent).toEqual([]);
+  });
+  it('turns the news opt-in off with the unsubscribe (Decision 32: only the address is kept)', async () => {
+    const { deps, sent, state } = setup();
+    await handleSignup(post({ email: 'ada@example.com', news: true }), deps);
+    expect((await handleUnsubscribe(oneClick(oneClickIn(sent[0])!), deps)).status).toBe(200);
+    expect(state.signups[0]).toMatchObject({ unsubscribed: true, news: false, newsAt: null });
+  });
+
+  it('a fresh news tick on a later request clears the unsubscribe (Decision 32)', async () => {
+    const { deps, sent, state } = await signedUp();
+    await handleUnsubscribe(oneClick(oneClickIn(sent[0])!), deps);
+    await handleSignup(post({ email: 'ada@example.com', news: true }), deps);
+    expect(state.signups[0]).toMatchObject({ news: true, newsAt: state.now });
+    expect(state.signups[0].unsubscribed).toBeUndefined();
+  });
+
+  it('a later request without the tick keeps the person unsubscribed, and still sends the link', async () => {
+    const { deps, sent, state } = await signedUp();
+    await handleUnsubscribe(oneClick(oneClickIn(sent[0])!), deps);
+    expect((await handleSignup(post({ email: 'ada@example.com' }), deps)).status).toBe(200);
+    expect(sent).toHaveLength(2);
+    expect(state.signups[0]).toMatchObject({ unsubscribed: true, news: false, newsAt: null });
   });
 });

@@ -1,5 +1,5 @@
 // The email gate's SQL (supabase/migrations) against the dev Supabase project: the opt-in rules in
-// request_download and the token cleanup job (Decisions 2, 3). gate.test.ts covers the handlers
+// request_download, the token cleanup job, and unsubscribe with re-consent (Decisions 2, 3, 4, 32). gate.test.ts covers the handlers
 // with a stand-in database; this checks the real functions behave the same way.
 // Skipped unless DB_TESTS=dev, with SUPABASE_URL and SUPABASE_SECRET_KEY set to the dev project
 // (never prod), e.g.:
@@ -104,5 +104,66 @@ describe.skipIf(!run)('the token cleanup job on the dev database', () => {
     // The token from the signup request itself is untouched too, and so is the signup.
     expect(remaining.size).toBe(4);
     expect(await signup(email)).toMatchObject({ id, news_opt_in: true });
+  });
+});
+
+async function unsubscribe(email: string) {
+  const hash = newHash();
+  expect((await db.rpc('issue_unsubscribe_token', { p_email: email, p_token_hash: hash })).error).toBeNull();
+  const { data, error } = await db.rpc('unsubscribe', { p_token_hash: hash });
+  expect(error).toBeNull();
+  expect(data).toBe(true);
+}
+
+async function subscribed(email: string) {
+  const { data, error } = await db.rpc('subscribed_signups').eq('email', email);
+  expect(error).toBeNull();
+  return data!.length === 1;
+}
+
+async function row(email: string) {
+  const { data, error } = await db.from('signups').select('email, filling, news_opt_in, news_opt_in_at, unsubscribed_at').eq('email', email).single();
+  expect(error).toBeNull();
+  return data!;
+}
+
+describe.skipIf(!run)('unsubscribe and re-consent on the dev database', () => {
+  it('keeps only the address after an unsubscribe: the news opt-in goes with the rest', async () => {
+    const email = newEmail('unsub');
+    const { error } = await db.rpc('request_download', { p_email: email, p_filling: 'development', p_news: true, p_token_hash: newHash() });
+    expect(error).toBeNull();
+    await unsubscribe(email);
+    const r = await row(email);
+    expect(r).toMatchObject({ email, filling: null, news_opt_in: false, news_opt_in_at: null });
+    expect(r.unsubscribed_at).not.toBeNull();
+    expect(await subscribed(email)).toBe(false);
+  });
+
+  it('a fresh tick on a later request clears the unsubscribe, so emails resume', async () => {
+    const email = newEmail('reconsent');
+    await request(email, true);
+    await unsubscribe(email);
+    const before = Date.now() - 60_000;
+    await request(email, true);
+    const r = await row(email);
+    expect(r.unsubscribed_at).toBeNull();
+    expect(r.news_opt_in).toBe(true);
+    expect(Date.parse(r.news_opt_in_at!)).toBeGreaterThan(before);
+    expect(await subscribed(email)).toBe(true);
+  });
+
+  it('a later request without the tick keeps the person unsubscribed', async () => {
+    const email = newEmail('staysout');
+    await request(email, true);
+    await unsubscribe(email);
+    await request(email, false);
+    const r = await row(email);
+    expect(r.unsubscribed_at).not.toBeNull();
+    expect(r).toMatchObject({ news_opt_in: false, news_opt_in_at: null });
+    expect(await subscribed(email)).toBe(false);
+    // The three-argument wrapper older previews call never opts in, so it never re-consents either.
+    const { error } = await db.rpc('request_download', { p_email: email, p_filling: null, p_token_hash: newHash() });
+    expect(error).toBeNull();
+    expect(await subscribed(email)).toBe(false);
   });
 });
