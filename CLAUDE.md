@@ -1,6 +1,6 @@
 # CacheDrop website (cachedrop.io)
 
-Marketing site and beta download for CacheDrop, the Mac storage cleaner built in `Patrick-M-Bourget/mac-cleaner`. Astro on Vercel; Supabase (Montreal, `ca-central-1`) stores signups, feedback and releases; Resend sends email.
+Marketing site and beta download for CacheDrop, the Mac storage cleaner built in `Patrick-M-Bourget/mac-cleaner`. Astro on Vercel; Supabase (AWS US regions) stores signups, feedback and releases; Resend sends email.
 
 `docs/DECISIONS.md` is the plan. Its decisions override anything else, including `handoff/HANDOFF.md`. The design authority is `handoff/`: the pages in `handoff/site/`, the brand guide in `handoff/design-system/README.md`, and the renders in `handoff/screenshots/`.
 
