@@ -1,0 +1,146 @@
+---
+// The email gate (Decision 1): every Download button lands here. The form posts to /api/signup,
+// which saves the signup and emails a download link; the card then says to check the inbox.
+// Built from the design system's utility-page recipe and its TextField, Checkbox, Button and
+// done-state parts (handoff/design-system/components/bundle.css), with the token page's head.
+import Base from '../../layouts/Base.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import { downloadHead } from './_head.ts';
+
+const filling = [
+  ['development', 'Development'],
+  ['video-photo', 'Video & photo'],
+  ['music-audio', 'Music & audio'],
+  ['other', 'Other'],
+];
+const label = 'font-size: 13px; line-height: 18px; font-weight: 500';
+const guideLink = 'color: var(--accent-text); font-weight: 500';
+---
+<Base {...downloadHead}>
+<style is:global>
+.gate-input{height:var(--control-md);padding:0 var(--space-3);border:0;border-radius:var(--radius-md);background:var(--surface);box-shadow:0 0 0 1px var(--line-strong);font:inherit;font-size:14px;color:var(--ink);transition:box-shadow .15s}
+.gate-input::placeholder{color:var(--ink-tertiary)}
+.gate-input:focus{outline:none;box-shadow:var(--focus-ring-field)}
+.gate-input[aria-invalid="true"]{box-shadow:0 0 0 1px var(--danger-ink)}
+.gate-check{display:flex;align-items:flex-start;gap:var(--space-2-5);font-size:13px;line-height:18px;color:var(--ink-body);cursor:pointer}
+.gate-check input{margin:1px 0 0;width:16px;height:16px;accent-color:var(--accent);flex:none}
+.gate-check input:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.gate-btn{display:inline-flex;align-items:center;justify-content:center;height:var(--control-md);padding:0 var(--space-4);border:0;border-radius:var(--radius-md);font:inherit;font-size:14px;font-weight:500;cursor:pointer;transition:filter .15s,background-color .15s,transform .1s}
+.gate-btn:active{transform:translateY(1px)}
+.gate-btn:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.gate-primary{background:var(--accent);color:var(--on-accent);box-shadow:var(--shadow-button)}
+.gate-primary:hover{background:var(--accent-hover)}
+.gate-primary[disabled]{opacity:.45;pointer-events:none}
+.gate-quiet{background:transparent;color:var(--ink)}
+.gate-quiet:hover{background:var(--surface-subtle)}
+[data-gate] [hidden]{display:none !important}
+</style>
+<Nav />
+
+<main style="padding: 104px var(--space-6) var(--space-32)">
+<div style="max-width: var(--window-max); margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center">
+<div style="width: var(--tile-lg); height: var(--tile-lg); border-radius: var(--radius-2xl); background: var(--surface-subtle); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; color: var(--ink)">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg>
+</div>
+<h1 style="margin: var(--space-8) 0 0; font-size: clamp(34px, 4.6vw, 56px); line-height: 1.08; font-weight: 600; letter-spacing: -0.035em; text-wrap: balance">Get the CacheDrop beta.</h1>
+<p style="margin: 18px 0 0; max-width: 560px; font-size: 19px; line-height: 29px; color: var(--ink-secondary); text-wrap: pretty">Enter your email and we’ll send you a download link. It works for 7 days, on any Mac.</p>
+<p style="margin: var(--space-5) 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2) var(--space-4); font-size: 13px; color: var(--ink-secondary)">
+<span>Free while in beta</span>
+<span aria-hidden="true">·</span>
+<span>Universal: Apple Silicon &amp; Intel</span>
+<span aria-hidden="true">·</span>
+<span>macOS 14 Sonoma or later</span>
+</p>
+
+<div data-gate style="margin-top: var(--space-12); width: 100%; max-width: var(--modal-max); padding: var(--space-8); border: 1px solid var(--line); border-radius: var(--radius-2xl); background: var(--surface-raised); box-shadow: var(--shadow-card); text-align: left">
+<form data-gate-form novalidate style="display: flex; flex-direction: column; gap: var(--space-5); margin: 0">
+<div style="display: flex; flex-direction: column; gap: var(--space-1-5)">
+<label for="gate-email" style={label}>Email</label>
+<input id="gate-email" name="email" class="gate-input" type="email" autocomplete="email" required placeholder="you@example.com" aria-describedby="gate-error">
+<p id="gate-error" data-gate-error hidden role="alert" style="margin: 0; font-size: 13px; line-height: 18px; color: var(--danger-ink)"></p>
+</div>
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: var(--space-2-5)">
+<legend style={`padding: 0; margin-bottom: var(--space-2-5); ${label}`}>What’s filling your Mac? <span style="font-weight: 400; color: var(--ink-secondary)">(optional)</span></legend>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2-5) var(--space-4)">
+{filling.map(([value, text]) => (
+<label class="gate-check"><input type="radio" name="filling" value={value}><span>{text}</span></label>
+))}
+</div>
+</fieldset>
+<button type="submit" class="gate-btn gate-primary">Send Download Link</button>
+<p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-secondary)">We email you the link, then only about new versions and security. <a class="textlink" href="/privacy/" style="color: var(--accent-text); font-weight: 500">Privacy Policy</a></p>
+</form>
+
+<div data-gate-done hidden aria-live="polite" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-3); padding: var(--space-6) 0 var(--space-2)">
+<div style="width: var(--control-lg); height: var(--control-lg); border-radius: var(--radius-full); background: var(--success-soft); color: var(--success-ink); display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+<h2 data-gate-done-title tabindex="-1" style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 600; letter-spacing: -0.01em; outline: none">Check your inbox</h2>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-secondary)">We sent a download link to <span data-gate-sent-to style="font-weight: 500; color: var(--ink); word-break: break-all"></span>. If it isn’t there in a minute, check your spam folder.</p>
+<button type="button" class="gate-btn gate-quiet" data-gate-again style="margin-top: var(--space-1)">Use a Different Email</button>
+</div>
+</div>
+
+<div style="margin-top: var(--space-18); display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3) var(--space-8); font-size: 14px">
+<span style="color: var(--ink-secondary)">While you wait:</span>
+<a class="textlink" href="/clear-mac-developer-caches/" style={guideLink}>Clear Developer Caches guide</a>
+<a class="textlink" href="/clear-adobe-media-cache-mac/" style={guideLink}>Clear Adobe Media Cache guide</a>
+</div>
+</div>
+</main>
+
+<Footer overview />
+
+<script is:inline>
+(function () {
+  var form = document.querySelector('[data-gate-form]');
+  var done = document.querySelector('[data-gate-done]');
+  var error = document.querySelector('[data-gate-error]');
+  var email = form.email;
+  var submit = form.querySelector('[type=submit]');
+
+  function fail(message, field) {
+    error.textContent = message;
+    error.hidden = false;
+    if (field) { email.setAttribute('aria-invalid', 'true'); email.focus(); }
+  }
+  function clear() { error.hidden = true; email.removeAttribute('aria-invalid'); }
+  var BAD_EMAIL = 'Enter a full email address, like you@example.com.';
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    clear();
+    var address = email.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) return fail(BAD_EMAIL, true);
+    var choice = form.querySelector('[name=filling]:checked');
+    submit.disabled = true;
+    fetch('/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: address, filling: choice ? choice.value : null })
+    })
+      .then(function (res) {
+        if (res.ok) {
+          document.querySelector('[data-gate-sent-to]').textContent = address;
+          form.hidden = true;
+          done.hidden = false;
+          document.querySelector('[data-gate-done-title]').focus();
+          return;
+        }
+        return res.json().catch(function () { return {}; }).then(function (body) {
+          if (body.error === 'invalid_email') fail(BAD_EMAIL, true);
+          else fail('We couldn’t send the link. Check your connection and try again.');
+        });
+      })
+      .catch(function () { fail('We couldn’t send the link. Check your connection and try again.'); })
+      .then(function () { submit.disabled = false; });
+  });
+  email.addEventListener('input', clear);
+  document.querySelector('[data-gate-again]').addEventListener('click', function () {
+    form.reset();
+    done.hidden = true;
+    form.hidden = false;
+    email.focus();
+  });
+})();
+</script>
+</Base>

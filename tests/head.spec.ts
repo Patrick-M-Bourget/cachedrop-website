@@ -27,10 +27,11 @@ async function headEntries(page: Page, html: string) {
   }, html);
 }
 
-for (const p of pages.filter((p) => p.handoff)) {
+for (const p of pages.filter((p) => p.handoff || p.head)) {
+  const handoff = (p.head ?? p.handoff)!;
   test(`head of ${p.path} matches the handoff apart from the .io domain and copy fixes`, async ({ page, request }) => {
     const built = await (await request.get(p.path)).text();
-    const original = toProductionDomain(withHandoffChanges(p.handoff!, await readFile(`handoff/site/${p.handoff}`, 'utf8')));
+    const original = toProductionDomain(withHandoffChanges(handoff, await readFile(`handoff/site/${handoff}`, 'utf8')));
     await page.goto('about:blank');
     expect(await headEntries(page, built)).toEqual(await headEntries(page, original));
   });

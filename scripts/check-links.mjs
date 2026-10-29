@@ -5,10 +5,8 @@ import { LinkChecker } from 'linkinator';
 
 const PORT = 5799;
 
-// Pages the homepage links to that later tickets build. Remove each line when its page lands.
-const PENDING = [
-  '/download/', // #8 email gate
-];
+// Pages the site links to that later tickets build. Add one per line; remove it when its page lands.
+const PENDING = /** @type {string[]} */ ([]);
 
 const checker = new LinkChecker();
 checker.on('link', (link) => {
