@@ -16,6 +16,8 @@
     var done = scrim.querySelector('[data-fb-done]');
     var error = scrim.querySelector('[data-fb-error]');
     var submit = form.querySelector('[type=submit]');
+    var check = form.querySelector('[data-bot-check]');
+    var bot = window.CacheDropBotCheck; // /assets/bot-check.js, loaded just before this file
     var rating = null;
     var lastFocus = null;
 
@@ -25,6 +27,7 @@
       form.hidden = false; done.hidden = true; error.hidden = true;
       scrim.hidden = false;
       document.documentElement.style.overflow = 'hidden';
+      bot.prepare(check); // Cloudflare's script loads only now (Decision 12)
       var first = scrim.querySelector('.fb-emoji');
       if (first) first.focus();
     }
@@ -73,11 +76,22 @@
         specs: form.includeSpecs.checked ? { userAgent: navigator.userAgent, platform: navigator.platform, language: navigator.language } : null
       };
       submit.disabled = true;
-      fetch(FEEDBACK_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-        .then(function (res) { if (!res.ok) throw new Error(res.status); })
-        .then(function () { form.hidden = true; done.hidden = false; form.reset(); rating = null;
-          scrim.querySelectorAll('[data-rating]').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); }); })
-        .catch(function () { error.textContent = 'We couldn’t send that. Check your connection and try again.'; error.hidden = false; })
+      var NOT_SENT = 'We couldn’t send that. Check your connection and try again.';
+      function fail(message) { error.textContent = message; error.hidden = false; }
+      bot.token(check)
+        .then(function (token) {
+          payload.turnstile = token;
+          return fetch(FEEDBACK_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+            .then(function (res) {
+              bot.reset(check); // a token works once
+              if (res.ok) {
+                form.hidden = true; done.hidden = false; form.reset(); rating = null;
+                scrim.querySelectorAll('[data-rating]').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+                return;
+              }
+              return res.json().catch(function () { return {}; }).then(function (body) { fail(bot.message(check, res, body) || NOT_SENT); });
+            }, function () { bot.reset(check); fail(NOT_SENT); });
+        }, function () { fail(bot.failed(check)); })
         .then(function () { submit.disabled = false; });
     });
     if (location.hash === '#feedback') open();

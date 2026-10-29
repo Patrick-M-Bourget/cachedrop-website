@@ -5,9 +5,11 @@
 // The news checkbox starts unticked and the download never depends on it (Decision 3).
 // Built from the design system's utility-page recipe and its TextField, Checkbox, Button and
 // done-state parts (handoff/design-system/components/bundle.css), with the token page's head.
+// The bot check (Decision 12) starts on load, so its token is ready by the time the email is typed.
 import Base from '../../layouts/Base.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
+import BotCheck from '../../components/BotCheck.astro';
 import { downloadHead } from './_head.ts';
 
 const filling = [
@@ -81,6 +83,7 @@ if (new URLSearchParams(location.search).get('link') === 'expired') {
 <label class="gate-check"><input type="checkbox" name="news" aria-describedby="gate-news-note"><span>Email me news about CacheDrop, like new features, surveys and the paid launch.</span></label>
 <p id="gate-news-note" style="margin: var(--space-1) 0 0 calc(var(--space-4) + var(--space-2-5)); font-size: 13px; line-height: 18px; color: var(--ink-secondary)">Optional. You can unsubscribe at any time from any of our emails.</p>
 </div>
+<BotCheck form="signup" />
 <button type="submit" class="gate-btn gate-primary">Send Download Link</button>
 <p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-secondary)">We email you the link, then only about new versions and security. <a class="textlink" href="/privacy/" style="color: var(--accent-text); font-weight: 500">Privacy Policy</a></p>
 </form>
@@ -108,8 +111,11 @@ if (new URLSearchParams(location.search).get('link') === 'expired') {
   var form = document.querySelector('[data-gate-form]');
   var done = document.querySelector('[data-gate-done]');
   var error = document.querySelector('[data-gate-error]');
+  var check = form.querySelector('[data-bot-check]');
   var email = form.email;
   var submit = form.querySelector('[type=submit]');
+  // bot-check.js is deferred, so it runs after this and before DOMContentLoaded.
+  document.addEventListener('DOMContentLoaded', function () { window.CacheDropBotCheck.prepare(check); });
 
   function fail(message, field) {
     error.textContent = message;
@@ -118,6 +124,7 @@ if (new URLSearchParams(location.search).get('link') === 'expired') {
   }
   function clear() { error.hidden = true; email.removeAttribute('aria-invalid'); }
   var BAD_EMAIL = 'Enter a full email address, like you@example.com.';
+  var NOT_SENT = 'We couldn’t send the link. Check your connection and try again.';
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -125,26 +132,31 @@ if (new URLSearchParams(location.search).get('link') === 'expired') {
     var address = email.value.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) return fail(BAD_EMAIL, true);
     var choice = form.querySelector('[name=filling]:checked');
+    var bot = window.CacheDropBotCheck;
     submit.disabled = true;
-    fetch('/api/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: address, filling: choice ? choice.value : null, news: form.news.checked })
-    })
-      .then(function (res) {
-        if (res.ok) {
-          document.querySelector('[data-gate-sent-to]').textContent = address;
-          form.hidden = true;
-          done.hidden = false;
-          document.querySelector('[data-gate-done-title]').focus();
-          return;
-        }
-        return res.json().catch(function () { return {}; }).then(function (body) {
-          if (body.error === 'invalid_email') fail(BAD_EMAIL, true);
-          else fail('We couldn’t send the link. Check your connection and try again.');
-        });
-      })
-      .catch(function () { fail('We couldn’t send the link. Check your connection and try again.'); })
+    bot.token(check)
+      .then(function (token) {
+        return fetch('/api/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: address, filling: choice ? choice.value : null, news: form.news.checked, turnstile: token })
+        }).then(function (res) {
+          bot.reset(check); // a token works once
+          if (res.ok) {
+            document.querySelector('[data-gate-sent-to]').textContent = address;
+            form.hidden = true;
+            done.hidden = false;
+            document.querySelector('[data-gate-done-title]').focus();
+            return;
+          }
+          return res.json().catch(function () { return {}; }).then(function (body) {
+            var refused = bot.message(check, res, body);
+            if (refused) fail(refused);
+            else if (body.error === 'invalid_email') fail(BAD_EMAIL, true);
+            else fail(NOT_SENT);
+          });
+        }, function () { bot.reset(check); fail(NOT_SENT); });
+      }, function () { fail(bot.failed(check)); })
       .then(function () { submit.disabled = false; });
   });
   email.addEventListener('input', clear);

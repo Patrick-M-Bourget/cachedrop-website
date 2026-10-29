@@ -84,7 +84,7 @@ test.describe('submitting feedback', () => {
     await page.getByLabel('What should we change?').fill('More guides please');
     await page.getByRole('button', { name: 'Submit Feedback' }).click();
     await expect(page.getByText('Thanks, that helps.')).toBeVisible();
-    expect(sent).toEqual([{ rating: 'happy', email: 'ada@example.com', message: 'More guides please', page: '/clear-mac-developer-caches/', specs: null }]);
+    expect(sent).toEqual([{ rating: 'happy', email: 'ada@example.com', message: 'More guides please', page: '/clear-mac-developer-caches/', specs: null, turnstile: 'XXXX.DUMMY.TOKEN.XXXX' }]);
   });
 
   test('sends the browser user agent, platform and language when the box is ticked', async ({ page }) => {

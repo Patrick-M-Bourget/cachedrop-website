@@ -1,6 +1,6 @@
 ---
 // The document shell every page shares: the handoff's head tags in the handoff's
-// order, the design tokens, the site-wide styles, the feedback modal and site.js.
+// order, the design tokens, the site-wide styles, the feedback modal, bot-check.js and site.js.
 // Keep the head tags exactly as delivered (HANDOFF.md §2); tests/head.spec.ts diffs them.
 import '../../handoff/design-system/tokens.css';
 import '../styles/global.css';
@@ -52,6 +52,8 @@ const url = new URL(path, site).href;
 <slot />
 </div>
 <FeedbackModal />
+<!-- bot-check.js first: site.js and the /download/ form use it (Decision 12). It loads Cloudflare's script only on demand. -->
+<script is:inline src="/assets/bot-check.js" defer></script>
 <script is:inline src="/assets/site.js" defer></script>
 <!-- Vercel Web Analytics (Decision 16). analytics.js must run first: it strips download tokens. -->
 <script is:inline src="/assets/analytics.js" defer></script>

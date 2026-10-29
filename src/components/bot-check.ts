@@ -1,0 +1,29 @@
+// What the bot check (Decision 12) says and which Turnstile site key it uses. BotCheck.astro puts
+// both on the page; /assets/bot-check.js shows the messages. Add a language here to add its copy.
+
+/** Cloudflare's always-pass test site key, used by local builds and CI. */
+export const TEST_SITE_KEY = '1x00000000000000000000AA';
+
+/**
+ * The site key the build embeds. Vercel sets PUBLIC_TURNSTILE_SITE_KEY: the real key on
+ * Production, the test key on Preview. A production build without it fails instead of shipping
+ * forms nobody can send.
+ */
+export function siteKey(key: string | undefined, vercelEnv: string | undefined): string {
+  if (key) return key;
+  if (vercelEnv === 'production') throw new Error('PUBLIC_TURNSTILE_SITE_KEY must be set for a production build');
+  return TEST_SITE_KEY;
+}
+
+export const botCheckCopy = {
+  en: {
+    /** The function refused the token, or Turnstile couldn't run in this browser. */
+    failed: 'We couldn’t confirm this came from a person. Reload the page and try again.',
+    /** Too many sends from one place; {wait} is `minute` or `minutes`. */
+    limited: 'That’s a lot of tries from your network. Try again in {wait}.',
+    minute: 'a minute',
+    minutes: '{n} minutes',
+  },
+} as const;
+
+export type Lang = keyof typeof botCheckCopy;
