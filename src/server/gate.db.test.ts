@@ -1,5 +1,5 @@
 // The email gate's SQL (supabase/migrations) against the dev Supabase project: the opt-in rules in
-// request_download, the token cleanup job, and unsubscribe with re-consent (Decisions 2, 3, 4, 32). gate.test.ts covers the handlers
+// request_download, the signup language, the token cleanup job, and unsubscribe with re-consent (Decisions 2, 3, 4, 32). gate.test.ts covers the handlers
 // with a stand-in database; this checks the real functions behave the same way.
 // Skipped unless DB_TESTS=dev, with SUPABASE_URL and SUPABASE_SECRET_KEY set to the dev project
 // (never prod), e.g.:
@@ -26,6 +26,17 @@ const newHash = () => createHash('sha256').update(randomBytes(32)).digest('hex')
 async function request(email: string, news: boolean) {
   const { error } = await db.rpc('request_download', { p_email: email, p_filling: null, p_news: news, p_token_hash: newHash() });
   expect(error).toBeNull();
+}
+
+async function requestIn(email: string, lang: 'en' | 'fr' | null, news = false) {
+  const { error } = await db.rpc('request_download', { p_email: email, p_filling: null, p_news: news, p_lang: lang, p_token_hash: newHash() });
+  expect(error).toBeNull();
+}
+
+async function langOf(email: string) {
+  const { data, error } = await db.from('signups').select('lang').eq('email', email).single();
+  expect(error).toBeNull();
+  return data!.lang;
 }
 
 async function signup(email: string) {
@@ -67,6 +78,45 @@ describe.skipIf(!run)('request_download on the dev database', () => {
     expect(after).toEqual(first);
     const { count } = await db.from('download_tokens').select('*', { count: 'exact', head: true }).eq('signup_id', first.id);
     expect(count).toBe(3);
+  });
+});
+
+describe.skipIf(!run)('signup language on the dev database (Decision 5)', () => {
+  it('stores the language, and a later request in the other language switches it', async () => {
+    const email = newEmail('lang');
+    await requestIn(email, 'fr');
+    expect(await langOf(email)).toBe('fr');
+    await requestIn(email, 'en');
+    expect(await langOf(email)).toBe('en');
+    await requestIn(email, 'fr');
+    expect(await langOf(email)).toBe('fr');
+  });
+
+  it('switching language keeps the opt-in rules: no tick never turns a yes off', async () => {
+    const email = newEmail('langnews');
+    await requestIn(email, 'en', true);
+    const first = await signup(email);
+    await requestIn(email, 'fr', false);
+    expect(await signup(email)).toEqual(first);
+    expect(await langOf(email)).toBe('fr');
+  });
+
+  it('refuses a language other than en or fr', async () => {
+    const email = newEmail('langbad');
+    const { error } = await db.rpc('request_download', { p_email: email, p_filling: null, p_news: false, p_lang: 'de', p_token_hash: newHash() });
+    expect(error).not.toBeNull();
+  });
+
+  it('the older calls without a language store English and never change a stored language', async () => {
+    const email = newEmail('langold');
+    await request(email, false);
+    expect(await langOf(email)).toBe('en');
+    await requestIn(email, 'fr');
+    await request(email, true);
+    expect(await langOf(email)).toBe('fr');
+    const { error } = await db.rpc('request_download', { p_email: email, p_filling: null, p_token_hash: newHash() });
+    expect(error).toBeNull();
+    expect(await langOf(email)).toBe('fr');
   });
 });
 

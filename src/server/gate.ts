@@ -10,13 +10,16 @@ export const BUCKET = 'releases';
 export const SIGNED_URL_SECONDS = 60;
 /** The "What's filling your Mac?" answers, as the form posts them. */
 export const FILLING = ['development', 'video-photo', 'music-audio', 'other'] as const;
+/** The site's languages (Decision 5): English at /, French at /fr/. */
+export const LANGS = ['en', 'fr'] as const;
+export type Lang = (typeof LANGS)[number];
 
 type Result<T> = Promise<{ data: T | null; error: { message: string } | null }>;
 export type TokenLookup = { status: 'ok' | 'unknown' | 'expired' | 'no_release'; version: string | null; filename: string | null };
 
 /** The slice of the supabase-js client the gate uses. */
 export interface GateDb {
-  rpc(fn: 'request_download', args: { p_email: string; p_filling: string | null; p_news: boolean; p_token_hash: string }): Result<unknown>;
+  rpc(fn: 'request_download', args: { p_email: string; p_filling: string | null; p_news: boolean; p_lang: Lang; p_token_hash: string }): Result<unknown>;
   rpc(fn: 'download_for_token', args: { p_token_hash: string; p_count: boolean }): Result<TokenLookup[]>;
   rpc(fn: 'issue_unsubscribe_token', args: { p_email: string; p_token_hash: string }): Result<unknown>;
   /** true when the token was known (and its address is now unsubscribed). */
@@ -52,12 +55,14 @@ const json = (body: unknown, status = 200) =>
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * POST /api/signup with JSON `{ email, filling?, news? }`: saves the signup (or finds the one for
- * this email) and emails a new download link. Only `news: true` counts as the news opt-in, and a
- * later request without it never turns an existing yes off (Decision 3).
+ * POST /api/signup with JSON `{ email, filling?, news?, lang? }`: saves the signup (or finds the one
+ * for this email) and emails a new download link. Only `news: true` counts as the news opt-in, and a
+ * later request without it never turns an existing yes off (Decision 3). `lang` is the page's
+ * language, "en" unless it is exactly "fr"; the latest request's language is stored and the email
+ * goes out in it (Decision 5).
  */
 export async function handleSignup(request: Request, deps: GateDeps): Promise<Response> {
-  let body: { email?: unknown; filling?: unknown; news?: unknown };
+  let body: { email?: unknown; filling?: unknown; news?: unknown; lang?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -66,12 +71,14 @@ export async function handleSignup(request: Request, deps: GateDeps): Promise<Re
   const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
   if (email.length > 254 || !EMAIL.test(email)) return json({ error: 'invalid_email' }, 400);
   const filling = FILLING.find((f) => f === body.filling) ?? null;
+  const lang: Lang = body.lang === 'fr' ? 'fr' : 'en';
 
   const token = newToken();
   const saved = await deps.db.rpc('request_download', {
     p_email: email,
     p_filling: filling,
     p_news: body.news === true,
+    p_lang: lang,
     p_token_hash: hashToken(token),
   });
   if (saved.error) return json({ error: 'unavailable' }, 503);
