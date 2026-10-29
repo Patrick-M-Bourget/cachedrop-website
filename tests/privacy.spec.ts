@@ -37,6 +37,16 @@ test('lists what is collected and why', async ({ page }) => {
   expect(text).toContain('without cookies'); // Decision 16
 });
 
+test('says what Vercel Web Analytics records about a visit (Decision 16)', async ({ page }) => {
+  const visits = (await page.locator('#collect li', { hasText: 'Page visits' }).innerText()).replace(/\s+/g, ' ');
+  expect(visits).toContain('Vercel Web Analytics');
+  for (const field of ['page you visit', 'site that sent you', 'country', 'browser', 'operating system', 'type of device']) {
+    expect(visits, field).toContain(field);
+  }
+  expect(visits).toContain('without cookies');
+  expect(visits).toContain('We remove the code from download links');
+});
+
 test('lists every provider and says which are outside Quebec', async ({ page }) => {
   const text = await sectionText(page, 'Who handles your information');
   for (const provider of ['Supabase', 'Vercel', 'Resend', 'Cloudflare', 'GitHub']) expect(text, provider).toContain(provider);
