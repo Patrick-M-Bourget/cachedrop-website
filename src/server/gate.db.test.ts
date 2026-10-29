@@ -198,6 +198,24 @@ describe.skipIf(!run)('unsubscribe and re-consent on the dev database', () => {
     expect(await subscribed(email)).toBe(false);
   });
 
+  it('a later request without the tick leaves the marker language alone (Decision 32)', async () => {
+    const email = newEmail('unsubnolang');
+    await requestIn(email, 'fr', true);
+    await unsubscribe(email);
+    await requestIn(email, 'fr', false);
+    expect(await langOf(email)).toBe('en');
+    expect(await subscribed(email)).toBe(false);
+  });
+
+  it('a fresh tick stores the request\'s language again with the new consent', async () => {
+    const email = newEmail('reconsentlang');
+    await requestIn(email, 'en', true);
+    await unsubscribe(email);
+    await requestIn(email, 'fr', true);
+    expect(await langOf(email)).toBe('fr');
+    expect(await subscribed(email)).toBe(true);
+  });
+
   it('a fresh tick on a later request clears the unsubscribe, so emails resume', async () => {
     const email = newEmail('reconsent');
     await request(email, true);

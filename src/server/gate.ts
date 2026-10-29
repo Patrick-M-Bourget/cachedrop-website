@@ -54,9 +54,9 @@ export type SignupDeps = GateDeps & Guard;
  * POST /api/signup with JSON `{ email, filling?, news?, lang?, turnstile }`: saves the signup (or
  * finds the one for this email) and emails a new download link. Only `news: true` counts as the
  * news opt-in, and a later request without it never turns an existing yes off (Decision 3). `lang`
- * is the page's language, "en" unless it is exactly "fr"; the latest request's language is stored
- * and the email goes out in it (Decision 5). The Turnstile token and the rate limit are checked
- * first (Decision 12).
+ * is the page's language, "en" unless it is exactly "fr"; the email goes out in it, and it is
+ * stored unless the signup is unsubscribed and this request has no tick (Decisions 5, 32). The
+ * Turnstile token and the rate limit are checked first (Decision 12).
  */
 export async function handleSignup(request: Request, deps: SignupDeps): Promise<Response> {
   let body: { email?: unknown; filling?: unknown; news?: unknown; lang?: unknown; turnstile?: unknown };
