@@ -1,0 +1,17 @@
+<!-- @dsCard group="Actions" height=96 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>ArrowLink — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo' },
+  h(C.ArrowLink, { href: '#' }, 'How to clear developer caches'),
+  h(C.ArrowLink, { href: '#', size: 'lg' }, 'Read the creator guide'),
+  h(C.ArrowLink, { href: '#', tone: 'ink', arrow: false }, 'Using it already? Tell us what to fix next'))
+);
+</script>
+</body>
+</html>

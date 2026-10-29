@@ -1,0 +1,51 @@
+# CacheDrop website: decisions
+
+Grilled with the owner on 2026-10-29 from the design handoff in `handoff/`. These decisions override `handoff/HANDOFF.md` where they differ. Amend a decision by adding a new numbered one that names what it changes; never rewrite an old one.
+
+The legal points below come from primary sources and law-firm summaries researched on 2026-10-29. They are not legal advice; a lawyer reviews the privacy policy before launch (Decision 15).
+
+## Product
+
+1. **The download is gated by a verified email.** `/download/` asks for an email and an optional "What's filling your Mac?" choice (Development, Video & photo, Music & audio, Other). Submitting sends an email with a download link; the page says to check the inbox. Only a real inbox gets the app. Every Download button on the site points at `/download/`.
+2. **Download links.** The link opens `/download/<token>`, which shows the "Your download has started" content from the handoff and starts the download with a fresh 60-second signed URL from a private Supabase bucket. A token works for 7 days and can be reused on any Mac. The same email submitted again re-sends a link instead of adding a row. An expired token shows "This link has expired" with the email form. Tokens are deleted 30 days after they expire.
+3. **Who gets which email.** Everyone who signs up gets the download email, "a new version is available" emails and security notices. None of these promote anything. Only people who tick an **unticked** box ("Email me news about CacheDrop, like new features, surveys and the paid launch") get anything else. The download never depends on that box. A pre-ticked box is not consent under CASL, Law 25 or GDPR.
+4. **Unsubscribe.** Every email has one link that turns off both update emails and the opt-in, plus one-click unsubscribe headers (`List-Unsubscribe`, `List-Unsubscribe-Post`). No preferences page.
+5. **Bilingual.** English at `/`, French at `/fr/`, with `hreflang` alternates. Emails go out in the language the person signed up in. The Charter of the French Language (s. 52) requires a Quebec business's commercial website to be available in French. Claude drafts the French; the owner reviews it.
+
+## Feedback loop
+
+6. **Feedback becomes a GitHub issue.** The feedback modal posts to a Vercel function. The function saves the row in Supabase, then creates an issue in `Patrick-M-Bourget/mac-cleaner` labelled `feedback` and `needs-triage`, with the rating, message, page and specs, **never the email**, and writes the issue number back to the row. A scheduled job retries rows with no issue. Website-only feedback moves to this repo by hand at triage.
+7. **Human in the loop.** A daily Claude scheduled routine reads untriaged `feedback` issues and posts a proposed triage on each (bug or idea, likely duplicates, a proposed label, questions to grill). It never applies a `ready-*` label; the owner does, then grills. Its instructions live in mac-cleaner `docs/agents/feedback-triage.md`.
+8. **GitHub access.** A fine-grained personal access token limited to mac-cleaner, Issues read and write only, stored as a Vercel production secret. The owner creates it. Move to a GitHub App if more repos need it.
+9. **Replying to reporters** is out of scope for now. Emails stay in Supabase for manual lookup.
+10. **The specs checkbox starts unchecked.** The handoff pre-checks it. Law 25 (art. 8.1) wants features that can identify a device off by default.
+
+## Stack and infrastructure
+
+11. **Astro, static output.** Port the handoff pages into Astro layouts and components. The rendered pages match the handoff except for the changes these decisions make, checked with screenshot comparisons at 1440 and 390 px against `handoff/screenshots/` and a diff of the head tags. Literal values become `var(--token)` from `handoff/design-system/tokens.css` in the same port. No React runtime on the pages.
+12. **Server side.** Vercel functions hold the Supabase service key; browsers never write to Supabase directly. Cloudflare Turnstile plus a per-IP rate limit protect the email gate and the feedback form.
+13. **Supabase.** Two projects, `prod` and `dev`, both in `ca-central-1` (AWS Montreal), so stored emails stay in Quebec. Free while building; `prod` moves to Pro the week of launch (Free projects pause after a week idle). The 4.9 MB DMG fits Free's 50 MB file cap.
+14. **Email.** Resend, called from the Vercel function (not Supabase Auth, whose built-in email only reaches the project team). Sends from `cachedrop.io` with SPF and DKIM. Free plan (100 a day) to start; Pro if launch nears that.
+15. **Releases.** A `releases` table and a private bucket. `scripts/publish-dmg.sh` in this repo uploads `CacheDrop-x.y.z.dmg` and marks it latest; the owner runs it after mac-cleaner's `release.sh`. The download page reads the version and filename from the table. Wiring it into `release.sh` waits for Sparkle (mac-cleaner #340), whose update feed is public and skips the gate.
+16. **Analytics.** Vercel Web Analytics (cookieless), listed in the privacy policy, with no consent banner. `beforeSend` strips the token from `/download/<token>` URLs. Downloads are counted in our own table, not in analytics.
+17. **Vercel.** Hobby while building; Pro before launch (Hobby is non-commercial only).
+18. **Domain.** `cachedrop.io` (Namecheap, registered 2026-10-29) moves to Vercel's nameservers; `www` redirects to the apex. Every canonical, Open Graph URL, JSON-LD URL, sitemap and robots entry changes from `cachedrop.app` to `cachedrop.io`. DNS goes up now: Resend's records, and Namecheap mail forwarding (MX) for `privacy@` and `hello@cachedrop.io` to the owner's inbox. The site is attached to the domain only at launch.
+
+## Compliance
+
+19. **Privacy policy** in English and French, linked from the footer and from every form. It names the owner as the person in charge of the protection of personal information (Law 25 art. 3.1) with `privacy@cachedrop.io`; lists what is collected and why, the providers (Supabase, Vercel, Resend, Cloudflare, GitHub) and that some are outside Quebec; and states retention: signups until unsubscribe or a deletion request, tokens 30 days after expiry, specs with their feedback.
+20. **Privacy impact assessment.** A short one in `docs/privacy/` covering the providers outside Quebec (Law 25 art. 17), written before launch.
+21. **Mailing address.** A PO box or virtual mailbox is in place before launch, for CASL's sender identification and the privacy policy. The owner's home address is never published.
+22. **A lawyer reviews** the privacy policy for about an hour before launch.
+
+## Content
+
+23. **Claims match the app.** "Cleaned items go to the Trash" is false for regenerable items, which mac-cleaner deletes permanently (RESET.md Decision 3). Rewrite to the mechanism, e.g. "Caches and build files that tools rebuild are deleted. Your files go to the Trash, so changing your mind is one drag away." Check every engineering claim in the handoff (HANDOFF.md §6.2, the Premiere menu path) against mac-cleaner `main`.
+24. **The homepage app window** becomes a real screenshot of the shipping app's Overview, light and dark, taken from the release build at launch.
+
+## Process
+
+25. **Nothing is public until launch.** Work is reviewed on Vercel previews.
+26. **Launch blocks on:** mac-cleaner #118 and #317 closed with the notarized DMG published through the script; the homepage screenshot re-shot from it; the French copy reviewed by the owner; the lawyer's review; the PO box; Supabase prod and Vercel on Pro; the impact assessment; and a test signup and feedback submission on production.
+27. **Testing.** Vitest for the functions, with Supabase, GitHub, Resend and Turnstile mocked at the boundary. Playwright for the gate, token download and feedback journeys, run against previews wired to the `dev` Supabase project, with a test mode that captures email instead of sending it. CI runs HTML validation, link checks and JSON-LD checks.
+28. **Tickets** are tracer-bullet vertical slices in this order: homepage on Astro deployed to a preview with CI; the guides and privacy page; the email gate; the feedback loop; French; analytics; launch.

@@ -1,0 +1,17 @@
+<!-- @dsCard group="Cards" height=380 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>FeatureCard — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo cd-demo--subtle' },
+  h('div', { className: 'cd-grid', style: { width: '100%' } },
+    h(C.FeatureCard, { icon: 'terminal', title: 'Clear Developer Junk', chips: ['node_modules', 'DerivedData', 'Docker images'], link: { href: '#', label: 'How to clear developer caches' } }, 'Drop gigabytes of forgotten node_modules, Xcode DerivedData, and Docker caches safely.'),
+    h(C.FeatureCard, { icon: 'film', title: 'Clear Creator Caches', chips: ['.cfa / .pek', 'Media Cache', 'FCPX Render Files'], link: { href: '#', label: 'How to clear Adobe media cache' } }, 'Strip out massive Final Cut Pro render files and hidden Adobe media caches without losing your project timelines.')))
+);
+</script>
+</body>
+</html>

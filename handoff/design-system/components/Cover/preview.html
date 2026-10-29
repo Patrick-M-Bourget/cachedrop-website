@@ -1,0 +1,55 @@
+<!-- @dsCard height=288 -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CacheDrop</title>
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--surface); color: var(--ink); font-family: var(--font-sans); overflow: hidden; }
+  .cover { position: relative; height: 288px; overflow: hidden; }
+  .art { position: absolute; top: 0; left: 480px; width: 480px; height: 288px; overflow: hidden; }
+  .art svg { display: block; width: 480px; height: 288px; }
+  .brand { fill: var(--accent); }
+  .deep { fill: var(--ink); }
+  .tint { fill: var(--track); }
+  .dot { fill: var(--accent); }
+  .cut { fill: var(--surface); }
+  .blk { rx: var(--radius-2xl); }
+  .bar { rx: var(--radius-full); }
+  .words { position: absolute; left: var(--space-6); right: var(--space-6); bottom: var(--space-6); max-width: 440px; }
+  .name { margin: 0; font-size: 80px; line-height: .92; font-weight: 600; letter-spacing: -0.04em; color: var(--ink); }
+  .tag { margin: var(--space-3) 0 0 3px; font-size: 14px; line-height: 20px; color: var(--ink-secondary); }
+</style>
+</head>
+<body>
+<div class="cover">
+<div class="art" aria-hidden="true">
+<svg viewBox="0 0 480 288" width="480" height="288">
+<!--
+  blocks      ink 208×280 slab bled off the top and right (the graphite of the type) · accent 232×112 (the one blue) · track 232×112 (the neutral tint) — about 40% of 960×288
+  arrangement one tall graphite slab with two stacked satellites on its left, bottoms on one line space-6 above the edge, space-4 gutters
+  pattern     dot grid, from "precise, Apple-native, 8px rhythm, mono for anything you could type": accent dots at a space-6 pitch on the track block; plus a storage bar (the product's own meter) cut out of the slab in surface with an accent fill
+  scales      sides in space-2 multiples; gutters space-4; dot pitch space-6; block corners radius-2xl; bars radius-full (rx = half of space-2)
+-->
+<rect class="deep blk" x="272" y="-16" width="224" height="280" rx="16"/>
+<rect class="tint blk" x="24" y="24" width="232" height="112" rx="16"/>
+<rect class="brand blk" x="24" y="152" width="232" height="112" rx="16"/>
+<g class="dots">
+<circle class="dot" cx="48" cy="48" r="2.5"/><circle class="dot" cx="72" cy="48" r="2.5"/><circle class="dot" cx="96" cy="48" r="2.5"/><circle class="dot" cx="120" cy="48" r="2.5"/><circle class="dot" cx="144" cy="48" r="2.5"/><circle class="dot" cx="168" cy="48" r="2.5"/><circle class="dot" cx="192" cy="48" r="2.5"/><circle class="dot" cx="216" cy="48" r="2.5"/>
+<circle class="dot" cx="48" cy="72" r="2.5"/><circle class="dot" cx="72" cy="72" r="2.5"/><circle class="dot" cx="96" cy="72" r="2.5"/><circle class="dot" cx="120" cy="72" r="2.5"/><circle class="dot" cx="144" cy="72" r="2.5"/><circle class="dot" cx="168" cy="72" r="2.5"/>
+<circle class="dot" cx="48" cy="96" r="2.5"/><circle class="dot" cx="72" cy="96" r="2.5"/><circle class="dot" cx="96" cy="96" r="2.5"/><circle class="dot" cx="120" cy="96" r="2.5"/>
+<circle class="dot" cx="48" cy="120" r="2.5"/><circle class="dot" cx="72" cy="120" r="2.5"/>
+</g>
+<rect class="cut bar" x="296" y="216" width="160" height="8" rx="4"/>
+<rect class="brand bar" x="296" y="216" width="140" height="8" rx="4"/>
+<rect class="cut bar" x="296" y="232" width="96" height="8" rx="4"/>
+</svg>
+</div>
+<div class="words">
+<h1 class="name">CacheDrop</h1>
+<p class="tag">Store less junk. Keep what matters.</p>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!-- @dsCard group="Page structure" height=260 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>SectionHeader — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.SectionHeader, { eyebrow: 'Built for workstations', title: 'Built for the heavy lifters.', lede: 'CacheDrop is a Mac storage cleaner made for developers and video editors.' }),
+  h(C.SectionHeader, { size: 'xl', align: 'center', title: 'Get your space back.', lede: 'Free while in beta. One universal app for Apple Silicon and Intel Macs on macOS 14 or later.' }))
+);
+</script>
+</body>
+</html>

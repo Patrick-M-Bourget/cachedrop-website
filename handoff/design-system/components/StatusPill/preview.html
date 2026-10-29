@@ -1,0 +1,18 @@
+<!-- @dsCard group="Content" height=96 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>StatusPill — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo' },
+  h(C.StatusPill, { dot: true }, 'Free Mac storage cleaner · Public beta'),
+  h(C.StatusPill, { tone: 'accent' }, 'Smart clean ready'),
+  h(C.StatusPill, { tone: 'success' }, 'Cleaned 3.7 GB'),
+  h(C.StatusPill, { tone: 'danger', dot: 'danger' }, 'Scan failed'))
+);
+</script>
+</body>
+</html>

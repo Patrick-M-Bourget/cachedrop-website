@@ -1,0 +1,15 @@
+<!-- @dsCard group="Brand" height=72 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Tag — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo' },
+  h(C.Tag, null, 'Beta'), h(C.Tag, null, 'New'))
+);
+</script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CacheDrop — Give Fast Feedback</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#1D1D1F;text-decoration:none}
+a:hover{color:#0066CC}
+.field{transition:box-shadow .15s}
+.field:focus{outline:none;box-shadow:0 0 0 1px #0071E3, 0 0 0 4px rgba(0,113,227,0.25)}
+.field::placeholder{color:#86868B}
+.ta::placeholder{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:12px}
+.emoji:hover{background:#ECECEF}
+.ghost:hover{background:#F5F5F7;color:#1D1D1F}
+.primary:hover{filter:brightness(1.08)}
+.close:hover{background:#F5F5F7;color:#1D1D1F}
+</style>
+</helmet>
+<div style="width: 560px; height: 720px; display: flex; align-items: center; justify-content: center; background: rgba(29,29,31,0.32); font-family: Inter, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif; color: #1D1D1F; -webkit-font-smoothing: antialiased">
+<div role="dialog" aria-modal="true" aria-labelledby="fb-title" style="width: 440px; background: #FFFFFF; border-radius: 20px; padding: 28px; box-shadow: 0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 22px">
+
+<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px">
+<div>
+<h1 id="fb-title" style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 600; letter-spacing: -0.01em">Give Fast Feedback</h1>
+<p style="margin: 4px 0 0; font-size: 14px; line-height: 20px; color: #6E6E73">How is CacheDrop working for you?</p>
+</div>
+<a class="close" href="Main.dc.html" aria-label="Close feedback" style="flex: none; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6E6E73">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+</a>
+</div>
+
+<sc-if value="{{sent}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 40px 8px 24px">
+<div style="width: 48px; height: 48px; border-radius: 9999px; background: #E9F8EE; color: #1E8E3E; display: flex; align-items: center; justify-content: center">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+</div>
+<p style="margin: 0; font-size: 16px; font-weight: 600">Thanks, that helps.</p>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6E6E73">We read every note and use them to decide what to build next.</p>
+<a href="Main.dc.html" style="margin-top: 12px; height: 40px; padding: 0 18px; display: inline-flex; align-items: center; border-radius: 10px; border: 1px solid #D2D2D7; font-size: 14px; font-weight: 500">Back to CacheDrop</a>
+</div>
+</sc-if>
+
+<sc-if value="{{notSent}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+<legend style="padding: 0; margin-bottom: 8px; font-size: 13px; font-weight: 500">Your rating</legend>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{ratings}}" as="r" hint-placeholder-count="5">
+<button type="button" class="emoji" aria-label="{{r.label}}" aria-pressed="{{r.pressed}}" onClick="{{r.pick}}" style="height: 52px; border: 0; border-radius: 12px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; background: {{r.bg}}; box-shadow: {{r.ring}}">{{r.emoji}}</button>
+</sc-for>
+</div>
+</fieldset>
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="fb-email" style="font-size: 13px; font-weight: 500">Email <span style="font-weight: 400; color: #6E6E73">(optional)</span></label>
+<input id="fb-email" class="field" type="email" placeholder="you@example.com" style="height: 40px; padding: 0 12px; border: 0; border-radius: 10px; background: #FFFFFF; box-shadow: 0 0 0 1px #D2D2D7; font: inherit; font-size: 14px; color: #1D1D1F">
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="fb-notes" style="font-size: 13px; font-weight: 500">What should we change?</label>
+<textarea id="fb-notes" class="field ta" placeholder="Or report a bug… (Markdown supported)" style="height: 120px; padding: 10px 12px; border: 0; border-radius: 10px; background: #FFFFFF; box-shadow: 0 0 0 1px #D2D2D7; font: inherit; font-size: 14px; line-height: 20px; color: #1D1D1F; resize: vertical"></textarea>
+</div>
+
+<label for="fb-specs" style="display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 18px; color: #424245; cursor: pointer">
+<input id="fb-specs" type="checkbox" checked="{{specs}}" onChange="{{toggleSpecs}}" style="margin: 1px 0 0; width: 16px; height: 16px; accent-color: #0071E3">
+<span>Send anonymous system specs <span style="color: #6E6E73">(Mac model, macOS version)</span></span>
+</label>
+
+<div style="display: flex; justify-content: flex-end; gap: 8px; padding-top: 4px">
+<a class="ghost" href="Main.dc.html" style="height: 40px; padding: 0 16px; display: inline-flex; align-items: center; border-radius: 10px; border: 1px solid #D2D2D7; font-size: 14px; font-weight: 500">Cancel</a>
+<button type="button" class="primary" onClick="{{submit}}" style="height: 40px; padding: 0 18px; border: 0; border-radius: 10px; background: #0071E3; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.12)">Submit Feedback</button>
+</div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":560,"height":720}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { rating: 'love', specs: true, sent: false };
+  }
+  renderVals() {
+    const scale = [
+      { id: 'angry', emoji: '😡', label: 'Very unhappy' },
+      { id: 'meh', emoji: '😕', label: 'Unhappy' },
+      { id: 'neutral', emoji: '😐', label: 'Neutral' },
+      { id: 'happy', emoji: '🙂', label: 'Happy' },
+      { id: 'love', emoji: '😍', label: 'Love it' }
+    ];
+    const ratings = scale.map((r) => {
+      const on = this.state.rating === r.id;
+      return {
+        ...r,
+        pressed: on ? 'true' : 'false',
+        bg: on ? '#EAF3FE' : '#F5F5F7',
+        ring: on ? '0 0 0 2px #0071E3' : 'none',
+        pick: () => this.setState({ rating: r.id })
+      };
+    });
+    return {
+      ratings,
+      specs: this.state.specs,
+      toggleSpecs: () => this.setState({ specs: !this.state.specs }),
+      submit: () => this.setState({ sent: true }),
+      sent: this.state.sent,
+      notSent: !this.state.sent
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Main.dc.html": {
+      "expand": "fill",
+      "h": 4700,
+      "is_interactive": true,
+      "title": "Home  \u00b7  /",
+      "w": 1440,
+      "x": 880,
+      "y": 0
+    },
+    "Developers.dc.html": {
+      "expand": "fill",
+      "h": 5600,
+      "is_interactive": true,
+      "title": "Developer guide  \u00b7  /clear-mac-developer-caches",
+      "w": 1440,
+      "x": 2400,
+      "y": 0
+    },
+    "Creators.dc.html": {
+      "expand": "fill",
+      "h": 5000,
+      "is_interactive": true,
+      "title": "Creator guide  \u00b7  /clear-adobe-media-cache-mac",
+      "w": 1440,
+      "x": 3920,
+      "y": 0
+    },
+    "Download.dc.html": {
+      "expand": "fill",
+      "h": 1700,
+      "is_interactive": true,
+      "title": "Download  \u00b7  /download",
+      "w": 1440,
+      "x": 5440,
+      "y": 0
+    },
+    "Feedback.dc.html": {
+      "h": 720,
+      "is_interactive": true,
+      "title": "Feedback modal",
+      "w": 560,
+      "x": 6960,
+      "y": 0
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-29T12:25:26.752Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {},
+  "notes": {
+    "siteTitle": {
+      "x": 880,
+      "y": -1260,
+      "text": "CacheDrop website \u2014 pages & SEO handoff",
+      "kind": "title1",
+      "maxW": 6640
+    },
+    "seoHome": {
+      "x": 880,
+      "y": -960,
+      "w": 640,
+      "size": "s",
+      "fill": "blue",
+      "text": "SEO \u00b7 HOME\nURL: /  (cachedrop.app)\nTitle tag: Mac Storage Cleaner \u2013 Free Up Space on Your Mac | CacheDrop\nMeta description: Free up space on your Mac. CacheDrop finds hidden caches, Xcode DerivedData, node_modules and render files, and clears them safely. Free beta.\nH1: Store less junk. Keep what matters.\nPrimary keywords: Mac storage cleaner, free up space on Mac, clear Mac disk\nSecondary: Mac System Data, is it safe to delete caches on Mac\nSchema (JSON-LD): SoftwareApplication (operatingSystem macOS 14+, offers price 0), Organization, FAQPage\nInternal links: nav + feature cards + footer \u2192 both guides (exact-match anchors in footer)"
+    },
+    "seoDev": {
+      "x": 2400,
+      "y": -960,
+      "w": 640,
+      "size": "s",
+      "fill": "blue",
+      "text": "SEO \u00b7 DEVELOPER GUIDE\nURL: /clear-mac-developer-caches\nTitle tag: Clear Xcode DerivedData, node_modules & Docker Cache on Mac\nMeta description: Delete Xcode DerivedData, clear old node_modules and Docker caches on your Mac. Manual Terminal steps, plus a free developer Mac cleaner that does it safely.\nH1: Reclaim 50GB of forgotten code.\nPrimary keywords: delete Xcode DerivedData, clear node_modules Mac, clear Docker cache Mac, developer mac cleaner\nSchema: Article (dateModified), BreadcrumbList, FAQPage\nShow 'Updated' date; refresh it when commands change."
+    },
+    "seoCreator": {
+      "x": 3920,
+      "y": -960,
+      "w": 640,
+      "size": "s",
+      "fill": "blue",
+      "text": "SEO \u00b7 CREATOR GUIDE\nURL: /clear-adobe-media-cache-mac\nTitle tag: Clear Adobe Media Cache on Mac (Premiere Pro & Final Cut Pro)\nMeta description: How to clear Adobe Premiere Pro media cache and Final Cut Pro render files on a Mac, step by step, plus a free tool that clears every version at once.\nH1: Stop buying external drives.\nPrimary keywords: clear Adobe media cache Mac, Final Cut Pro render files taking up space, Premiere Pro cache clear\nSchema: Article (dateModified), BreadcrumbList, FAQPage"
+    },
+    "seoDownload": {
+      "x": 5440,
+      "y": -960,
+      "w": 640,
+      "size": "s",
+      "fill": "gray",
+      "text": "DOWNLOAD\nURL: /download  \u00b7  meta robots: noindex, follow\nEvery 'Download' button lands here; the page starts the .dmg download on load.\nKeep out of the sitemap."
+    },
+    "seoFeedback": {
+      "x": 6960,
+      "y": -960,
+      "w": 560,
+      "size": "s",
+      "fill": "gray",
+      "text": "FEEDBACK MODAL\nOpens over any page from 'Provide Feedback' / 'Give Fast Feedback'.\nPOSTs to the secure webhook \u2192 structured issue in the private repo. Never mention GitHub in the UI."
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Developers.dc.html",
+    "Creators.dc.html",
+    "Download.dc.html",
+    "Feedback.dc.html"
+  ],
+  "pages": [],
+  "title": "CacheDrop Landing Page"
+}

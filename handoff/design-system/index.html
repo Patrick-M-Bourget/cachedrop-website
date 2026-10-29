@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CacheDrop components</title>
+<link rel="stylesheet" href="./fonts/fonts.css">
+<link rel="stylesheet" href="./tokens.css">
+<link rel="stylesheet" href="./components/bundle.css">
+<style>
+  .g-wrap { max-width: 1120px; margin: 0 auto; padding: 48px 24px 96px; }
+  .g-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .g-item { margin-top: 40px; }
+  .g-name { margin: 0 0 4px; font-size: 18px; font-weight: 600; }
+  .g-group { margin: 0 0 12px; font-size: 12px; color: var(--ink-secondary); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+  .g-stage { border: 1px solid var(--line); border-radius: var(--radius-2xl); overflow: hidden; background: var(--surface); }
+  .g-stage .cd-nav { position: relative; }
+</style>
+</head>
+<body class="cd-root">
+<div class="g-wrap">
+<div class="g-top"><span class="cd-logo"><span class="cd-logo__name" style="font-size:24px">CacheDrop components</span></span>
+<button class="cd-btn cd-btn--secondary cd-btn--sm cd-btn--pill" id="theme" type="button">Toggle dark theme</button></div>
+<p class="cd-sh__lede">Every component in <code class="cd-code">components/bundle.js</code>, rendered live from the same code agents use. Usage rules are in each <code class="cd-code">components/&lt;Name&gt;/README.md</code>.</p>
+<div id="root"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="./components/bundle.js"></script>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+var sections = [
+  { group: "Actions", name: "ArrowLink", el: function () { return (
+h('div', { className: 'cd-demo' },
+  h(C.ArrowLink, { href: '#' }, 'How to clear developer caches'),
+  h(C.ArrowLink, { href: '#', size: 'lg' }, 'Read the creator guide'),
+  h(C.ArrowLink, { href: '#', tone: 'ink', arrow: false }, 'Using it already? Tell us what to fix next'))
+); } },
+  { group: "Actions", name: "Button", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--col' },
+  h('div', { className: 'cd-demo', style: { padding: 0 } },
+    h(C.Button, { size: 'lg', icon: 'download' }, 'Download Free Beta'),
+    h(C.Button, { size: 'lg', variant: 'secondary' }, 'Give Fast Feedback'),
+    h(C.Button, { size: 'sm' }, 'Get Free Beta')),
+  h('div', { className: 'cd-demo', style: { padding: 0 } },
+    h(C.Button, { shape: 'rounded', variant: 'secondary' }, 'Cancel'),
+    h(C.Button, { shape: 'rounded' }, 'Submit Feedback'),
+    h(C.Button, { shape: 'rounded', variant: 'quiet' }, 'Back to CacheDrop'),
+    h(C.Button, { shape: 'rounded', variant: 'danger' }, 'Empty Trash')))
+); } },
+  { group: "Actions", name: "IconButton", el: function () { return (
+h('div', { className: 'cd-demo' },
+  h(C.IconButton, { icon: 'close', label: 'Close feedback' }),
+  h(C.IconButton, { icon: 'copy', label: 'Copy path' }))
+); } },
+  { group: "Brand", name: "Icon", el: function () { return (
+h('div', { className: 'cd-demo', style: { gap: '20px' } },
+  C.Icon.names.map(function (n) { return h('div', { key: n, title: n, style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', width: '64px', fontSize: '10px', color: 'var(--ink-secondary)' } }, h(C.Icon, { name: n, size: 20 }), n); }))
+); } },
+  { group: "Brand", name: "Logo", el: function () { return (
+h('div', { className: 'cd-demo' },
+  h(C.Logo, { beta: true }),
+  h(C.Logo, {}),
+  h(C.Logo, { markOnly: true, size: 24 }))
+); } },
+  { group: "Brand", name: "Tag", el: function () { return (
+h('div', { className: 'cd-demo' },
+  h(C.Tag, null, 'Beta'), h(C.Tag, null, 'New'))
+); } },
+  { group: "Content", name: "Chip", el: function () { return (
+h('div', { className: 'cd-demo' },
+  h('div', { className: 'cd-chips' }, h(C.Chip, null, 'node_modules'), h(C.Chip, null, 'DerivedData'), h(C.Chip, null, '~/Library/Caches'), h(C.Chip, null, '.cfa / .pek')))
+); } },
+  { group: "Content", name: "CodeBlock", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.CodeBlock, { code: 'rm -rf ~/Library/Developer/Xcode/DerivedData/*' }),
+  h(C.CodeBlock, { label: 'Path', code: '~/Library/Application Support/Adobe/Common/Media Cache Files' }))
+); } },
+  { group: "Content", name: "DataTable", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.DataTable, { caption: 'Package manager caches', columns: ['Tool', 'Cache location', 'Clear it with'], monoColumns: [1, 2], rows: [
+    ['Homebrew', '~/Library/Caches/Homebrew', 'brew cleanup --prune=all'],
+    ['npm', '~/.npm', 'npm cache clean --force'],
+    ['Dart / Flutter', '~/.pub-cache', 'dart pub cache clean']] }))
+); } },
+  { group: "Content", name: "IconTile", el: function () { return (
+h('div', { className: 'cd-demo' },
+  h(C.IconTile, { icon: 'terminal' }), h(C.IconTile, { icon: 'film' }), h(C.IconTile, { icon: 'drive' }),
+  h(C.IconTile, { icon: 'download', size: 'lg' }),
+  h(C.IconTile, { icon: 'terminal', size: 'sm', tone: 'dev' }), h(C.IconTile, { icon: 'box', size: 'sm', tone: 'downloads' }))
+); } },
+  { group: "Content", name: "InlineCode", el: function () { return (
+h('p', { className: 'cd-demo', style: { fontSize: '17px', lineHeight: '28px', color: 'var(--ink-body)', margin: 0 } }, 'CacheDrop safely clears ', h(C.InlineCode, null, '~/Library/Developer/Xcode/DerivedData'), ' without touching your actual code.')
+); } },
+  { group: "Content", name: "StatusPill", el: function () { return (
+h('div', { className: 'cd-demo' },
+  h(C.StatusPill, { dot: true }, 'Free Mac storage cleaner · Public beta'),
+  h(C.StatusPill, { tone: 'accent' }, 'Smart clean ready'),
+  h(C.StatusPill, { tone: 'success' }, 'Cleaned 3.7 GB'),
+  h(C.StatusPill, { tone: 'danger', dot: 'danger' }, 'Scan failed'))
+); } },
+  { group: "Cards", name: "Callout", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.Callout, { eyebrow: 'Also edit video?', title: 'How to clear Adobe media cache and Final Cut Pro render files', link: { href: '#', label: 'Read the creator guide' } }))
+); } },
+  { group: "Cards", name: "FeatureCard", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--subtle' },
+  h('div', { className: 'cd-grid', style: { width: '100%' } },
+    h(C.FeatureCard, { icon: 'terminal', title: 'Clear Developer Junk', chips: ['node_modules', 'DerivedData', 'Docker images'], link: { href: '#', label: 'How to clear developer caches' } }, 'Drop gigabytes of forgotten node_modules, Xcode DerivedData, and Docker caches safely.'),
+    h(C.FeatureCard, { icon: 'film', title: 'Clear Creator Caches', chips: ['.cfa / .pek', 'Media Cache', 'FCPX Render Files'], link: { href: '#', label: 'How to clear Adobe media cache' } }, 'Strip out massive Final Cut Pro render files and hidden Adobe media caches without losing your project timelines.')))
+); } },
+  { group: "Cards", name: "HowToPanel", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--col' },
+  h('div', { className: 'cd-grid', style: { width: '100%' } },
+    h(C.HowToPanel, { title: 'The manual way:', note: 'Note: This only deletes caches for the open version of Premiere.' },
+      h('ol', { style: { margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '16px', lineHeight: '25px', color: 'var(--ink-body)' } },
+        h('li', null, 'Open Premiere Pro.'), h('li', null, 'Go to Settings › Media Cache.'), h('li', null, 'Click “Delete”.'))),
+    h(C.HowToPanel, { title: 'The CacheDrop way:', variant: 'fill', link: { href: '#', label: 'Get CacheDrop free' } },
+      h('p', { style: { margin: 0, fontSize: '16px', lineHeight: '25px', color: 'var(--ink-body)' } }, 'CacheDrop scans your entire Library for every version of Adobe Premiere, After Effects, and Photoshop you’ve ever installed, and drops the caches in one click.'))))
+); } },
+  { group: "Cards", name: "StepList", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.StepList, { items: [
+    { title: 'Only what tools rebuild', body: 'Package caches, build files and render data that your apps regenerate on their own. Your code, projects and timelines stay put.' },
+    { title: 'You review first', body: 'Every recommendation shows its size and the files inside before anything moves.' }] }),
+  h(C.StepList, { variant: 'cards', items: [
+    { title: 'Open the disk image', body: 'Double-click CacheDrop.dmg in your Downloads folder.' },
+    { title: 'Drag it to Applications', body: 'Drop the CacheDrop icon onto the Applications folder.' },
+    { title: 'Choose what to scan', body: 'Pick the folders it can look in, then run your first scan.' }] }))
+); } },
+  { group: "Page structure", name: "Breadcrumb", el: function () { return (
+h('div', { className: 'cd-demo' },
+  h(C.Breadcrumb, { items: [{ label: 'CacheDrop', href: '/' }, { label: 'Developer Storage Guide' }] }))
+); } },
+  { group: "Page structure", name: "FAQList", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.FAQList, { items: [
+    { q: 'Is it safe to delete Xcode DerivedData?', a: 'Yes. DerivedData holds build products, logs and indexes that Xcode recreates automatically. Your next build will take longer once.' },
+    { q: 'Is CacheDrop free, and which Macs does it support?', a: 'It’s free for a limited time during the public beta. It’s a universal app for Apple Silicon and Intel Macs running macOS 14 Sonoma or later.' }] }))
+); } },
+  { group: "Page structure", name: "Footer", el: function () { return (
+h(C.Footer, {})
+); } },
+  { group: "Page structure", name: "NavBar", el: function () { return (
+h('div', { style: { background: 'var(--surface-subtle)', paddingBottom: '40px' } }, h(C.NavBar, { active: 'developers', homeHref: '#', ctaHref: '#', links: [{ id: 'developers', label: 'For Developers', href: '#' }, { id: 'creators', label: 'For Creators', href: '#' }, { id: 'feedback', label: 'Provide Feedback', href: '#' }] }))
+); } },
+  { group: "Page structure", name: "SectionHeader", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.SectionHeader, { eyebrow: 'Built for workstations', title: 'Built for the heavy lifters.', lede: 'CacheDrop is a Mac storage cleaner made for developers and video editors.' }),
+  h(C.SectionHeader, { size: 'xl', align: 'center', title: 'Get your space back.', lede: 'Free while in beta. One universal app for Apple Silicon and Intel Macs on macOS 14 or later.' }))
+); } },
+  { group: "Page structure", name: "TableOfContents", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.TableOfContents, { items: [
+    { href: '#derived-data', label: 'How to delete Xcode DerivedData' },
+    { href: '#node-modules', label: 'How to clear old node_modules folders on a Mac' },
+    { href: '#docker', label: 'How to clear Docker and package manager caches' },
+    { href: '#faq', label: 'Developer storage FAQ' }] }))
+); } },
+  { group: "Forms", name: "Checkbox", el: function () { return (
+h('div', { className: 'cd-demo' },
+  h(C.Checkbox, { id: 'p-specs', defaultChecked: true, label: 'Send anonymous system specs', hint: '(Mac model, macOS version)' }))
+); } },
+  { group: "Forms", name: "RatingScale", el: function () { return (
+h('div', { className: 'cd-demo' },
+  h('div', { style: { width: '100%', maxWidth: '384px' } }, h(C.RatingScale, { defaultValue: 'love' })))
+); } },
+  { group: "Forms", name: "TextArea", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.TextArea, { id: 'p-notes', label: 'What should we change?', placeholder: 'Or report a bug… (Markdown supported)' }))
+); } },
+  { group: "Forms", name: "TextField", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.TextField, { id: 'p-email', label: 'Email', optional: true, type: 'email', placeholder: 'you@example.com' }),
+  h(C.TextField, { id: 'p-email2', label: 'Email', type: 'email', defaultValue: 'pat@', error: 'Enter a full email address, like you@example.com.' }))
+); } },
+  { group: "Overlays", name: "FeedbackForm", el: function () { return (
+h(C.FeedbackForm, { inline: true, defaultRating: 'love', onClose: function () {} })
+); } },
+  { group: "Overlays", name: "Modal", el: function () { return (
+h(C.Modal, { inline: true, title: 'Remove this location?', subtitle: 'CacheDrop will stop scanning ~/Projects.', onClose: function () {},
+  footer: [h(C.Button, { key: 'a', shape: 'rounded', variant: 'secondary' }, 'Cancel'), h(C.Button, { key: 'b', shape: 'rounded' }, 'Remove')] },
+  h('p', { style: { margin: 0, fontSize: '14px', lineHeight: '20px', color: 'var(--ink-body)' } }, 'Nothing on disk is deleted. You can add the folder again from Locations & access.'))
+); } },
+  { group: "Product", name: "MacWindow", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--col', style: { background: 'var(--surface-subtle)' } }, h(C.MacWindow, { sidebar: [
+    { label: 'Storage', items: [{ icon: 'drive', label: 'Overview', active: true }, { icon: 'sparkle', label: 'Smart clean' }, { icon: 'list', label: 'Cleanup plan' }, { icon: 'trend', label: 'Storage trends' }, { icon: 'clock', label: 'History' }] },
+    { label: 'Settings', items: [{ icon: 'folder', label: 'Locations & access' }] }] },
+  h('div', null, h('div', { style: { fontSize: '22px', fontWeight: 600, letterSpacing: '-0.02em' } }, 'Storage overview'), h('div', { style: { fontSize: '13px', color: 'var(--ink-secondary)', marginTop: '2px' } }, 'A clearer picture of what’s on your Mac.')),
+  h(C.StorageBar, { used: 213.82, total: 245.11 }),
+  h(C.ReviewRow, { tone: 'dev', icon: 'terminal', title: 'Developer caches and build files', detail: 'Package caches and build files that tools rebuild', size: 'About 3.7 GB' })))
+); } },
+  { group: "Product", name: "ReviewRow", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.ReviewRow, { tone: 'dev', icon: 'terminal', title: 'Developer caches and build files', detail: 'Package caches and build files that tools rebuild', size: 'About 3.7 GB' }),
+  h(C.ReviewRow, { tone: 'downloads', icon: 'box', title: 'Downloads to review', detail: 'Installers and large files you haven’t opened lately', size: '123 KB' }))
+); } },
+  { group: "Product", name: "StorageBar", el: function () { return (
+h('div', { className: 'cd-demo cd-demo--col' },
+  h('div', { style: { width: '100%' } }, h(C.StorageBar, { used: 213.82, total: 245.11 })))
+); } },
+];
+ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment, null, sections.map(function (s) {
+  return h('section', { key: s.name, className: 'g-item' }, h('p', { className: 'g-group' }, s.group), h('h2', { className: 'g-name' }, s.name), h('div', { className: 'g-stage' }, s.el()));
+})));
+document.getElementById('theme').onclick = function () {
+  var r = document.documentElement; r.setAttribute('data-theme', r.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!-- @dsCard group="Overlays" height=320 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Modal — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h(C.Modal, { inline: true, title: 'Remove this location?', subtitle: 'CacheDrop will stop scanning ~/Projects.', onClose: function () {},
+  footer: [h(C.Button, { key: 'a', shape: 'rounded', variant: 'secondary' }, 'Cancel'), h(C.Button, { key: 'b', shape: 'rounded' }, 'Remove')] },
+  h('p', { style: { margin: 0, fontSize: '14px', lineHeight: '20px', color: 'var(--ink-body)' } }, 'Nothing on disk is deleted. You can add the folder again from Locations & access.'))
+);
+</script>
+</body>
+</html>

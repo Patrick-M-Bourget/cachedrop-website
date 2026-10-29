@@ -1,0 +1,20 @@
+<!-- @dsCard group="Cards" height=300 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>HowToPanel — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo cd-demo--col' },
+  h('div', { className: 'cd-grid', style: { width: '100%' } },
+    h(C.HowToPanel, { title: 'The manual way:', note: 'Note: This only deletes caches for the open version of Premiere.' },
+      h('ol', { style: { margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '16px', lineHeight: '25px', color: 'var(--ink-body)' } },
+        h('li', null, 'Open Premiere Pro.'), h('li', null, 'Go to Settings › Media Cache.'), h('li', null, 'Click “Delete”.'))),
+    h(C.HowToPanel, { title: 'The CacheDrop way:', variant: 'fill', link: { href: '#', label: 'Get CacheDrop free' } },
+      h('p', { style: { margin: 0, fontSize: '16px', lineHeight: '25px', color: 'var(--ink-body)' } }, 'CacheDrop scans your entire Library for every version of Adobe Premiere, After Effects, and Photoshop you’ve ever installed, and drops the caches in one click.'))))
+);
+</script>
+</body>
+</html>

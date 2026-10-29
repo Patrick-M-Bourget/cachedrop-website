@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clear Xcode DerivedData, node_modules &amp; Docker Cache on Mac</title>
+<meta name="description" content="Delete Xcode DerivedData, clear old node_modules and Docker caches on your Mac. Manual Terminal steps, plus a free developer Mac cleaner that does it safely.">
+<link rel="canonical" href="https://cachedrop.app/clear-mac-developer-caches/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="CacheDrop">
+<meta property="og:title" content="Clear Xcode DerivedData, node_modules &amp; Docker Cache on Mac">
+<meta property="og:description" content="Delete Xcode DerivedData, clear old node_modules and Docker caches on your Mac. Manual Terminal steps, plus a free developer Mac cleaner that does it safely.">
+<meta property="og:url" content="https://cachedrop.app/clear-mac-developer-caches/">
+<meta property="og:image" content="https://cachedrop.app/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/cachedrop-app-icon.png">
+<link rel="preload" href="/assets/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/inter-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<style>
+body{margin:0;background:#FFFFFF}
+*{box-sizing:border-box}
+a{color:#1D1D1F;text-decoration:none}
+a:hover{color:#0066CC}
+.navlink{color:#6E6E73;transition:color .15s}
+.navlink:hover{color:#1D1D1F}
+a.btn-primary,a.btn-primary:hover{color:#FFFFFF}
+.btn-primary{transition:filter .15s, transform .1s}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-primary:active{transform:translateY(1px)}
+.flink{color:#6E6E73}
+.flink:hover{color:#1D1D1F}
+.textlink:hover{text-decoration:underline;text-underline-offset:3px}
+.mono{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+.ic{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;font-size:0.86em;background:#F5F5F7;border:1px solid #E5E7EB;border-radius:6px;padding:1px 6px;white-space:nowrap}
+.copy{transition:background .15s}
+.copy:hover{background:#FFFFFF}
+.toc a{color:#424245}
+.toc a:hover{color:#0066CC}
+@media (max-width:760px){.navlinks{display:none !important}}
+</style>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Article",
+   "headline": "Reclaim 50GB of forgotten code.",
+   "description": "Delete Xcode DerivedData, clear old node_modules and Docker caches on your Mac. Manual Terminal steps, plus a free developer Mac cleaner that does it safely.",
+   "dateModified": "2026-10-29",
+   "mainEntityOfPage": "https://cachedrop.app/clear-mac-developer-caches/",
+   "author": {
+    "@type": "Organization",
+    "name": "CacheDrop",
+    "url": "https://cachedrop.app/"
+   },
+   "publisher": {
+    "@type": "Organization",
+    "@id": "https://cachedrop.app/#org",
+    "name": "CacheDrop",
+    "url": "https://cachedrop.app/",
+    "logo": "https://cachedrop.app/assets/cachedrop-app-icon.png"
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "CacheDrop",
+     "item": "https://cachedrop.app/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Developer Storage Guide",
+     "item": "https://cachedrop.app/clear-mac-developer-caches/"
+    }
+   ]
+  },
+  {
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Is it safe to delete Xcode DerivedData?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. DerivedData holds build products, logs and indexes that Xcode recreates automatically. Your next build and code indexing will take longer once while Xcode rebuilds them."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Will deleting node_modules break my project?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. As long as package.json and your lockfile are still there, npm install (or yarn or pnpm) restores the same dependencies."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Does docker system prune delete my volumes?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Not by default. Volumes are only removed when you add the --volumes flag."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why does my Mac show developer files as “System Data”?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "macOS Storage settings don’t break down caches inside your Library or project folders, so most developer build files are counted as System Data. A developer Mac cleaner like CacheDrop names each one and shows its size."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What does CacheDrop clean for developers?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Xcode DerivedData, old node_modules folders, unused Docker images and build cache, and Homebrew, npm and Dart package caches. You review every item before it’s cleared."
+     }
+    }
+   ]
+  }
+ ]
+}
+</script>
+</head>
+<body>
+<div style="font-family: Inter, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif; color: #1D1D1F; background: #FFFFFF; -webkit-font-smoothing: antialiased">
+
+<header style="position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,0.82); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid rgba(0,0,0,0.08)">
+<div style="max-width: 1120px; margin: 0 auto; padding: 0 24px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 16px">
+<a href="/" aria-label="CacheDrop home" style="display: flex; align-items: center; gap: 8px; color: #1D1D1F">
+<svg width="13" height="18" viewBox="326 264 372 510" aria-hidden="true"><path fill-rule="evenodd" d="M533.57 282.41 C520.43 265.84 503.57 265.84 490.43 282.41 C442.64 342.71 332 492.78 332 590 C332 689 413 768 512 768 C611 768 692 689 692 590 C692 492.78 581.36 342.71 533.57 282.41 Z M451.68 564.32 L488 600.64 L576.32 512.32 A25 25 0 0 1 611.68 547.68 L505.68 653.68 A25 25 0 0 1 470.32 653.68 L416.32 599.68 A25 25 0 0 1 451.68 564.32 Z" fill="#1D1D1F"></path></svg>
+<span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em">CacheDrop</span>
+<span style="font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: #6E6E73; background: #F5F5F7; border-radius: 9999px; padding: 2px 7px">BETA</span>
+</a>
+<nav class="navlinks" aria-label="Primary" style="display: flex; align-items: center; gap: 28px; font-size: 13px">
+<a href="/clear-mac-developer-caches/" aria-current="page" style="color: #1D1D1F; font-weight: 500">For Developers</a>
+<a class="navlink" href="/clear-adobe-media-cache-mac/">For Creators</a>
+<a class="navlink" href="#feedback" data-feedback>Provide Feedback</a>
+</nav>
+<a class="btn-primary" href="/download/" style="font-size: 13px; font-weight: 500; background: #0071E3; padding: 7px 14px; border-radius: 9999px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.12)">Get Free Beta</a>
+</div>
+</header>
+
+<main>
+<section style="background: #FBFBFD; border-bottom: 1px solid #E5E7EB; padding: 72px 24px 88px">
+<div style="max-width: 760px; margin: 0 auto">
+<nav aria-label="Breadcrumb">
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: #6E6E73">
+<li><a class="flink" href="/">CacheDrop</a></li>
+<li aria-hidden="true" style="display: flex"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></li>
+<li aria-current="page" style="color: #424245">Developer Storage Guide</li>
+</ol>
+</nav>
+<h1 style="margin: 40px 0 0; font-size: clamp(38px, 5.4vw, 64px); line-height: 1.06; font-weight: 600; letter-spacing: -0.04em; text-wrap: balance">Reclaim 50GB of forgotten code.</h1>
+<h2 style="margin: 24px 0 0; font-size: 19px; line-height: 29px; font-weight: 400; letter-spacing: -0.012em; color: #6E6E73; text-wrap: pretty">If you write code on a Mac, your biggest space hog isn’t your files. It’s the build artifacts scattered across every old project.</h2>
+<div style="margin-top: 36px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 20px">
+<a class="btn-primary" href="/download/" style="display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 24px; border-radius: 9999px; background: #0071E3; font-size: 15px; font-weight: 500; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.12)">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg>
+<span>Download CacheDrop (Free)</span>
+</a>
+<span style="font-size: 13px; color: #6E6E73">Developer Mac cleaner · macOS 14+ · Apple Silicon &amp; Intel</span>
+</div>
+<p style="margin: 40px 0 0; font-size: 13px; color: #6E6E73">Updated October 2026 · 6 min read</p>
+</div>
+</section>
+
+<div style="max-width: 760px; margin: 0 auto; padding: 72px 24px 0">
+
+<nav class="toc" aria-label="On this page" style="padding: 24px 28px; border: 1px solid #E5E7EB; border-radius: 16px">
+<p style="margin: 0 0 12px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #6E6E73">On this page</p>
+<ol style="margin: 0; padding: 0 0 0 20px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 22px">
+<li><a href="#derived-data">How to delete Xcode DerivedData</a></li>
+<li><a href="#node-modules">How to clear old node_modules folders on a Mac</a></li>
+<li><a href="#docker">How to clear Docker and package manager caches</a></li>
+<li><a href="#faq">Developer storage FAQ</a></li>
+</ol>
+</nav>
+
+<section style="padding-top: 64px">
+<h2 style="margin: 0; font-size: clamp(26px, 3vw, 34px); line-height: 1.2; font-weight: 600; letter-spacing: -0.025em">What is eating your Mac’s storage?</h2>
+<p style="margin: 18px 0 0; font-size: 17px; line-height: 28px; color: #424245; text-wrap: pretty">When you check macOS storage, developer environments are usually grouped into a massive, unhelpful “System Data” block. CacheDrop specifically targets:</p>
+<ul style="margin: 16px 0 0; padding: 0 0 0 20px; display: flex; flex-direction: column; gap: 6px; font-size: 17px; line-height: 28px; color: #424245">
+<li>Xcode DerivedData: intermediate build output and indexes</li>
+<li>Abandoned <span class="ic">node_modules</span> folders in old projects</li>
+<li>Docker images and build cache, plus Homebrew, npm and Dart package caches</li>
+</ul>
+<p style="margin: 18px 0 0; font-size: 17px; line-height: 28px; color: #424245">All three are rebuildable: your tools recreate them the next time you build or install. Deleting them frees disk space without touching your source code.</p>
+</section>
+
+<section id="derived-data" style="padding-top: 72px; display: flex; flex-direction: column; gap: 20px">
+<h3 style="margin: 0; font-size: 24px; line-height: 30px; font-weight: 600; letter-spacing: -0.015em">1. Xcode DerivedData</h3>
+<p style="margin: 0; font-size: 17px; line-height: 28px; color: #424245; text-wrap: pretty">Xcode generates massive amounts of intermediate build information. CacheDrop safely clears <span class="ic">~/Library/Developer/Xcode/DerivedData</span> without touching your actual code.</p>
+<p style="margin: 8px 0 0; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #6E6E73">Delete DerivedData manually</p>
+<p style="margin: 0; font-size: 17px; line-height: 28px; color: #424245">Quit Xcode first, then run this in Terminal. You can also open Xcode › Settings › Locations, click the arrow next to Derived Data, and move the folders to the Trash.</p>
+<div style="border: 1px solid #E5E7EB; background: #F5F5F7; border-radius: 12px; overflow: hidden">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 6px 6px 14px; border-bottom: 1px solid #E5E7EB; font-size: 12px; color: #6E6E73"><span>Terminal</span><button type="button" class="copy" data-copy="rm -rf ~/Library/Developer/Xcode/DerivedData/*" style="height: 28px; padding: 0 10px; border: 1px solid #D2D2D7; border-radius: 7px; background: #FBFBFD; font: inherit; font-size: 12px; font-weight: 500; color: #1D1D1F; cursor: pointer">Copy</button></div>
+<pre class="mono" style="margin: 0; padding: 14px 16px; font-size: 13px; line-height: 20px; color: #1D1D1F; overflow-x: auto"><code>rm -rf ~/Library/Developer/Xcode/DerivedData/*</code></pre>
+</div>
+<p style="margin: 8px 0 0; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #6E6E73">With CacheDrop</p>
+<p style="margin: 0; font-size: 17px; line-height: 28px; color: #424245">CacheDrop shows DerivedData’s size in its Developer caches review, so you can see it and clear it in one click.</p>
+</section>
+
+<section id="node-modules" style="padding-top: 72px; display: flex; flex-direction: column; gap: 20px">
+<h3 style="margin: 0; font-size: 24px; line-height: 30px; font-weight: 600; letter-spacing: -0.015em">2. Abandoned node_modules</h3>
+<p style="margin: 0; font-size: 17px; line-height: 28px; color: #424245; text-wrap: pretty">You probably have dozens of old React or Node projects you haven’t touched in a year. Each <span class="ic">node_modules</span> folder can be 500MB+. CacheDrop finds them all and lets you drop them in one click.</p>
+<p style="margin: 8px 0 0; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #6E6E73">Find and clear node_modules manually</p>
+<p style="margin: 0; font-size: 17px; line-height: 28px; color: #424245">List every node_modules folder under a directory with its size. Swap in the folder where you keep projects:</p>
+<div style="border: 1px solid #E5E7EB; background: #F5F5F7; border-radius: 12px; overflow: hidden">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 6px 6px 14px; border-bottom: 1px solid #E5E7EB; font-size: 12px; color: #6E6E73"><span>Terminal</span><button type="button" class="copy" data-copy="find ~/Projects -name node_modules -type d -prune -exec du -sh {} +" style="height: 28px; padding: 0 10px; border: 1px solid #D2D2D7; border-radius: 7px; background: #FBFBFD; font: inherit; font-size: 12px; font-weight: 500; color: #1D1D1F; cursor: pointer">Copy</button></div>
+<pre class="mono" style="margin: 0; padding: 14px 16px; font-size: 13px; line-height: 20px; color: #1D1D1F; overflow-x: auto"><code>find ~/Projects -name node_modules -type d -prune -exec du -sh {} +</code></pre>
+</div>
+<p style="margin: 0; font-size: 17px; line-height: 28px; color: #424245">Delete the ones you don’t need with <span class="ic">rm -rf path/to/project/node_modules</span>. If you return to a project, <span class="ic">npm install</span> brings them back.</p>
+<p style="margin: 8px 0 0; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #6E6E73">With CacheDrop</p>
+<p style="margin: 0; font-size: 17px; line-height: 28px; color: #424245">CacheDrop scans the folders you choose and lists every node_modules folder with its size, so you can pick the ones to drop.</p>
+</section>
+
+<section id="docker" style="padding-top: 72px; display: flex; flex-direction: column; gap: 20px">
+<h3 style="margin: 0; font-size: 24px; line-height: 30px; font-weight: 600; letter-spacing: -0.015em">3. Docker Caches &amp; Package Managers</h3>
+<p style="margin: 0; font-size: 17px; line-height: 28px; color: #424245; text-wrap: pretty">Clear out unused Docker images, Homebrew caches, <span class="ic">.pub-cache</span>, and <span class="ic">npm</span> leftovers that are quietly eating your SSD.</p>
+<p style="margin: 8px 0 0; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #6E6E73">Clear Docker cache manually</p>
+<p style="margin: 0; font-size: 17px; line-height: 28px; color: #424245">This removes stopped containers, unused networks, dangling images and build cache. Add <span class="ic">-a</span> to also remove every image no container is using. Volumes are kept unless you add <span class="ic">--volumes</span>.</p>
+<div style="border: 1px solid #E5E7EB; background: #F5F5F7; border-radius: 12px; overflow: hidden">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 6px 6px 14px; border-bottom: 1px solid #E5E7EB; font-size: 12px; color: #6E6E73"><span>Terminal</span><button type="button" class="copy" data-copy="docker system prune" style="height: 28px; padding: 0 10px; border: 1px solid #D2D2D7; border-radius: 7px; background: #FBFBFD; font: inherit; font-size: 12px; font-weight: 500; color: #1D1D1F; cursor: pointer">Copy</button></div>
+<pre class="mono" style="margin: 0; padding: 14px 16px; font-size: 13px; line-height: 20px; color: #1D1D1F; overflow-x: auto"><code>docker system prune</code></pre>
+</div>
+<p style="margin: 8px 0 0; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #6E6E73">Package manager caches</p>
+<div style="overflow-x: auto; border: 1px solid #E5E7EB; border-radius: 12px">
+<table style="width: 100%; min-width: 560px; border-collapse: collapse; font-size: 14px; line-height: 20px; text-align: left">
+<thead>
+<tr style="background: #FBFBFD">
+<th scope="col" style="padding: 12px 16px; font-weight: 600; border-bottom: 1px solid #E5E7EB">Tool</th>
+<th scope="col" style="padding: 12px 16px; font-weight: 600; border-bottom: 1px solid #E5E7EB">Cache location</th>
+<th scope="col" style="padding: 12px 16px; font-weight: 600; border-bottom: 1px solid #E5E7EB">Clear it with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row" style="padding: 12px 16px; font-weight: 500; border-bottom: 1px solid #E5E7EB">Homebrew</th>
+<td class="mono" style="padding: 12px 16px; font-size: 13px; color: #424245; border-bottom: 1px solid #E5E7EB">~/Library/Caches/Homebrew</td>
+<td class="mono" style="padding: 12px 16px; font-size: 13px; color: #424245; border-bottom: 1px solid #E5E7EB">brew cleanup --prune=all</td>
+</tr>
+<tr>
+<th scope="row" style="padding: 12px 16px; font-weight: 500; border-bottom: 1px solid #E5E7EB">npm</th>
+<td class="mono" style="padding: 12px 16px; font-size: 13px; color: #424245; border-bottom: 1px solid #E5E7EB">~/.npm</td>
+<td class="mono" style="padding: 12px 16px; font-size: 13px; color: #424245; border-bottom: 1px solid #E5E7EB">npm cache clean --force</td>
+</tr>
+<tr>
+<th scope="row" style="padding: 12px 16px; font-weight: 500">Dart / Flutter</th>
+<td class="mono" style="padding: 12px 16px; font-size: 13px; color: #424245">~/.pub-cache</td>
+<td class="mono" style="padding: 12px 16px; font-size: 13px; color: #424245">dart pub cache clean</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p style="margin: 8px 0 0; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #6E6E73">With CacheDrop</p>
+<p style="margin: 0; font-size: 17px; line-height: 28px; color: #424245">CacheDrop groups these caches under Developer caches and build files, shows the total, and clears them together. No commands to remember.</p>
+</section>
+
+<section id="faq" style="padding-top: 88px">
+<h2 style="margin: 0; font-size: clamp(26px, 3vw, 34px); line-height: 1.2; font-weight: 600; letter-spacing: -0.025em">Developer storage FAQ</h2>
+<div style="margin-top: 24px; display: flex; flex-direction: column">
+<div style="padding: 24px 0; border-top: 1px solid #E5E7EB">
+<h3 style="margin: 0; font-size: 18px; line-height: 26px; font-weight: 600; letter-spacing: -0.01em">Is it safe to delete Xcode DerivedData?</h3>
+<p style="margin: 8px 0 0; font-size: 16px; line-height: 26px; color: #424245">Yes. DerivedData holds build products, logs and indexes that Xcode recreates automatically. Your next build and code indexing will take longer once while Xcode rebuilds them.</p>
+</div>
+<div style="padding: 24px 0; border-top: 1px solid #E5E7EB">
+<h3 style="margin: 0; font-size: 18px; line-height: 26px; font-weight: 600; letter-spacing: -0.01em">Will deleting node_modules break my project?</h3>
+<p style="margin: 8px 0 0; font-size: 16px; line-height: 26px; color: #424245">No. As long as package.json and your lockfile are still there, <span class="ic">npm install</span> (or yarn or pnpm) restores the same dependencies.</p>
+</div>
+<div style="padding: 24px 0; border-top: 1px solid #E5E7EB">
+<h3 style="margin: 0; font-size: 18px; line-height: 26px; font-weight: 600; letter-spacing: -0.01em">Does docker system prune delete my volumes?</h3>
+<p style="margin: 8px 0 0; font-size: 16px; line-height: 26px; color: #424245">Not by default. Volumes are only removed when you add the <span class="ic">--volumes</span> flag.</p>
+</div>
+<div style="padding: 24px 0; border-top: 1px solid #E5E7EB">
+<h3 style="margin: 0; font-size: 18px; line-height: 26px; font-weight: 600; letter-spacing: -0.01em">Why does my Mac show developer files as “System Data”?</h3>
+<p style="margin: 8px 0 0; font-size: 16px; line-height: 26px; color: #424245">macOS Storage settings don’t break down caches inside your Library or project folders, so most developer build files are counted as System Data. A developer Mac cleaner like CacheDrop names each one and shows its size.</p>
+</div>
+<div style="padding: 24px 0; border-top: 1px solid #E5E7EB; border-bottom: 1px solid #E5E7EB">
+<h3 style="margin: 0; font-size: 18px; line-height: 26px; font-weight: 600; letter-spacing: -0.01em">What does CacheDrop clean for developers?</h3>
+<p style="margin: 8px 0 0; font-size: 16px; line-height: 26px; color: #424245">Xcode DerivedData, old node_modules folders, unused Docker images and build cache, and Homebrew, npm and Dart package caches. You review every item before it’s cleared.</p>
+</div>
+</div>
+</section>
+
+<aside style="margin-top: 72px; padding: 28px; border-radius: 16px; background: #F5F5F7; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<div>
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #6E6E73">Also edit video?</p>
+<p style="margin: 6px 0 0; font-size: 17px; line-height: 24px; font-weight: 600">How to clear Adobe media cache and Final Cut Pro render files</p>
+</div>
+<a class="textlink" href="/clear-adobe-media-cache-mac/" style="display: inline-flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 500; color: #0066CC">Read the creator guide
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></a>
+</aside>
+</div>
+
+<section style="margin-top: 120px; background: #F5F5F7; padding: 112px 24px; text-align: center">
+<div style="max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; align-items: center">
+<h2 style="margin: 0; font-size: clamp(30px, 4vw, 48px); line-height: 1.1; font-weight: 600; letter-spacing: -0.035em">Skip the Terminal.</h2>
+<p style="margin: 16px 0 0; font-size: 17px; line-height: 27px; color: #6E6E73">CacheDrop finds DerivedData, node_modules and Docker caches in one scan. Free while in beta.</p>
+<a class="btn-primary" href="/download/" style="margin-top: 32px; display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 24px; border-radius: 9999px; background: #0071E3; font-size: 15px; font-weight: 500; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.12)">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg>
+<span>Download CacheDrop (Free)</span>
+</a>
+</div>
+</section>
+</main>
+
+<footer style="border-top: 1px solid #E5E7EB; background: #FFFFFF">
+<div style="max-width: 1120px; margin: 0 auto; padding: 64px 24px 40px">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 8px">
+<svg width="12" height="16" viewBox="326 264 372 510" aria-hidden="true"><path fill-rule="evenodd" d="M533.57 282.41 C520.43 265.84 503.57 265.84 490.43 282.41 C442.64 342.71 332 492.78 332 590 C332 689 413 768 512 768 C611 768 692 689 692 590 C692 492.78 581.36 342.71 533.57 282.41 Z M451.68 564.32 L488 600.64 L576.32 512.32 A25 25 0 0 1 611.68 547.68 L505.68 653.68 A25 25 0 0 1 470.32 653.68 L416.32 599.68 A25 25 0 0 1 451.68 564.32 Z" fill="#1D1D1F"></path></svg>
+<span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em">CacheDrop</span>
+</div>
+<p style="margin: 0; max-width: 240px; font-size: 13px; line-height: 19px; color: #6E6E73">A careful Mac storage cleaner for developer caches and creative render files.</p>
+</div>
+<nav aria-label="Cleaning guides" style="display: flex; flex-direction: column; gap: 10px; font-size: 13px">
+<h3 style="margin: 0 0 4px; font-size: 13px; font-weight: 600">Cleaning Guides</h3>
+<a class="flink" href="/clear-mac-developer-caches/">Clear Developer Caches</a>
+<a class="flink" href="/clear-adobe-media-cache-mac/">Clear Adobe Media Cache</a>
+</nav>
+<nav aria-label="Product" style="display: flex; flex-direction: column; gap: 10px; font-size: 13px">
+<h3 style="margin: 0 0 4px; font-size: 13px; font-weight: 600">Product</h3>
+<a class="flink" href="/">Overview</a>
+<a class="flink" href="/download/">Download Free Beta</a>
+<a class="flink" href="#feedback" data-feedback>Provide Feedback</a>
+</nav>
+<div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #6E6E73">
+<h3 style="margin: 0 0 4px; font-size: 13px; font-weight: 600; color: #1D1D1F">Platform</h3>
+<span>Apple Silicon &amp; Intel</span>
+<span>macOS 14 Sonoma and later</span>
+</div>
+</div>
+<div style="margin-top: 56px; padding-top: 24px; border-top: 1px solid #E5E7EB; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 12px; color: #6E6E73">
+<span>© 2026 CacheDrop. Apple, Mac, macOS and Xcode are trademarks of Apple Inc.</span>
+<span>Public beta</span>
+</div>
+</div>
+</footer>
+
+</div>
+
+<!-- Feedback modal: opened by any [data-feedback] link. Logic in /assets/site.js. -->
+<style>
+.fb-scrim{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(29,29,31,0.32);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-family:Inter,-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;color:#1D1D1F}
+.fb-scrim[hidden],.fb-scrim [hidden]{display:none !important}
+.fb-card{width:100%;max-width:440px;max-height:calc(100vh - 32px);overflow:auto;background:#FFFFFF;border-radius:20px;padding:28px;box-shadow:0 24px 48px -12px rgba(0,0,0,0.18),0 0 0 1px rgba(0,0,0,0.08);display:flex;flex-direction:column;gap:22px}
+.fb-field{transition:box-shadow .15s}
+.fb-field:focus{outline:none;box-shadow:0 0 0 1px #0071E3,0 0 0 4px rgba(0,113,227,0.25)}
+.fb-field::placeholder{color:#86868B}
+.fb-ta::placeholder{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:12px}
+.fb-emoji{height:52px;border:0;border-radius:12px;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#F5F5F7}
+.fb-emoji:hover{background:#ECECEF}
+.fb-emoji[aria-pressed="true"]{background:#EAF3FE;box-shadow:0 0 0 2px #0071E3}
+.fb-btn{height:40px;padding:0 16px;border-radius:10px;font:inherit;font-size:14px;font-weight:500;cursor:pointer}
+.fb-ghost{border:1px solid #D2D2D7;background:#FFFFFF;color:#1D1D1F}
+.fb-ghost:hover{background:#F5F5F7}
+.fb-primary{border:0;background:#0071E3;color:#FFFFFF;box-shadow:inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.12)}
+.fb-primary:hover{filter:brightness(1.08)}
+.fb-primary[disabled]{opacity:.6;cursor:progress}
+.fb-close{flex:none;width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:#6E6E73;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.fb-close:hover{background:#F5F5F7;color:#1D1D1F}
+.fb-scrim button:focus-visible,.fb-scrim input[type=checkbox]:focus-visible{outline:none;box-shadow:0 0 0 2px #FFFFFF,0 0 0 4px #0071E3}
+</style>
+<div class="fb-scrim" id="feedback" hidden>
+<div role="dialog" aria-modal="true" aria-labelledby="fb-title" class="fb-card">
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+<div>
+<h2 id="fb-title" style="margin:0;font-size:18px;line-height:24px;font-weight:600;letter-spacing:-0.01em">Give Fast Feedback</h2>
+<p style="margin:4px 0 0;font-size:14px;line-height:20px;color:#6E6E73">How is CacheDrop working for you?</p>
+</div>
+<button type="button" class="fb-close" data-fb-close aria-label="Close feedback"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+
+<div data-fb-done hidden style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:40px 8px 24px">
+<div style="width:48px;height:48px;border-radius:9999px;background:#E9F8EE;color:#1A7F37;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+<p style="margin:0;font-size:16px;font-weight:600">Thanks, that helps.</p>
+<p style="margin:0;font-size:14px;line-height:20px;color:#6E6E73">We read every note and use them to decide what to build next.</p>
+<button type="button" class="fb-btn fb-ghost" data-fb-close style="margin-top:12px">Back to CacheDrop</button>
+</div>
+
+<form data-fb-form novalidate style="display:flex;flex-direction:column;gap:20px;margin:0">
+<fieldset style="margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:8px">
+<legend style="padding:0;margin-bottom:8px;font-size:13px;font-weight:500">Your rating</legend>
+<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px">
+<button type="button" class="fb-emoji" data-rating="angry" aria-label="Very unhappy" aria-pressed="false">😡</button>
+<button type="button" class="fb-emoji" data-rating="meh" aria-label="Unhappy" aria-pressed="false">😕</button>
+<button type="button" class="fb-emoji" data-rating="neutral" aria-label="Neutral" aria-pressed="false">😐</button>
+<button type="button" class="fb-emoji" data-rating="happy" aria-label="Happy" aria-pressed="false">🙂</button>
+<button type="button" class="fb-emoji" data-rating="love" aria-label="Love it" aria-pressed="false">😍</button>
+</div>
+</fieldset>
+<div style="display:flex;flex-direction:column;gap:6px">
+<label for="fb-email" style="font-size:13px;font-weight:500">Email <span style="font-weight:400;color:#6E6E73">(optional)</span></label>
+<input id="fb-email" name="email" class="fb-field" type="email" autocomplete="email" placeholder="you@example.com" style="height:40px;padding:0 12px;border:0;border-radius:10px;background:#FFFFFF;box-shadow:0 0 0 1px #D2D2D7;font:inherit;font-size:14px;color:#1D1D1F">
+</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<label for="fb-notes" style="font-size:13px;font-weight:500">What should we change?</label>
+<textarea id="fb-notes" name="message" class="fb-field fb-ta" placeholder="Or report a bug… (Markdown supported)" style="height:120px;padding:10px 12px;border:0;border-radius:10px;background:#FFFFFF;box-shadow:0 0 0 1px #D2D2D7;font:inherit;font-size:14px;line-height:20px;color:#1D1D1F;resize:vertical"></textarea>
+<p data-fb-error hidden role="alert" style="margin:0;font-size:13px;line-height:18px;color:#D70015"></p>
+</div>
+<label for="fb-specs" style="display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:18px;color:#424245;cursor:pointer">
+<input id="fb-specs" name="includeSpecs" type="checkbox" checked style="margin:1px 0 0;width:16px;height:16px;accent-color:#0071E3">
+<span>Send anonymous system specs <span style="color:#6E6E73">(Mac model, macOS version)</span></span>
+</label>
+<div style="display:flex;justify-content:flex-end;gap:8px;padding-top:4px">
+<button type="button" class="fb-btn fb-ghost" data-fb-close>Cancel</button>
+<button type="submit" class="fb-btn fb-primary">Submit Feedback</button>
+</div>
+</form>
+</div>
+</div>
+
+<script src="/assets/site.js" defer></script>
+</body>
+</html>

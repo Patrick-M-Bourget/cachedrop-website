@@ -1,0 +1,15 @@
+<!-- @dsCard group="Content" height=80 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Chip — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo' },
+  h('div', { className: 'cd-chips' }, h(C.Chip, null, 'node_modules'), h(C.Chip, null, 'DerivedData'), h(C.Chip, null, '~/Library/Caches'), h(C.Chip, null, '.cfa / .pek')))
+);
+</script>
+</body>
+</html>

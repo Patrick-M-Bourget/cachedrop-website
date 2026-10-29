@@ -1,0 +1,18 @@
+<!-- @dsCard group="Content" height=230 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>DataTable — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.DataTable, { caption: 'Package manager caches', columns: ['Tool', 'Cache location', 'Clear it with'], monoColumns: [1, 2], rows: [
+    ['Homebrew', '~/Library/Caches/Homebrew', 'brew cleanup --prune=all'],
+    ['npm', '~/.npm', 'npm cache clean --force'],
+    ['Dart / Flutter', '~/.pub-cache', 'dart pub cache clean']] }))
+);
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!-- @dsCard group="Page structure" height=300 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>FAQList — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.FAQList, { items: [
+    { q: 'Is it safe to delete Xcode DerivedData?', a: 'Yes. DerivedData holds build products, logs and indexes that Xcode recreates automatically. Your next build will take longer once.' },
+    { q: 'Is CacheDrop free, and which Macs does it support?', a: 'It’s free for a limited time during the public beta. It’s a universal app for Apple Silicon and Intel Macs running macOS 14 Sonoma or later.' }] }))
+);
+</script>
+</body>
+</html>

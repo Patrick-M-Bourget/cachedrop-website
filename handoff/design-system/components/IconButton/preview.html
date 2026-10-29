@@ -1,0 +1,16 @@
+<!-- @dsCard group="Actions" height=88 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>IconButton — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo' },
+  h(C.IconButton, { icon: 'close', label: 'Close feedback' }),
+  h(C.IconButton, { icon: 'copy', label: 'Copy path' }))
+);
+</script>
+</body>
+</html>

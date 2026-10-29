@@ -1,0 +1,15 @@
+<!-- @dsCard group="Forms" height=130 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>RatingScale — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo' },
+  h('div', { style: { width: '100%', maxWidth: '384px' } }, h(C.RatingScale, { defaultValue: 'love' })))
+);
+</script>
+</body>
+</html>

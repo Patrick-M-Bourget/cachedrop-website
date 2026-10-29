@@ -1,0 +1,15 @@
+<!-- @dsCard group="Forms" height=88 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Checkbox — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo' },
+  h(C.Checkbox, { id: 'p-specs', defaultChecked: true, label: 'Send anonymous system specs', hint: '(Mac model, macOS version)' }))
+);
+</script>
+</body>
+</html>

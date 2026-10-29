@@ -1,0 +1,17 @@
+<!-- @dsCard group="Content" height=96 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>IconTile — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo' },
+  h(C.IconTile, { icon: 'terminal' }), h(C.IconTile, { icon: 'film' }), h(C.IconTile, { icon: 'drive' }),
+  h(C.IconTile, { icon: 'download', size: 'lg' }),
+  h(C.IconTile, { icon: 'terminal', size: 'sm', tone: 'dev' }), h(C.IconTile, { icon: 'box', size: 'sm', tone: 'downloads' }))
+);
+</script>
+</body>
+</html>

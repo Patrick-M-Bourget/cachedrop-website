@@ -1,0 +1,17 @@
+<!-- @dsCard group="Brand" height=96 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Logo — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo' },
+  h(C.Logo, { beta: true }),
+  h(C.Logo, {}),
+  h(C.Logo, { markOnly: true, size: 24 }))
+);
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!-- @dsCard group="Forms" height=200 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>TextArea — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.TextArea, { id: 'p-notes', label: 'What should we change?', placeholder: 'Or report a bug… (Markdown supported)' }))
+);
+</script>
+</body>
+</html>

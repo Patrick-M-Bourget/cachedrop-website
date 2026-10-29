@@ -1,0 +1,19 @@
+<!-- @dsCard group="Page structure" height=200 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>TableOfContents — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('div', { className: 'cd-demo cd-demo--col' },
+  h(C.TableOfContents, { items: [
+    { href: '#derived-data', label: 'How to delete Xcode DerivedData' },
+    { href: '#node-modules', label: 'How to clear old node_modules folders on a Mac' },
+    { href: '#docker', label: 'How to clear Docker and package manager caches' },
+    { href: '#faq', label: 'Developer storage FAQ' }] }))
+);
+</script>
+</body>
+</html>

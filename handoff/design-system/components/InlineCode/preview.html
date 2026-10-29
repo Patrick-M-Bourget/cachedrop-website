@@ -1,0 +1,14 @@
+<!-- @dsCard group="Content" height=80 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>InlineCode — preview</title></head>
+<body>
+<div id="root" class="cd-root"></div>
+<script>
+var C = window.CacheDrop, h = React.createElement;
+ReactDOM.createRoot(document.getElementById('root')).render(
+h('p', { className: 'cd-demo', style: { fontSize: '17px', lineHeight: '28px', color: 'var(--ink-body)', margin: 0 } }, 'CacheDrop safely clears ', h(C.InlineCode, null, '~/Library/Developer/Xcode/DerivedData'), ' without touching your actual code.')
+);
+</script>
+</body>
+</html>
