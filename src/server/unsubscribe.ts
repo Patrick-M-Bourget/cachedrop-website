@@ -10,25 +10,31 @@
 //   `List-Unsubscribe=One-Click` to it (RFC 8058 §3.2) and get an empty 200, never a redirect
 //   (§3.1). A GET changes nothing and sends the browser to the page, so a link scanner that
 //   prefetches URLs can't unsubscribe anyone.
-import type { GateDb } from './gate.ts';
+// A French email's links carry its language (Decision 5): the page is /fr/unsubscribe/<token>/,
+// and List-Unsubscribe adds &lang=fr so a GET lands on the French page.
+import { pagesFor } from './download-email.js';
+import type { GateDb, Lang } from './gate.ts';
 import { TOKEN, hashToken } from './tokens.js';
 
 export const ONE_CLICK = 'List-Unsubscribe=One-Click';
 
 /** The emailed page link, and the headers that make the mail client's one-click button work. */
-export function unsubscribeFor(siteUrl: string, token: string) {
+export function unsubscribeFor(siteUrl: string, token: string, lang: Lang) {
+  const api = `${siteUrl}/api/unsubscribe?token=${token}${lang === 'fr' ? '&lang=fr' : ''}`;
   return {
-    link: `${siteUrl}/unsubscribe/${token}/`,
-    headers: { 'List-Unsubscribe': `<${siteUrl}/api/unsubscribe?token=${token}>`, 'List-Unsubscribe-Post': ONE_CLICK },
+    link: `${pagesFor(siteUrl, lang)}/unsubscribe/${token}/`,
+    headers: { 'List-Unsubscribe': `<${api}>`, 'List-Unsubscribe-Post': ONE_CLICK },
   };
 }
 
 /** GET or POST /api/unsubscribe?token=. Unsubscribing twice is harmless: both answer 200. */
 export async function handleUnsubscribe(request: Request, deps: { db: GateDb }): Promise<Response> {
-  const token = new URL(request.url).searchParams.get('token') ?? '';
+  const params = new URL(request.url).searchParams;
+  const token = params.get('token') ?? '';
   const valid = TOKEN.test(token);
   if (request.method !== 'POST') {
-    return new Response(null, { status: 303, headers: { location: valid ? `/unsubscribe/${token}/` : '/unsubscribe/', 'cache-control': 'no-store' } });
+    const page = `${pagesFor('', params.get('lang') === 'fr' ? 'fr' : 'en')}/unsubscribe/${valid ? `${token}/` : ''}`;
+    return new Response(null, { status: 303, headers: { location: page, 'cache-control': 'no-store' } });
   }
   const empty = (status: number) => new Response(null, { status, headers: { 'cache-control': 'no-store' } });
   if (!valid) return empty(404);
