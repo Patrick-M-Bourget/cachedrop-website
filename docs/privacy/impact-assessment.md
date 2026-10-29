@@ -69,14 +69,18 @@ Two purposes (Decision 29 amends 18).
 - **Data:** each feedback submission becomes an issue in `Patrick-M-Bourget/mac-cleaner` with the rating, message, page and specs, **never the email** (Decision 6). Website-only feedback is moved by hand to this repository at triage.
 - **Why:** feedback becomes work the owner triages (Decisions 6, 7).
 - **Where:** United States.
-- **Important:** `mac-cleaner` is a **public** repository (checked 2026-10-29), so feedback text and specs are public. The privacy policy says so. A person could still type personal details into the message.
-- **Technical safeguards:** the email never leaves Supabase. The token can only write issues to that one repository (Decision 8). Specs are opt-in (Decision 10).
+- **Launch dependency:** `mac-cleaner` is public today (checked 2026-10-29). It is made private before launch, and launch (#17) blocks on it (Decision 30). This assessment and the privacy policy describe that launch state: feedback issues are private. Until then, only test feedback from previews reaches the repository.
+- **Technical safeguards:** the repository is private (Decision 30). The email never leaves Supabase. The token can only write issues to that one repository (Decision 8). Specs are opt-in (Decision 10). A person could still type personal details into the message.
 - **Contractual safeguards:** to check: GitHub's terms and Data Protection Agreement.
-- **Conclusion (draft):** acceptable if the feedback form says that feedback is published. **Open question for the owner:** add that notice to the form (#11), or send feedback to a private repository instead.
+- **Conclusion (draft):** acceptable once the repository is private.
 
 ## The legal framework where the data goes
 
 Most of these providers are United States companies. US law can give US authorities access to data those companies hold (for example, the CLOUD Act). Given the low sensitivity of the data, this draft treats that risk as acceptable. **For the lawyer to confirm.**
+
+## Launch dependencies
+
+- [ ] `Patrick-M-Bourget/mac-cleaner` is private (Decision 30; launch #17 blocks on it). Until it is, the GitHub section above doesn't hold.
 
 ## Open items before launch
 
@@ -84,6 +88,5 @@ Most of these providers are United States companies. US law can give US authorit
 - [ ] Each provider's data processing terms are read and recorded here.
 - [ ] Vercel function region and Resend region are checked.
 - [ ] Feedback retention: the decisions set none (specs are kept with their feedback). The owner picks a period, or "until deleted on request".
-- [ ] The feedback form tells people that feedback is published on GitHub (#11), or the target repository becomes private.
 - [ ] The specs checkbox starts unchecked (Decision 10, #11), and its label matches what is sent: today it says "Mac model, macOS version" but `site.js` sends the user agent, platform and language.
 - [ ] The PO box address replaces the placeholder in the policy (Decision 21).
