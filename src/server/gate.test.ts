@@ -31,8 +31,9 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
         if (p_lang !== 'en' && p_lang !== 'fr') return { data: null, error: { message: 'check constraint' } };
         let s = signups.find((x) => x.email === p_email);
         if (!s) signups.push((s = { id: signups.length + 1, email: p_email, filling: p_filling, news: false, newsAt: null, lang: p_lang }));
-        // The latest request's language wins: later emails go out in it (Decision 5, #14).
-        s.lang = p_lang;
+        // The latest request's language wins: later emails go out in it (Decision 5, #14). An
+        // unsubscribed marker keeps its own unless the request ticks the box (Decision 32).
+        if (!s.unsubscribed || p_news) s.lang = p_lang;
         // A tick turns the opt-in on; no tick never turns it off (Decision 3). A tick is also fresh
         // consent after an unsubscribe (Decision 32).
         if (p_news && !s.news) Object.assign(s, { news: true, newsAt: state.now });
@@ -612,6 +613,14 @@ describe('unsubscribe', () => {
     await handleSignup(post({ email: 'ada@example.com', news: true }), deps);
     expect(state.signups[0]).toMatchObject({ news: true, newsAt: state.now });
     expect(state.signups[0].unsubscribed).toBeUndefined();
+  });
+
+  it('a later request without the tick leaves the marker\'s language alone, but its email is in the request\'s language', async () => {
+    const { deps, sent, state } = await signedUp();
+    await handleUnsubscribe(oneClick(oneClickIn(sent[0])!), deps);
+    expect((await handleSignup(post({ email: 'ada@example.com', lang: 'fr' }), deps)).status).toBe(200);
+    expect(sent[1].subject).toBe('Votre lien de téléchargement CacheDrop');
+    expect(state.signups[0]).toMatchObject({ unsubscribed: true, lang: 'en' });
   });
 
   it('a later request without the tick keeps the person unsubscribed, and still sends the link', async () => {
