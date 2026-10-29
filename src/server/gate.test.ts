@@ -11,7 +11,7 @@ type Release = { id: number; version: string; filename: string; is_latest: boole
 // email-gate migration: one signup per email, tokens stored as hashes that expire after 7 days,
 // and download_for_token counting starts on the latest release.
 function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename: 'CacheDrop-1.2.0.dmg', is_latest: true, download_starts: 0 }]) {
-  const signups: Array<{ id: number; email: string; filling: string | null; news: boolean; newsAt: number | null; unsubscribed?: boolean }> = [];
+  const signups: Array<{ id: number; email: string; filling: string | null; news: boolean; newsAt: number | null; lang: string; unsubscribed?: boolean }> = [];
   const tokens = new Map<string, { signupId: number; expiresAt: number }>();
   const unsubscribeTokens = new Map<string, number>();
   const signed: Array<{ path: string; expiresIn: number; download: unknown }> = [];
@@ -20,12 +20,15 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
     async rpc(fn: string, args: Record<string, unknown>) {
       if (state.fail) return { data: null, error: { message: 'connection reset' } };
       if (fn === 'request_download') {
-        const { p_email, p_filling, p_token_hash, p_news } = args as { p_email: string; p_filling: string | null; p_token_hash: string; p_news: boolean };
+        const { p_email, p_filling, p_token_hash, p_news, p_lang } = args as { p_email: string; p_filling: string | null; p_token_hash: string; p_news: boolean; p_lang: string };
         if (p_email !== p_email.toLowerCase()) return { data: null, error: { message: 'check constraint' } };
         if (!/^[0-9a-f]{64}$/.test(p_token_hash)) return { data: null, error: { message: 'check constraint' } };
         if (typeof p_news !== 'boolean') return { data: null, error: { message: 'function request_download does not exist' } };
+        if (p_lang !== 'en' && p_lang !== 'fr') return { data: null, error: { message: 'check constraint' } };
         let s = signups.find((x) => x.email === p_email);
-        if (!s) signups.push((s = { id: signups.length + 1, email: p_email, filling: p_filling, news: false, newsAt: null }));
+        if (!s) signups.push((s = { id: signups.length + 1, email: p_email, filling: p_filling, news: false, newsAt: null, lang: p_lang }));
+        // The latest request's language wins: later emails go out in it (Decision 5, #14).
+        s.lang = p_lang;
         // A tick turns the opt-in on; no tick never turns it off (Decision 3). A tick is also fresh
         // consent after an unsubscribe (Decision 32).
         if (p_news && !s.news) Object.assign(s, { news: true, newsAt: state.now });
@@ -54,8 +57,8 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
       if (fn === 'unsubscribe') {
         const id = unsubscribeTokens.get((args as { p_token_hash: string }).p_token_hash);
         const s = signups.find((x) => x.id === id);
-        // Only the address stays marked (Decision 32): the opt-in goes with it.
-        if (s) Object.assign(s, { unsubscribed: true, news: false, newsAt: null });
+        // Only the address stays marked (Decision 32): the opt-in and the language go with it (Decision 34).
+        if (s) Object.assign(s, { unsubscribed: true, news: false, newsAt: null, lang: 'en' });
         return { data: !!s, error: null };
       }
       throw new Error(`unexpected rpc ${fn}`);
@@ -102,7 +105,7 @@ describe('signup', () => {
     expect(sent[0].to).toBe('ada@example.com');
     expect(linkIn(sent[0])?.[0]).toMatch(new RegExp(`^${SITE}/download/[A-Za-z0-9_-]{43}/$`));
     expect(sent[0].html).toContain(linkIn(sent[0])![0]);
-    expect(state.signups).toEqual([{ id: 1, email: 'ada@example.com', filling: 'development', news: false, newsAt: null }]);
+    expect(state.signups).toEqual([{ id: 1, email: 'ada@example.com', filling: 'development', news: false, newsAt: null, lang: 'en' }]);
   });
 
   it('keeps one signup for an email submitted twice and sends a working link each time', async () => {
@@ -197,6 +200,39 @@ describe('signup', () => {
   });
 });
 
+describe('signup language (Decision 5)', () => {
+  it('stores the language of the page the signup came from', async () => {
+    const { deps, state } = setup();
+    await handleSignup(post({ email: 'ada@example.com', lang: 'fr' }), deps);
+    await handleSignup(post({ email: 'bob@example.com', lang: 'en' }), deps);
+    expect(state.signups.map((s) => [s.email, s.lang])).toEqual([
+      ['ada@example.com', 'fr'],
+      ['bob@example.com', 'en'],
+    ]);
+  });
+
+  it.each([[undefined], ['FR'], ['fr-CA'], ['de'], [''], [1], [null], [['fr']]])(
+    'falls back to English for lang %j, and still sends the link',
+    async (lang) => {
+      const { deps, sent, state } = setup();
+      const res = await handleSignup(post({ email: 'ada@example.com', lang }), deps);
+      expect(res.status).toBe(200);
+      expect(state.signups[0].lang).toBe('en');
+      expect(sent).toHaveLength(1);
+    },
+  );
+
+  it('a later signup from the other language switches the stored language to it', async () => {
+    const { deps, state } = setup();
+    await handleSignup(post({ email: 'ada@example.com', lang: 'en' }), deps);
+    await handleSignup(post({ email: 'ada@example.com', lang: 'fr' }), deps);
+    expect(state.signups).toHaveLength(1);
+    expect(state.signups[0].lang).toBe('fr');
+    await handleSignup(post({ email: 'ada@example.com' }), deps);
+    expect(state.signups[0].lang).toBe('en');
+  });
+});
+
 describe('news opt-in (Decision 3)', () => {
   it('records a tick as a yes, with when it was given', async () => {
     const { deps, state } = setup();
@@ -228,6 +264,88 @@ describe('news opt-in (Decision 3)', () => {
     state.now += DAY;
     await handleSignup(post({ email: 'ada@example.com', news: false }), deps);
     expect(state.signups[0]).toMatchObject({ news: true, newsAt: givenAt });
+  });
+});
+
+// French emails (Decision 5, #14): the download email, re-sent links and the unsubscribe page
+// follow the language the person signed up in.
+const tokenLinkIn = (email: Email, base: string) => email.text.match(new RegExp(`${base}/download/([A-Za-z0-9_-]{43})/`));
+
+describe('emails in the signup language (Decision 5)', () => {
+  it('a signup from a French page gets the French download email, linking to the French pages', async () => {
+    const { deps, sent } = setup();
+    await handleSignup(post({ email: 'ada@example.com', lang: 'fr' }), deps);
+    const [email] = sent;
+    expect(email.subject).toBe('Votre lien de téléchargement CacheDrop');
+    expect(email.html).toContain('<html lang="fr">');
+    const [link, token] = tokenLinkIn(email, `${SITE}/fr`)!;
+    const unsubscribe = email.text.match(new RegExp(`${SITE}/fr/unsubscribe/([A-Za-z0-9_-]{43})/`))!;
+    for (const part of [email.text, email.html]) {
+      expect(part).toContain(link);
+      expect(part).toContain(unsubscribe[0]);
+      expect(part).toContain(`${SITE}/fr/privacy/`);
+      expect(part).toContain('Le lien fonctionne pendant 7 jours, sur n’importe quel Mac.');
+      expect(part).toContain('CacheDrop est un nettoyeur de stockage pour Mac');
+      expect(part).toContain('hello@cachedrop.io');
+      expect(part).not.toContain('CacheDrop is a Mac storage cleaner');
+      expect(part).not.toMatch(new RegExp(`${SITE}/(download|unsubscribe|privacy)/`));
+    }
+    expect(email.html).toContain('Télécharger CacheDrop');
+    expect(email.html).toContain('Se désabonner');
+    expect(email.html).toContain('Politique de confidentialité');
+    // The link is the same token the API serves; only the page around it is French.
+    expect((await handleDownload(get(`/api/download?token=${token}`), deps)).status).toBe(302);
+  });
+
+  it('a signup from an English page gets the English email, linking to the English pages', async () => {
+    const { deps, sent } = setup();
+    await handleSignup(post({ email: 'ada@example.com', lang: 'en' }), deps);
+    const [email] = sent;
+    expect(email.subject).toBe('Your CacheDrop download link');
+    expect(email.html).toContain('<html lang="en">');
+    for (const part of [email.text, email.html]) {
+      expect(part).not.toContain(`${SITE}/fr/`);
+      expect(part).toMatch(new RegExp(`${SITE}/download/[A-Za-z0-9_-]{43}/`));
+      expect(part).toMatch(new RegExp(`${SITE}/unsubscribe/[A-Za-z0-9_-]{43}/`));
+    }
+  });
+
+  it('the French one-click headers unsubscribe, and a GET opens the French page', async () => {
+    const { deps, sent, state } = setup();
+    await handleSignup(post({ email: 'ada@example.com', lang: 'fr' }), deps);
+    const [email] = sent;
+    expect(email.headers?.['List-Unsubscribe-Post']).toBe('List-Unsubscribe=One-Click');
+    const url = oneClickIn(email)!;
+    const [pageUrl, token] = email.text.match(new RegExp(`${SITE}/fr/unsubscribe/([A-Za-z0-9_-]{43})/`))!;
+    expect(url).toBe(`${SITE}/api/unsubscribe?token=${token}&lang=fr`);
+    const opened = await handleUnsubscribe(get(new URL(url).pathname + new URL(url).search), deps);
+    expect(opened.status).toBe(303);
+    expect(new URL(opened.headers.get('location')!, SITE).href).toBe(pageUrl);
+    expect(state.signups[0].unsubscribed).toBeUndefined();
+    expect((await handleUnsubscribe(oneClick(url), deps)).status).toBe(200);
+    expect(state.signups[0].unsubscribed).toBe(true);
+  });
+
+  it('a GET without a valid token goes to the unsubscribe page in its language', async () => {
+    const { deps } = setup();
+    const fr = await handleUnsubscribe(get('/api/unsubscribe?token=nope&lang=fr'), deps);
+    expect(fr.headers.get('location')).toBe('/fr/unsubscribe/');
+    const other = await handleUnsubscribe(get('/api/unsubscribe?token=nope&lang=de'), deps);
+    expect(other.headers.get('location')).toBe('/unsubscribe/');
+  });
+
+  it('a re-sent link follows a language change: English, then French, then English again', async () => {
+    const { deps, sent } = setup();
+    await handleSignup(post({ email: 'ada@example.com', lang: 'en' }), deps);
+    await handleSignup(post({ email: 'ada@example.com', lang: 'fr' }), deps);
+    await handleSignup(post({ email: 'ada@example.com', lang: 'en' }), deps);
+    expect(sent.map((e) => e.subject)).toEqual([
+      'Your CacheDrop download link',
+      'Votre lien de téléchargement CacheDrop',
+      'Your CacheDrop download link',
+    ]);
+    expect(tokenLinkIn(sent[1], `${SITE}/fr`)).not.toBeNull();
+    expect(tokenLinkIn(sent[2], SITE)).not.toBeNull();
   });
 });
 
@@ -416,6 +534,14 @@ describe('unsubscribe', () => {
     await handleSignup(post({ email: 'ada@example.com', news: true }), deps);
     expect((await handleUnsubscribe(oneClick(oneClickIn(sent[0])!), deps)).status).toBe(200);
     expect(state.signups[0]).toMatchObject({ unsubscribed: true, news: false, newsAt: null });
+  });
+
+  it('resets the stored language to English with the unsubscribe (Decision 34)', async () => {
+    const { deps, sent, state } = setup();
+    await handleSignup(post({ email: 'ada@example.com', lang: 'fr' }), deps);
+    expect(state.signups[0].lang).toBe('fr');
+    expect((await handleUnsubscribe(oneClick(oneClickIn(sent[0])!), deps)).status).toBe(200);
+    expect(state.signups[0]).toMatchObject({ unsubscribed: true, lang: 'en' });
   });
 
   it('a fresh news tick on a later request clears the unsubscribe (Decision 32)', async () => {
