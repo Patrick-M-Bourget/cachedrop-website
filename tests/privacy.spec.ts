@@ -99,3 +99,55 @@ test('says what the spam check uses, and that the IP address is never stored (De
   expect(kept).toContain('we never store your IP address');
   expect(kept).toContain('at most a day');
 });
+
+// Review fixes: the download link is a bearer link, and every stored item has a stated retention.
+const policy = {
+  en: {
+    path: '/privacy/',
+    collect: 'What we collect and why',
+    retention: 'How long we keep it',
+    token: ['Anyone with the link can use it for 7 days, so don’t share it.'],
+    collected: ['Your language', 'A code in each email’s unsubscribe link'],
+    kept: [
+      'Feedback: your rating, your message, the page, your email if you added one, and the system specs if you sent them. We keep it until you ask us to delete it.',
+      'your news choice and your language',
+      'Unsubscribe codes: we keep them as long as your signup, and delete them with it.',
+    ],
+  },
+  fr: {
+    path: '/fr/privacy/',
+    collect: 'Ce que nous recueillons et pourquoi',
+    retention: 'Combien de temps nous les gardons',
+    token: ['Toute personne qui a le lien peut s’en servir pendant 7 jours. Ne le partagez donc pas.'],
+    collected: ['Votre langue', 'Un code dans le lien de désabonnement de chaque courriel'],
+    kept: [
+      'Les avis : votre note, votre message, la page, votre adresse courriel si vous l’avez ajoutée, et les caractéristiques du système si vous les avez envoyées. Nous les gardons jusqu’à ce que vous nous demandiez de les supprimer.',
+      'votre choix pour les courriels de nouvelles et votre langue',
+      'Les codes de désabonnement : nous les gardons aussi longtemps que votre inscription, et les supprimons avec elle.',
+    ],
+  },
+};
+
+for (const [lang, p] of Object.entries(policy)) {
+  test.describe(`${lang}: ${p.path}`, () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto(p.path);
+    });
+
+    test('says anyone with the download link can use it, so not to share it', async ({ page }) => {
+      const text = await sectionText(page, p.collect);
+      for (const line of p.token) expect(text).toContain(line);
+      expect(text).not.toMatch(/only for you|ne fonctionne que pour vous/);
+    });
+
+    test('lists the stored language and the unsubscribe codes', async ({ page }) => {
+      const text = await sectionText(page, p.collect);
+      for (const item of p.collected) expect(text, item).toContain(item);
+    });
+
+    test('states how long feedback, the language and unsubscribe codes are kept', async ({ page }) => {
+      const text = await sectionText(page, p.retention);
+      for (const line of p.kept) expect(text, line).toContain(line);
+    });
+  });
+}
