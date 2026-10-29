@@ -6,13 +6,20 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "test": "playwright test"
+    "test": "playwright test",
+    "check:html": "html-validate \"dist/**/*.html\"",
+    "check:links": "node scripts/check-links.mjs",
+    "check:jsonld": "node scripts/check-jsonld.mjs",
+    "check": "npm run check:html && npm run check:links && npm run check:jsonld"
   },
   "dependencies": {
     "astro": "^7.4.4"
   },
   "devDependencies": {
-    "@playwright/test": "^1.64.1"
+    "@playwright/test": "^1.64.1",
+    "html-validate": "^11.17.0",
+    "jsonld": "^9.0.0",
+    "linkinator": "^8.1.0"
   },
   "engines": {
     "node": ">=22"
