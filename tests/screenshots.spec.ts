@@ -2,7 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { pages } from './pages';
-import { withCopyFixes } from './copy-fixes';
+import { withHandoffChanges } from './handoff-changes';
 
 // Decision 11: the rendered pages match the handoff at 1440 and 390 px.
 // The reference renders are desktop at 1x and mobile at 2x.
@@ -20,15 +20,19 @@ async function settle(page: Page) {
   await page.evaluate(() => document.fonts.ready);
 }
 
-/** Serves handoff/site/ at http://handoff.test/ so the original renders in this same browser, with its agreed copy fixes. */
+/**
+ * Serves handoff/site/ at http://handoff.test/ so the original renders in this same browser.
+ * HTML pages get their changes from handoff-changes.ts (decided changes and copy fixes) first.
+ */
 async function serveHandoff(page: Page) {
   await page.route('http://handoff.test/**', async (route) => {
     let path = new URL(route.request().url()).pathname;
     if (path.endsWith('/')) path += 'index.html';
     const file = join('handoff/site', decodeURIComponent(path));
     if (file.endsWith('.html')) {
-      const html = withCopyFixes(path.slice(1), await readFile(file, 'utf8'));
-      return route.fulfill({ body: html, contentType: 'text/html; charset=utf-8' });
+      const html = await readFile(file, 'utf8').catch(() => null);
+      if (html === null) return route.fulfill({ status: 404 });
+      return route.fulfill({ contentType: 'text/html; charset=utf-8', body: withHandoffChanges(path.slice(1), html) });
     }
     try {
       await route.fulfill({ path: file });
