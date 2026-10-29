@@ -5,23 +5,76 @@
 // The news checkbox starts unticked and the download never depends on it (Decision 3).
 // Built from the design system's utility-page recipe and its TextField, Checkbox, Button and
 // done-state parts (handoff/design-system/components/bundle.css), with the token page's head.
+// Built at /download/ and /fr/download/ (Decision 5); the signup says which with `lang`, so the
+// download email goes out in that language. The scripts take their messages from `msg`.
 // The bot check (Decision 12) starts on load, so its token is ready by the time the email is typed.
-import Base from '../../layouts/Base.astro';
-import Nav from '../../components/Nav.astro';
-import Footer from '../../components/Footer.astro';
-import BotCheck from '../../components/BotCheck.astro';
-import { downloadHead } from './_head.ts';
+import Base from '../../../layouts/Base.astro';
+import Nav from '../../../components/Nav.astro';
+import Footer from '../../../components/Footer.astro';
+import BotCheck from '../../../components/BotCheck.astro';
+import { downloadHead, downloadMeta, guideLinks } from './_head.ts';
+import { langOf, langPaths, localize } from '../../../i18n';
 
-const filling = [
-  ['development', 'Development'],
-  ['video-photo', 'Video & photo'],
-  ['music-audio', 'Music & audio'],
-  ['other', 'Other'],
-];
+export const getStaticPaths = langPaths;
+
+const copy = {
+  en: {
+    filling: ['Development', 'Video & photo', 'Music & audio', 'Other'],
+    title: 'Get the CacheDrop beta.',
+    lede: 'Enter your email and we’ll send you a download link. The link works for 7 days, on any Mac. CacheDrop itself doesn’t expire.',
+    expiredTitle: 'This link has expired.',
+    expiredLede: 'Download links work for 7 days. Enter your email and we’ll send you a new one. CacheDrop itself doesn’t expire.',
+    email: 'Email',
+    placeholder: 'you@example.com',
+    filled: 'What’s filling your Mac?',
+    optional: '(optional)',
+    news: 'Email me news about CacheDrop, like new features, surveys and the paid launch.',
+    newsNote: 'Optional. You can unsubscribe at any time from any of our emails.',
+    send: 'Send Download Link',
+    promise: 'We email you the link, then only about new versions and security.',
+    privacy: 'Privacy Policy',
+    sentTitle: 'Check your inbox',
+    sentBefore: 'We sent a download link to ',
+    sentAfter: '. If it isn’t there in a minute, check your spam folder.',
+    again: 'Use a Different Email',
+    wait: 'While you wait:',
+    badEmail: 'Enter a full email address, like you@example.com.',
+    failed: 'We couldn’t send the link. Check your connection and try again.',
+  },
+  fr: {
+    filling: ['Développement', 'Vidéo et photo', 'Musique et audio', 'Autre'],
+    title: 'Obtenez la bêta de CacheDrop.',
+    lede: 'Entrez votre adresse courriel et nous vous enverrons un lien de téléchargement. Le lien fonctionne pendant 7 jours, sur n’importe quel Mac. CacheDrop lui-même n’expire pas.',
+    expiredTitle: 'Ce lien a expiré.',
+    expiredLede: 'Les liens de téléchargement fonctionnent pendant 7 jours. Entrez votre adresse courriel et nous vous en enverrons un nouveau. CacheDrop lui-même n’expire pas.',
+    email: 'Courriel',
+    placeholder: 'vous@exemple.com',
+    filled: 'Qu’est-ce qui remplit votre Mac?',
+    optional: '(facultatif)',
+    news: 'Envoyez-moi des nouvelles de CacheDrop par courriel : nouvelles fonctionnalités, sondages et lancement de la version payante.',
+    newsNote: 'Facultatif. Vous pouvez vous désabonner en tout temps à partir de n’importe lequel de nos courriels.',
+    send: 'Envoyer le lien de téléchargement',
+    promise: 'Nous vous envoyons le lien, puis seulement des courriels sur les nouvelles versions et la sécurité.',
+    privacy: 'Politique de confidentialité',
+    sentTitle: 'Vérifiez vos courriels',
+    sentBefore: 'Nous avons envoyé un lien de téléchargement à ',
+    sentAfter: '. S’il n’est pas arrivé d’ici une minute, vérifiez votre dossier de courrier indésirable.',
+    again: 'Utiliser une autre adresse',
+    wait: 'En attendant :',
+    badEmail: 'Entrez une adresse courriel complète, comme vous@exemple.com.',
+    failed: 'Le lien n’a pas pu être envoyé. Vérifiez votre connexion et réessayez.',
+  },
+};
+const lang = langOf(Astro.url);
+const t = copy[lang];
+const meta = downloadMeta[lang];
+const filling = ['development', 'video-photo', 'music-audio', 'other'].map((value, i) => [value, t.filling[i]]);
+const expired = { title: t.expiredTitle, lede: t.expiredLede };
+const msg = { lang, badEmail: t.badEmail, failed: t.failed };
 const label = 'font-size: 13px; line-height: 18px; font-weight: 500';
 const guideLink = 'color: var(--accent-text); font-weight: 500';
 ---
-<Base {...downloadHead}>
+<Base {...downloadHead[lang]}>
 <style is:global>
 .gate-input{height:var(--control-md);padding:0 var(--space-3);border:0;border-radius:var(--radius-md);background:var(--surface);box-shadow:0 0 0 1px var(--line-strong);font:inherit;font-size:14px;color:var(--ink);transition:box-shadow .15s}
 .gate-input::placeholder{color:var(--ink-tertiary)}
@@ -47,32 +100,32 @@ const guideLink = 'color: var(--accent-text); font-weight: 500';
 <div style="width: var(--tile-lg); height: var(--tile-lg); border-radius: var(--radius-2xl); background: var(--surface-subtle); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; color: var(--ink)">
 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg>
 </div>
-<h1 data-gate-title style="margin: var(--space-8) 0 0; font-size: clamp(34px, 4.6vw, 56px); line-height: 1.08; font-weight: 600; letter-spacing: -0.035em; text-wrap: balance">Get the CacheDrop beta.</h1>
-<p data-gate-lede style="margin: 18px 0 0; max-width: 560px; font-size: 19px; line-height: 29px; color: var(--ink-secondary); text-wrap: pretty">Enter your email and we’ll send you a download link. The link works for 7 days, on any Mac. CacheDrop itself doesn’t expire.</p>
-<script is:inline>
+<h1 data-gate-title style="margin: var(--space-8) 0 0; font-size: clamp(34px, 4.6vw, 56px); line-height: 1.08; font-weight: 600; letter-spacing: -0.035em; text-wrap: balance">{t.title}</h1>
+<p data-gate-lede style="margin: 18px 0 0; max-width: 560px; font-size: 19px; line-height: 29px; color: var(--ink-secondary); text-wrap: pretty">{t.lede}</p>
+<script is:inline define:vars={{ expired }}>
 // The token page sends an expired or unknown link here (Decision 2). Swapped before first paint.
 if (new URLSearchParams(location.search).get('link') === 'expired') {
-  document.querySelector('[data-gate-title]').textContent = 'This link has expired.';
-  document.querySelector('[data-gate-lede]').textContent = 'Download links work for 7 days. Enter your email and we’ll send you a new one. CacheDrop itself doesn’t expire.';
+  document.querySelector('[data-gate-title]').textContent = expired.title;
+  document.querySelector('[data-gate-lede]').textContent = expired.lede;
 }
 </script>
 <p style="margin: var(--space-5) 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2) var(--space-4); font-size: 13px; color: var(--ink-secondary)">
-<span>Free while in beta</span>
+<span>{meta[0]}</span>
 <span aria-hidden="true">·</span>
-<span>Universal: Apple Silicon &amp; Intel</span>
+<span>{meta[1]}</span>
 <span aria-hidden="true">·</span>
-<span>macOS 14 Sonoma or later</span>
+<span>{meta[2]}</span>
 </p>
 
 <div data-gate style="margin-top: var(--space-12); width: 100%; max-width: var(--modal-max); padding: var(--space-8); border: 1px solid var(--line); border-radius: var(--radius-2xl); background: var(--surface-raised); box-shadow: var(--shadow-card); text-align: left">
 <form data-gate-form novalidate style="display: flex; flex-direction: column; gap: var(--space-5); margin: 0">
 <div style="display: flex; flex-direction: column; gap: var(--space-1-5)">
-<label for="gate-email" style={label}>Email</label>
-<input id="gate-email" name="email" class="gate-input" type="email" autocomplete="email" required placeholder="you@example.com" aria-describedby="gate-error">
+<label for="gate-email" style={label}>{t.email}</label>
+<input id="gate-email" name="email" class="gate-input" type="email" autocomplete="email" required placeholder={t.placeholder} aria-describedby="gate-error">
 <p id="gate-error" data-gate-error hidden role="alert" style="margin: 0; font-size: 13px; line-height: 18px; color: var(--danger-ink)"></p>
 </div>
 <fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: var(--space-2-5)">
-<legend style={`padding: 0; margin-bottom: var(--space-2-5); ${label}`}>What’s filling your Mac? <span style="font-weight: 400; color: var(--ink-secondary)">(optional)</span></legend>
+<legend style={`padding: 0; margin-bottom: var(--space-2-5); ${label}`}>{t.filled} <span style="font-weight: 400; color: var(--ink-secondary)">{t.optional}</span></legend>
 <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2-5) var(--space-4)">
 {filling.map(([value, text]) => (
 <label class="gate-check"><input type="radio" name="filling" value={value}><span>{text}</span></label>
@@ -80,33 +133,33 @@ if (new URLSearchParams(location.search).get('link') === 'expired') {
 </div>
 </fieldset>
 <div>
-<label class="gate-check"><input type="checkbox" name="news" aria-describedby="gate-news-note"><span>Email me news about CacheDrop, like new features, surveys and the paid launch.</span></label>
-<p id="gate-news-note" style="margin: var(--space-1) 0 0 calc(var(--space-4) + var(--space-2-5)); font-size: 13px; line-height: 18px; color: var(--ink-secondary)">Optional. You can unsubscribe at any time from any of our emails.</p>
+<label class="gate-check"><input type="checkbox" name="news" aria-describedby="gate-news-note"><span>{t.news}</span></label>
+<p id="gate-news-note" style="margin: var(--space-1) 0 0 calc(var(--space-4) + var(--space-2-5)); font-size: 13px; line-height: 18px; color: var(--ink-secondary)">{t.newsNote}</p>
 </div>
-<BotCheck form="signup" />
-<button type="submit" class="gate-btn gate-primary">Send Download Link</button>
-<p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-secondary)">We email you the link, then only about new versions and security. <a class="textlink" href="/privacy/" style="color: var(--accent-text); font-weight: 500">Privacy Policy</a></p>
+<BotCheck form="signup" lang={lang} />
+<button type="submit" class="gate-btn gate-primary">{t.send}</button>
+<p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-secondary)">{t.promise} <a class="textlink" href={localize(lang, '/privacy/')} style="color: var(--accent-text); font-weight: 500">{t.privacy}</a></p>
 </form>
 
 <div data-gate-done hidden aria-live="polite" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-3); padding: var(--space-6) 0 var(--space-2)">
 <div style="width: var(--control-lg); height: var(--control-lg); border-radius: var(--radius-full); background: var(--success-soft); color: var(--success-ink); display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
-<h2 data-gate-done-title tabindex="-1" style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 600; letter-spacing: -0.01em; outline: none">Check your inbox</h2>
-<p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-secondary)">We sent a download link to <span data-gate-sent-to style="font-weight: 500; color: var(--ink); overflow-wrap: anywhere"></span>. If it isn’t there in a minute, check your spam folder.</p>
-<button type="button" class="gate-btn gate-quiet" data-gate-again style="margin-top: var(--space-1)">Use a Different Email</button>
+<h2 data-gate-done-title tabindex="-1" style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 600; letter-spacing: -0.01em; outline: none">{t.sentTitle}</h2>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-secondary)">{t.sentBefore}<span data-gate-sent-to style="font-weight: 500; color: var(--ink); overflow-wrap: anywhere"></span>{t.sentAfter}</p>
+<button type="button" class="gate-btn gate-quiet" data-gate-again style="margin-top: var(--space-1)">{t.again}</button>
 </div>
 </div>
 
 <div style="margin-top: var(--space-18); display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3) var(--space-8); font-size: 14px">
-<span style="color: var(--ink-secondary)">While you wait:</span>
-<a class="textlink" href="/clear-mac-developer-caches/" style={guideLink}>Clear Developer Caches guide</a>
-<a class="textlink" href="/clear-adobe-media-cache-mac/" style={guideLink}>Clear Adobe Media Cache guide</a>
+<span style="color: var(--ink-secondary)">{t.wait}</span>
+<a class="textlink" href={localize(lang, '/clear-mac-developer-caches/')} style={guideLink}>{guideLinks[lang][0]}</a>
+<a class="textlink" href={localize(lang, '/clear-adobe-media-cache-mac/')} style={guideLink}>{guideLinks[lang][1]}</a>
 </div>
 </div>
 </main>
 
-<Footer overview />
+<Footer path="/download/" overview />
 
-<script is:inline>
+<script is:inline define:vars={{ msg }}>
 (function () {
   var form = document.querySelector('[data-gate-form]');
   var done = document.querySelector('[data-gate-done]');
@@ -123,8 +176,8 @@ if (new URLSearchParams(location.search).get('link') === 'expired') {
     if (field) { email.setAttribute('aria-invalid', 'true'); email.focus(); }
   }
   function clear() { error.hidden = true; email.removeAttribute('aria-invalid'); }
-  var BAD_EMAIL = 'Enter a full email address, like you@example.com.';
-  var NOT_SENT = 'We couldn’t send the link. Check your connection and try again.';
+  var BAD_EMAIL = msg.badEmail;
+  var NOT_SENT = msg.failed;
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -139,7 +192,7 @@ if (new URLSearchParams(location.search).get('link') === 'expired') {
         return fetch('/api/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: address, filling: choice ? choice.value : null, news: form.news.checked, turnstile: token })
+          body: JSON.stringify({ email: address, filling: choice ? choice.value : null, news: form.news.checked, lang: msg.lang, turnstile: token })
         }).then(function (res) {
           bot.reset(check); // a token works once
           if (res.ok) {

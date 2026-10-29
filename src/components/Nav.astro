@@ -2,35 +2,42 @@
 // Sticky frosted nav from the handoff. On the homepage the logo links to #top;
 // elsewhere it links to /. `current` marks the matching nav link with aria-current.
 import BrandMark from './BrandMark.astro';
+import { langOf, localize } from '../i18n';
 
 interface Props {
-  /** Where the logo goes: `#top` on the homepage, `/` everywhere else. */
+  /** Where the logo goes: `#top` on the homepage, the home page everywhere else. */
   homeHref?: string;
-  /** Path of the current page, e.g. `/clear-mac-developer-caches/`. */
+  /** English path of the current page, e.g. `/clear-mac-developer-caches/`. */
   current?: string;
 }
 
-const { homeHref = '/', current } = Astro.props;
+const copy = {
+  en: { home: 'CacheDrop home', beta: 'BETA', primary: 'Primary', developers: 'For Developers', creators: 'For Creators', feedback: 'Provide Feedback', download: 'Get Free Beta' },
+  fr: { home: 'Accueil CacheDrop', beta: 'BÊTA', primary: 'Principale', developers: 'Pour les développeurs', creators: 'Pour les créateurs', feedback: 'Donner votre avis', download: 'Obtenir la bêta gratuite' },
+};
+const lang = langOf(Astro.url);
+const t = copy[lang];
+const { homeHref = localize(lang, '/'), current } = Astro.props;
 const links = [
-  { href: '/clear-mac-developer-caches/', label: 'For Developers' },
-  { href: '/clear-adobe-media-cache-mac/', label: 'For Creators' },
+  { path: '/clear-mac-developer-caches/', label: t.developers },
+  { path: '/clear-adobe-media-cache-mac/', label: t.creators },
 ];
 ---
 <header style="position: sticky; top: 0; z-index: var(--z-nav); background: var(--glass); backdrop-filter: var(--backdrop-nav); -webkit-backdrop-filter: var(--backdrop-nav); border-bottom: 1px solid var(--glass-line)">
 <div style="max-width: var(--container-max); margin: 0 auto; padding: 0 var(--space-6); height: var(--nav-height); display: flex; align-items: center; justify-content: space-between; gap: var(--space-4)">
-<a href={homeHref} aria-label="CacheDrop home" style="display: flex; align-items: center; gap: var(--space-2); color: var(--ink)">
+<a href={homeHref} aria-label={t.home} style="display: flex; align-items: center; gap: var(--space-2); color: var(--ink)">
 <BrandMark width={13} height={18} />
 <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em">CacheDrop</span>
-<span style="font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: var(--ink-secondary); background: var(--surface-subtle); border-radius: var(--radius-full); padding: var(--space-0-5) 7px">BETA</span>
+<span style="font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: var(--ink-secondary); background: var(--surface-subtle); border-radius: var(--radius-full); padding: var(--space-0-5) 7px">{t.beta}</span>
 </a>
-<nav class="navlinks" aria-label="Primary" style="display: flex; align-items: center; gap: var(--space-7); font-size: 13px">
+<nav class="navlinks" aria-label={t.primary} style="display: flex; align-items: center; gap: var(--space-7); font-size: 13px">
 {links.map((l) =>
-  l.href === current
-    ? <a href={l.href} aria-current="page" style="color: var(--ink); font-weight: 500">{l.label}</a>
-    : <a class="navlink" href={l.href}>{l.label}</a>
+  l.path === current
+    ? <a href={localize(lang, l.path)} aria-current="page" style="color: var(--ink); font-weight: 500">{l.label}</a>
+    : <a class="navlink" href={localize(lang, l.path)}>{l.label}</a>
 )}
-<a class="navlink" href="#feedback" data-feedback>Provide Feedback</a>
+<a class="navlink" href="#feedback" data-feedback>{t.feedback}</a>
 </nav>
-<a class="btn-primary" href="/download/" style="font-size: 13px; font-weight: 500; background: var(--accent); padding: 7px 14px; border-radius: var(--radius-full); box-shadow: var(--shadow-button)">Get Free Beta</a>
+<a class="btn-primary" href={localize(lang, '/download/')} style="font-size: 13px; font-weight: 500; background: var(--accent); padding: 7px 14px; border-radius: var(--radius-full); box-shadow: var(--shadow-button)">{t.download}</a>
 </div>
 </header>

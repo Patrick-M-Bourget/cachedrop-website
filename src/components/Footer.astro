@@ -2,16 +2,60 @@
 // Site footer from the handoff. The "Cleaning Guides" anchors are exact-match on
 // purpose (HANDOFF.md §4); don't rename them.
 // The "Privacy Policy" link in the bottom row is Decision 19; the handoff has none.
+// The language switch after "Public beta" is Decision 5: it opens this page in the other language.
 import BrandMark from './BrandMark.astro';
+import { langOf, localize, other } from '../i18n';
 
 interface Props {
+  /** Root-relative English path of this page (as Base's `path`); the language switch goes to its twin. */
+  path: string;
   /** Adds an "Overview" link to / at the top of Product (the guide pages have it; the homepage doesn't). */
   overview?: boolean;
   /** The trademark line; the developer guide also names Xcode. */
   trademarks?: string;
 }
 
-const { overview = false, trademarks = 'Apple, Mac, and macOS are trademarks of Apple Inc.' } = Astro.props;
+const copy = {
+  en: {
+    tagline: 'A careful Mac storage cleaner for developer caches and creative render files.',
+    guides: 'Cleaning Guides',
+    developer: 'Clear Developer Caches',
+    creator: 'Clear Adobe Media Cache',
+    product: 'Product',
+    overview: 'Overview',
+    download: 'Download Free Beta',
+    feedback: 'Provide Feedback',
+    platform: 'Platform',
+    chips: 'Apple Silicon & Intel',
+    macos: 'macOS 14 Sonoma and later',
+    trademarks: 'Apple, Mac, and macOS are trademarks of Apple Inc.',
+    privacy: 'Privacy Policy',
+    beta: 'Public beta',
+    switchTo: 'Français',
+  },
+  fr: {
+    tagline: 'Un nettoyeur de stockage prudent pour Mac, fait pour les caches de développement et les fichiers de rendu.',
+    guides: 'Guides de nettoyage',
+    developer: 'Vider les caches de développement',
+    creator: 'Vider le cache de média Adobe',
+    product: 'Produit',
+    overview: 'Aperçu',
+    download: 'Télécharger la bêta gratuite',
+    feedback: 'Donner votre avis',
+    platform: 'Plateforme',
+    chips: 'Apple Silicon et Intel',
+    macos: 'macOS 14 Sonoma ou version ultérieure',
+    trademarks: 'Apple, Mac et macOS sont des marques de commerce d’Apple Inc.',
+    privacy: 'Politique de confidentialité',
+    beta: 'Bêta publique',
+    switchTo: 'English',
+  },
+};
+const lang = langOf(Astro.url);
+const t = copy[lang];
+const to = other(lang);
+const href = (english: string) => localize(lang, english);
+const { path, overview = false, trademarks = t.trademarks } = Astro.props;
 ---
 <footer style="border-top: 1px solid var(--line); background: var(--surface)">
 <div style="max-width: var(--container-max); margin: 0 auto; padding: var(--space-16) var(--space-6) var(--space-10)">
@@ -21,28 +65,28 @@ const { overview = false, trademarks = 'Apple, Mac, and macOS are trademarks of 
 <BrandMark width={12} height={16} />
 <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em">CacheDrop</span>
 </div>
-<p style="margin: 0; max-width: 240px; font-size: 13px; line-height: 19px; color: var(--ink-secondary)">A careful Mac storage cleaner for developer caches and creative render files.</p>
+<p style="margin: 0; max-width: 240px; font-size: 13px; line-height: 19px; color: var(--ink-secondary)">{t.tagline}</p>
 </div>
 <nav aria-label="Cleaning guides" style="display: flex; flex-direction: column; gap: var(--space-2-5); font-size: 13px">
-<h3 style="margin: 0 0 var(--space-1); font-size: 13px; font-weight: 600">Cleaning Guides</h3>
-<a class="flink" href="/clear-mac-developer-caches/">Clear Developer Caches</a>
-<a class="flink" href="/clear-adobe-media-cache-mac/">Clear Adobe Media Cache</a>
+<h3 style="margin: 0 0 var(--space-1); font-size: 13px; font-weight: 600">{t.guides}</h3>
+<a class="flink" href={href('/clear-mac-developer-caches/')}>{t.developer}</a>
+<a class="flink" href={href('/clear-adobe-media-cache-mac/')}>{t.creator}</a>
 </nav>
 <nav aria-label="Product" style="display: flex; flex-direction: column; gap: var(--space-2-5); font-size: 13px">
-<h3 style="margin: 0 0 var(--space-1); font-size: 13px; font-weight: 600">Product</h3>
-{overview && <a class="flink" href="/">Overview</a>}
-<a class="flink" href="/download/">Download Free Beta</a>
-<a class="flink" href="#feedback" data-feedback>Provide Feedback</a>
+<h3 style="margin: 0 0 var(--space-1); font-size: 13px; font-weight: 600">{t.product}</h3>
+{overview && <a class="flink" href={href('/')}>{t.overview}</a>}
+<a class="flink" href={href('/download/')}>{t.download}</a>
+<a class="flink" href="#feedback" data-feedback>{t.feedback}</a>
 </nav>
 <div style="display: flex; flex-direction: column; gap: var(--space-2-5); font-size: 13px; color: var(--ink-secondary)">
-<h3 style="margin: 0 0 var(--space-1); font-size: 13px; font-weight: 600; color: var(--ink)">Platform</h3>
-<span>Apple Silicon &amp; Intel</span>
-<span>macOS 14 Sonoma and later</span>
+<h3 style="margin: 0 0 var(--space-1); font-size: 13px; font-weight: 600; color: var(--ink)">{t.platform}</h3>
+<span>{t.chips}</span>
+<span>{t.macos}</span>
 </div>
 </div>
 <div style="margin-top: var(--space-14); padding-top: var(--space-6); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3); font-size: 12px; color: var(--ink-secondary)">
 <span>© 2026 CacheDrop. {trademarks}</span>
-<span style="display: flex; gap: var(--space-4)"><a class="flink" href="/privacy/">Privacy Policy</a><span>Public beta</span></span>
+<span style="display: flex; gap: var(--space-4)"><a class="flink" href={href('/privacy/')}>{t.privacy}</a><span>{t.beta}</span><a class="flink" href={localize(to, path)} hreflang={to} lang={to}>{t.switchTo}</a></span>
 </div>
 </div>
 </footer>

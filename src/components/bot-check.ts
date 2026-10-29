@@ -1,5 +1,6 @@
 // What the bot check (Decision 12) says and which Turnstile site key it uses. BotCheck.astro puts
-// both on the page; /assets/bot-check.js shows the messages. Add a language here to add its copy.
+// both on the page; /assets/bot-check.js shows the messages. Every language in src/i18n.ts needs its copy here.
+import type { Lang } from '../i18n';
 
 /** Cloudflare's always-pass test site key, used by local builds and CI. */
 export const TEST_SITE_KEY = '1x00000000000000000000AA';
@@ -24,6 +25,12 @@ export const botCheckCopy = {
     minute: 'a minute',
     minutes: '{n} minutes',
   },
-} as const;
+  fr: {
+    failed: 'Nous n’avons pas pu confirmer que l’envoi vient d’une personne. Rechargez la page et réessayez.',
+    limited: 'Il y a eu beaucoup d’essais à partir de votre réseau. Réessayez dans {wait}.',
+    minute: 'une minute',
+    minutes: '{n}\u00a0minutes',
+  },
+} as const satisfies Record<Lang, Record<'failed' | 'limited' | 'minute' | 'minutes', string>>;
 
-export type Lang = keyof typeof botCheckCopy;
+export type { Lang };

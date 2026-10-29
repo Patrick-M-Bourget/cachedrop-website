@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { pages } from './pages';
+import { pages, uiOf } from './pages';
 
 // The email gate's pages (Decisions 1, 2) against the static build, with the Vercel functions
 // mocked. tests/gate-journey.spec.ts runs the real thing against a preview.
@@ -10,13 +10,13 @@ const NEWS = 'Email me news about CacheDrop, like new features, surveys and the 
 const turnstile = 'XXXX.DUMMY.TOKEN.XXXX';
 
 test.describe('every Download button leads to the form', () => {
-  for (const p of pages.filter((p) => !p.path.startsWith('/download/'))) {
+  for (const p of pages.filter((p) => !/^(\/fr)?\/download\//.test(p.path))) {
     test(`on ${p.path}`, async ({ page }) => {
       await page.goto(p.path);
-      const links = page.locator('a', { hasText: /download|get free beta|get your space back/i });
+      const links = page.locator('a', { hasText: /download|get free beta|get your space back|télécharg|obtenir/i });
       const hrefs = await links.evaluateAll((as) => as.map((a) => a.getAttribute('href')));
       expect(hrefs.length).toBeGreaterThan(0);
-      for (const href of hrefs) expect(href).toBe('/download/');
+      for (const href of hrefs) expect(href).toBe(uiOf(p).download);
     });
   }
 
@@ -50,7 +50,7 @@ test.describe('the form', () => {
     await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeFocused();
     await expect(page.getByText('We sent a download link to ada@example.com.')).toBeVisible();
     await expect(page.getByLabel('Email', { exact: true })).toBeHidden();
-    expect(requests).toEqual([{ email: 'ada@example.com', filling: 'video-photo', news: false, turnstile }]);
+    expect(requests).toEqual([{ email: 'ada@example.com', filling: 'video-photo', news: false, lang: 'en', turnstile }]);
   });
 
   test('sends no answer when the question is skipped', async ({ page }) => {
@@ -59,7 +59,7 @@ test.describe('the form', () => {
     await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
     await page.getByLabel('Email', { exact: true }).press('Enter');
     await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
-    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false, turnstile }]);
+    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false, lang: 'en', turnstile }]);
   });
 
   test('catches an incomplete email before sending anything', async ({ page }) => {
@@ -108,7 +108,7 @@ test.describe('the form', () => {
     await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
     await page.getByRole('button', { name: 'Send Download Link' }).click();
     await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
-    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false, turnstile }]);
+    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false, lang: 'en', turnstile }]);
   });
 
   test('sends news: true only when the box is ticked, and starts unticked again for a different email', async ({ page }) => {
@@ -119,7 +119,7 @@ test.describe('the form', () => {
     await page.getByRole('button', { name: 'Send Download Link' }).click();
     await page.getByRole('button', { name: 'Use a Different Email' }).click();
     await expect(page.getByRole('checkbox', { name: NEWS, exact: true })).not.toBeChecked();
-    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: true, turnstile }]);
+    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: true, lang: 'en', turnstile }]);
   });
 
   test('links to the privacy policy (Decision 19)', async ({ page }) => {
@@ -176,7 +176,7 @@ test.describe('the token page', () => {
       await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
       await page.getByRole('button', { name: 'Send Download Link' }).click();
       await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
-      expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false, turnstile }]);
+      expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false, lang: 'en', turnstile }]);
     });
   }
 

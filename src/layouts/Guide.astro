@@ -1,16 +1,18 @@
 ---
 // A cleaning guide: hero with breadcrumb, the guide body (default slot), the FAQ,
 // a link to the other guide and the closing call to action. It builds the
-// Article, BreadcrumbList and FAQPage JSON-LD in the handoff's key order.
+// Article, BreadcrumbList and FAQPage JSON-LD in the handoff's key order. The page passes its
+// strings in its own language; the layout's own few words are in `copy`.
 import Base from './Base.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { guideH2, primaryLg, arrowLink } from '../components/guide-styles';
+import { langOf, localize } from '../i18n';
 
 interface Props {
   title: string;
   description: string;
-  /** e.g. `/clear-mac-developer-caches/`. */
+  /** English path, e.g. `/clear-mac-developer-caches/`. */
   path: string;
   /** Breadcrumb and BreadcrumbList name, e.g. `Developer Storage Guide`. */
   crumb: string;
@@ -22,21 +24,26 @@ interface Props {
   cta: string;
   /** Short line beside the hero button. */
   ctaNote: string;
-  /** Visible "Updated …" month, kept in step with `dateModified` and the sitemap lastmod (HANDOFF.md §4). */
+  /** Visible "Updated …" month in the page's language, kept in step with `dateModified` and the sitemap lastmod (HANDOFF.md §4). */
   updated: string;
   dateModified: string;
   readTime: string;
   faqTitle: string;
   /** Question and answer. The answer is HTML (inline code spans); its text is the FAQPage answer. */
   faq: Array<[question: string, answerHtml: string]>;
+  /** The other guide; `href` is its English path. */
   other: { eyebrow: string; title: string; href: string; link: string };
   closing: { title: string; body: string };
   trademarks: string;
 }
 
 const p = Astro.props;
+const lang = langOf(Astro.url);
+const t = { en: { breadcrumb: 'Breadcrumb', updated: 'Updated' }, fr: { breadcrumb: 'Fil d’Ariane', updated: 'Mis à jour en' } }[lang];
 const site = Astro.site!.origin;
-const url = new URL(p.path, site).href;
+const url = new URL(localize(lang, p.path), site).href;
+const home = `${site}${localize(lang, '/')}`;
+const downloadHref = localize(lang, '/download/');
 const plain = (html: string) => html.replace(/<[^>]+>/g, '');
 
 const jsonLd = {
@@ -54,7 +61,7 @@ const jsonLd = {
     {
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'CacheDrop', item: `${site}/` },
+        { '@type': 'ListItem', position: 1, name: 'CacheDrop', item: home },
         { '@type': 'ListItem', position: 2, name: p.crumb, item: url },
       ],
     },
@@ -74,9 +81,9 @@ const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" strok
 <main>
 <section style="background: var(--surface-elevated); border-bottom: 1px solid var(--line); padding: var(--space-18) var(--space-6) var(--space-22)">
 <div style="max-width: var(--reading-max); margin: 0 auto">
-<nav aria-label="Breadcrumb">
+<nav aria-label={t.breadcrumb}>
 <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-size: 13px; color: var(--ink-secondary)">
-<li><a class="flink" href="/">CacheDrop</a></li>
+<li><a class="flink" href={localize(lang, '/')}>CacheDrop</a></li>
 <li aria-hidden="true" style="display: flex"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></li>
 <li aria-current="page" style="color: var(--ink-body)">{p.crumb}</li>
 </ol>
@@ -84,13 +91,13 @@ const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" strok
 <h1 style="margin: var(--space-10) 0 0; font-size: clamp(38px, 5.4vw, 64px); line-height: 1.06; font-weight: 600; letter-spacing: -0.04em; text-wrap: balance">{p.headline}</h1>
 <h2 style="margin: var(--space-6) 0 0; font-size: 19px; line-height: 29px; font-weight: 400; letter-spacing: -0.012em; color: var(--ink-secondary); text-wrap: pretty">{p.lede}</h2>
 <div style="margin-top: 36px; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-5)">
-<a class="btn-primary" href="/download/" style={primaryLg}>
+<a class="btn-primary" href={downloadHref} style={primaryLg}>
 <Fragment set:html={download} />
 <span>{p.cta}</span>
 </a>
 <span style="font-size: 13px; color: var(--ink-secondary)">{p.ctaNote}</span>
 </div>
-<p style="margin: var(--space-10) 0 0; font-size: 13px; color: var(--ink-secondary)">Updated {p.updated} · {p.readTime}</p>
+<p style="margin: var(--space-10) 0 0; font-size: 13px; color: var(--ink-secondary)">{t.updated} {p.updated} · {p.readTime}</p>
 </div>
 </section>
 
@@ -115,7 +122,7 @@ const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" strok
 <p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-secondary)">{p.other.eyebrow}</p>
 <p style="margin: var(--space-1-5) 0 0; font-size: 17px; line-height: 24px; font-weight: 600">{p.other.title}</p>
 </div>
-<a class="textlink" href={p.other.href} style={arrowLink}>{p.other.link}
+<a class="textlink" href={localize(lang, p.other.href)} style={arrowLink}>{p.other.link}
 <Fragment set:html={arrow} /></a>
 </aside>
 </div>
@@ -124,7 +131,7 @@ const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" strok
 <div style="max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; align-items: center">
 <h2 style="margin: 0; font-size: clamp(30px, 4vw, 48px); line-height: 1.1; font-weight: 600; letter-spacing: -0.035em">{p.closing.title}</h2>
 <p style="margin: var(--space-4) 0 0; font-size: 17px; line-height: 27px; color: var(--ink-secondary)">{p.closing.body}</p>
-<a class="btn-primary" href="/download/" style={`margin-top: var(--space-8); ${primaryLg}`}>
+<a class="btn-primary" href={downloadHref} style={`margin-top: var(--space-8); ${primaryLg}`}>
 <Fragment set:html={download} />
 <span>{p.cta}</span>
 </a>
@@ -132,7 +139,7 @@ const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" strok
 </section>
 </main>
 
-<Footer overview trademarks={p.trademarks} />
+<Footer path={p.path} overview trademarks={p.trademarks} />
 </Base>
 
 <style is:global>

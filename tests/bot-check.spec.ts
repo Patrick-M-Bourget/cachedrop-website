@@ -8,6 +8,7 @@ const DUMMY = 'XXXX.DUMMY.TOKEN.XXXX';
 const KEYS = { pass: '1x00000000000000000000AA', block: '2x00000000000000000000AB', interactive: '3x00000000000000000000FF' };
 const CLOUDFLARE = 'https://challenges.cloudflare.com/turnstile/';
 const FAILED = 'We couldn’t confirm this came from a person. Reload the page and try again.';
+const FAILED_FR = 'Nous n’avons pas pu confirmer que l’envoi vient d’une personne. Rechargez la page et réessayez.';
 
 /** Serves the built pages with another Turnstile site key in them. */
 async function useSiteKey(page: Page, key: string) {
@@ -67,7 +68,7 @@ test.describe('the download form', () => {
     await page.goto('/download/');
     await sendSignup(page);
     await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
-    expect(sent).toEqual([{ email: 'ada@example.com', filling: null, news: false, turnstile: DUMMY }]);
+    expect(sent).toEqual([{ email: 'ada@example.com', filling: null, news: false, lang: 'en', turnstile: DUMMY }]);
     await expect(page.locator('[data-gate-form] [data-bot-check]')).toBeHidden();
   });
 
@@ -142,5 +143,81 @@ test.describe('the feedback modal', () => {
     await page.getByRole('button', { name: 'Submit Feedback' }).click();
     await expect(page.getByRole('alert')).toHaveText(FAILED);
     expect(sent).toEqual([]);
+  });
+});
+
+// The same states on the French pages (Decision 5): the widget's copy comes from the page's language.
+async function sendSignupFr(page: Page) {
+  await page.getByLabel('Courriel', { exact: true }).fill('ada@example.com');
+  await page.getByRole('button', { name: 'Envoyer le lien de téléchargement' }).click();
+}
+
+test.describe('the French download form', () => {
+  test('sends the Turnstile token with lang: "fr"', async ({ page }) => {
+    const sent = await mock(page, '/api/signup');
+    await page.goto('/fr/download/');
+    await sendSignupFr(page);
+    await expect(page.getByRole('heading', { name: 'Vérifiez vos courriels' })).toBeVisible();
+    expect(sent).toEqual([{ email: 'ada@example.com', filling: null, news: false, lang: 'fr', turnstile: DUMMY }]);
+  });
+
+  test('says in French when the function refuses the bot check', async ({ page }) => {
+    await mock(page, '/api/signup', 403, { error: 'bot_check' });
+    await page.goto('/fr/download/');
+    await sendSignupFr(page);
+    await expect(page.getByRole('alert')).toHaveText(FAILED_FR);
+  });
+
+  test('says in French how long to wait when the place is rate-limited', async ({ page }) => {
+    await mock(page, '/api/signup', 429, { error: 'rate_limited', retryAfter: 1150 }, { 'retry-after': '1150' });
+    await page.goto('/fr/download/');
+    await sendSignupFr(page);
+    await expect(page.getByRole('alert')).toHaveText('Il y a eu beaucoup d’essais à partir de votre réseau. Réessayez dans 20\u00a0minutes.');
+  });
+
+  test('sends nothing and says so in French when the check fails in the browser (always-block key)', async ({ page }) => {
+    await useSiteKey(page, KEYS.block);
+    const sent = await mock(page, '/api/signup');
+    await page.goto('/fr/download/');
+    await sendSignupFr(page);
+    await expect(page.getByRole('alert')).toHaveText(FAILED_FR);
+    expect(sent).toEqual([]);
+  });
+});
+
+async function openFeedbackFr(page: Page) {
+  await page.goto('/fr/clear-mac-developer-caches/');
+  await page.locator('[data-feedback]').first().click();
+  await page.getByLabel('Que devrions-nous changer?').fill('Plus de guides');
+}
+
+test.describe('the French feedback modal', () => {
+  test('sends the Turnstile token', async ({ page }) => {
+    const sent = await mock(page, '/api/feedback');
+    await openFeedbackFr(page);
+    await page.getByRole('button', { name: 'Envoyer mon avis' }).click();
+    await expect(page.getByText('Merci, ça nous aide.')).toBeVisible();
+    expect(sent).toEqual([{ rating: null, email: '', message: 'Plus de guides', page: '/fr/clear-mac-developer-caches/', specs: null, turnstile: DUMMY }]);
+  });
+
+  test('says in French when the function refuses the bot check', async ({ page }) => {
+    await mock(page, '/api/feedback', 403, { error: 'bot_check' });
+    await openFeedbackFr(page);
+    await page.getByRole('button', { name: 'Envoyer mon avis' }).click();
+    await expect(page.getByRole('alert')).toHaveText(FAILED_FR);
+  });
+
+  test('says in French how long to wait when the place is rate-limited', async ({ page }) => {
+    await mock(page, '/api/feedback', 429, { error: 'rate_limited', retryAfter: 30 }, { 'retry-after': '30' });
+    await openFeedbackFr(page);
+    await page.getByRole('button', { name: 'Envoyer mon avis' }).click();
+    await expect(page.getByRole('alert')).toHaveText('Il y a eu beaucoup d’essais à partir de votre réseau. Réessayez dans une minute.');
+  });
+
+  test('says in French when a send fails for another reason', async ({ page }) => {
+    await mock(page, '/api/feedback', 500, { error: 'failed' });
+    await openFeedbackFr(page);
+    await page.getByRole('button', { name: 'Envoyer mon avis' }).click();
+    await expect(page.getByRole('alert')).toHaveText('L’envoi n’a pas fonctionné. Vérifiez votre connexion et réessayez.');
   });
 });
