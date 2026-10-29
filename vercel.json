@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [{ "path": "/api/feedback-retry", "schedule": "0 13 * * *" }],
   "rewrites": [
     { "source": "/download/:token([A-Za-z0-9_-]{43})/", "destination": "/download/link/" },
     { "source": "/download/:token([A-Za-z0-9_-]{43})", "destination": "/download/link/" }
