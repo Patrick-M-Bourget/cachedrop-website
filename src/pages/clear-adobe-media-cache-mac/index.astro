@@ -1,0 +1,100 @@
+---
+import Guide from '../../layouts/Guide.astro';
+import Toc from '../../components/Toc.astro';
+import CodeBlock from '../../components/CodeBlock.astro';
+import { guideH2, guideP, arrowLink } from '../../components/guide-styles';
+
+const section = 'padding-top: var(--space-22); display: flex; flex-direction: column; gap: var(--space-5)';
+const pair = 'margin-top: var(--space-4); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: var(--space-4)';
+const card = 'padding: var(--space-7); border-radius: var(--radius-2xl); display: flex; flex-direction: column; gap: 14px';
+const manual = `${card}; border: 1px solid var(--line)`;
+const ours = `${card}; background: var(--surface-subtle)`;
+const h3 = 'margin: 0; font-size: 20px; line-height: 26px; font-weight: 600; letter-spacing: -0.015em';
+const steps = 'margin: 0; padding: 0 0 0 var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); font-size: 16px; line-height: 25px; color: var(--ink-body)';
+const note = 'margin: var(--space-1) 0 0; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; line-height: 21px; color: var(--ink-secondary)';
+const cardP = 'margin: 0; font-size: 16px; line-height: 25px; color: var(--ink-body)';
+const getLink = `margin-top: auto; ${arrowLink}`;
+const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>';
+
+// One list feeds both the visible FAQ and the FAQPage JSON-LD (answers lose their tags there).
+const faq: Array<[string, string]> = [
+  ['Is it safe to clear the Premiere Pro media cache?', 'Yes. Media cache files are copies Premiere makes for faster playback. It regenerates them the next time you open a project, so the first playback may take a moment longer while waveforms and conformed audio rebuild.'],
+  ['What are .cfa and .pek files?', '<span class="ic">.cfa</span> files are conformed audio: versions of your clips’ audio that Adobe apps can play back quickly. <span class="ic">.pek</span> files store peak data used to draw audio waveforms. Both are safe to delete.'],
+  ['Will deleting Final Cut Pro render files delete my edits?', 'No. Your projects, timelines and original media stay in the library. Final Cut Pro re-renders effects and transitions when it needs them again.'],
+  ['Why is my Mac still full after deleting old projects?', 'Deleting a project doesn’t remove the caches it created. Media cache files, After Effects disk cache and render files stay behind in your Library until you clear them.'],
+  ['Which apps does CacheDrop clear caches for?', 'Adobe Premiere Pro, After Effects and Photoshop (every installed version), plus Final Cut Pro render files. You review each item before anything is cleared.'],
+];
+---
+<Guide
+  title="Clear Adobe Media Cache on Mac (Premiere Pro & Final Cut Pro)"
+  description="How to clear Adobe Premiere Pro media cache and Final Cut Pro render files on a Mac, step by step, plus a free tool that clears every version at once."
+  path="/clear-adobe-media-cache-mac/"
+  crumb="Creator Storage Guide"
+  headline="Stop buying external drives."
+  lede="Video editing software generates massive, invisible cache files to keep playback smooth. When the project is over, those files stay on your Mac forever. CacheDrop finds them."
+  cta="Get Your Space Back (Free)"
+  ctaNote="Premiere Pro · After Effects · Final Cut Pro · macOS 14+"
+  updated="October 2026"
+  dateModified="2026-10-29"
+  readTime="5 min read"
+  faqTitle="Creator storage FAQ"
+  faq={faq}
+  other={{ eyebrow: 'Also write code?', title: 'How to delete Xcode DerivedData and old node_modules', href: '/clear-mac-developer-caches/', link: 'Read the developer guide' }}
+  closing={{ title: 'Keep the drive you have.', body: 'CacheDrop finds Adobe media cache and Final Cut Pro render files in one scan. Free while in beta.' }}
+  trademarks="Adobe, Premiere Pro, After Effects and Photoshop are trademarks of Adobe. Final Cut Pro, Apple, Mac and macOS are trademarks of Apple Inc."
+>
+<Toc items={[
+  ['#premiere', 'How to clear Adobe Premiere Media Cache'],
+  ['#fcpx', 'How to delete Final Cut Pro render files'],
+  ['#faq', 'Creator storage FAQ'],
+]} />
+
+<section id="premiere" style="padding-top: var(--space-16); display: flex; flex-direction: column; gap: var(--space-5)">
+<h2 style={guideH2}>How to clear Adobe Premiere Media Cache</h2>
+<p style={`${guideP}; text-wrap: pretty`}>Adobe Premiere Pro generates <span class="ic">.cfa</span> and <span class="ic">.pek</span> files to optimize audio and video playback. Over a few months, this hidden folder can grow to 100GB+.</p>
+<p style={guideP}>On a Mac, the media cache lives here by default:</p>
+<CodeBlock label="Path" code="~/Library/Application Support/Adobe/Common/Media Cache Files" />
+
+<div style={pair}>
+<div style={manual}>
+<h3 style={h3}>The manual way:</h3>
+<ol style={steps}>
+<li>Open Premiere Pro.</li>
+<li>Go to Settings › Media Cache (Preferences › Media Cache in older versions).</li>
+<li>Click “Delete”.</li>
+</ol>
+<p style={note}>Note: This only deletes caches for the open version of Premiere.</p>
+</div>
+<div style={ours}>
+<h3 style={h3}>The CacheDrop way:</h3>
+<p style={cardP}>CacheDrop scans your entire Library for every version of Adobe Premiere, After Effects, and Photoshop you’ve ever installed, and drops the caches in one click.</p>
+<a class="textlink" href="/download/" style={getLink}>Get CacheDrop free
+<Fragment set:html={arrow} /></a>
+</div>
+</div>
+</section>
+
+<section id="fcpx" style={section}>
+<h2 style={guideH2}>Final Cut Pro Render Files</h2>
+<p style={`${guideP}; text-wrap: pretty`}>FCPX stores render files directly inside the Library bundle. CacheDrop safely analyzes your FCPX libraries and lets you strip out the heavy render files while keeping your project timeline intact.</p>
+<p style={guideP}>That’s why a finished Final Cut Pro library can take up far more space than its source media. The render files sit inside the <span class="ic">.fcpbundle</span>, where Finder doesn’t show them.</p>
+
+<div style={pair}>
+<div style={manual}>
+<h3 style={h3}>Delete render files in Final Cut Pro</h3>
+<ol style={steps}>
+<li>Select the library in the Libraries sidebar.</li>
+<li>Choose File › Delete Generated Library Files.</li>
+<li>Select Delete Render Files, choose Unused Only or All, and click OK.</li>
+</ol>
+<p style={note}>One library at a time, and only libraries you open.</p>
+</div>
+<div style={ours}>
+<h3 style={h3}>Clear them with CacheDrop</h3>
+<p style={cardP}>CacheDrop lists the render files in each library it finds, with their size. Clear the heavy ones and your timelines, media and edits stay exactly as they were.</p>
+<a class="textlink" href="/download/" style={getLink}>Get CacheDrop free
+<Fragment set:html={arrow} /></a>
+</div>
+</div>
+</section>
+</Guide>

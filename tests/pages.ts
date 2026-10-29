@@ -12,4 +12,6 @@ export type PageUnderTest = {
 
 export const pages: PageUnderTest[] = [
   { path: '/', handoff: 'index.html', screenshots: 'home' },
+  { path: '/clear-mac-developer-caches/', handoff: 'clear-mac-developer-caches/index.html', screenshots: 'developer-guide' },
+  { path: '/clear-adobe-media-cache-mac/', handoff: 'clear-adobe-media-cache-mac/index.html', screenshots: 'creator-guide' },
 ];

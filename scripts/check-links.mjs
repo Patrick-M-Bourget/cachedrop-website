@@ -7,8 +7,6 @@ const PORT = 5799;
 
 // Pages the homepage links to that later tickets build. Remove each line when its page lands.
 const PENDING = [
-  '/clear-mac-developer-caches/', // #5 guides
-  '/clear-adobe-media-cache-mac/', // #5 guides
   '/download/', // #8 email gate
 ];
 
