@@ -1,0 +1,12 @@
+/*
+ * The site's own tokens, layered on handoff/design-system/tokens.css (imported first in Base.astro).
+ * The design system's README, rule 4: never write a literal colour, size or radius; when a token is
+ * missing, add it first. The handoff stays as delivered, so the ones it lacks live here.
+ */
+:root {
+  /* The app window mock (AppWindow.astro): its muted sidebar labels and storage bar, in both themes. */
+  --window-muted: #8A8A90;
+  /* ...and the macOS-sized radii of its small controls and category tiles. */
+  --radius-window-control: 7px;
+  --radius-window-tile: 9px;
+}

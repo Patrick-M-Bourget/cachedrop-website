@@ -1,0 +1,144 @@
+---
+// A cleaning guide: hero with breadcrumb, the guide body (default slot), the FAQ,
+// a link to the other guide and the closing call to action. It builds the
+// Article, BreadcrumbList and FAQPage JSON-LD in the handoff's key order. The page passes its
+// strings in its own language; the layout's own few words are in `copy`.
+import Base from './Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { guideH2, primaryLg, arrowLink, faqItem, faqQuestion } from '../components/guide-styles';
+import ClosingCta from '../components/ClosingCta.astro';
+import { langOf, localize } from '../i18n';
+
+interface Props {
+  title: string;
+  description: string;
+  /** English path, e.g. `/clear-mac-developer-caches/`. */
+  path: string;
+  /** Breadcrumb and BreadcrumbList name, e.g. `Developer Storage Guide`. */
+  crumb: string;
+  /** The H1, also the Article headline. */
+  headline: string;
+  /** The H2 under the H1. */
+  lede: string;
+  /** Label of both download buttons. */
+  cta: string;
+  /** Short line beside the hero button. */
+  ctaNote: string;
+  /** Visible "Updated …" month in the page's language, kept in step with `dateModified` and the sitemap lastmod (HANDOFF.md §4). */
+  updated: string;
+  dateModified: string;
+  readTime: string;
+  faqTitle: string;
+  /** Question and answer. The answer is HTML (inline code spans); its text is the FAQPage answer. */
+  faq: Array<[question: string, answerHtml: string]>;
+  /** The other guide; `href` is its English path. */
+  other: { eyebrow: string; title: string; href: string; link: string };
+  closing: { title: string; body: string };
+  trademarks: string;
+}
+
+const p = Astro.props;
+const lang = langOf(Astro.url);
+const t = { en: { breadcrumb: 'Breadcrumb', updated: 'Updated' }, fr: { breadcrumb: 'Fil d’Ariane', updated: 'Mis à jour en' } }[lang];
+const site = Astro.site!.origin;
+const url = new URL(localize(lang, p.path), site).href;
+const home = `${site}${localize(lang, '/')}`;
+const downloadHref = localize(lang, '/download/');
+const plain = (html: string) => html.replace(/<[^>]+>/g, '');
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Article',
+      headline: p.headline,
+      description: p.description,
+      dateModified: p.dateModified,
+      mainEntityOfPage: url,
+      author: { '@type': 'Organization', name: 'CacheDrop', url: `${site}/` },
+      publisher: { '@type': 'Organization', '@id': `${site}/#org`, name: 'CacheDrop', url: `${site}/`, logo: `${site}/assets/cachedrop-app-icon.png` },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'CacheDrop', item: home },
+        { '@type': 'ListItem', position: 2, name: p.crumb, item: url },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: p.faq.map(([name, a]) => ({ '@type': 'Question', name, acceptedAnswer: { '@type': 'Answer', text: plain(a) } })),
+    },
+  ],
+};
+
+const download = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg>';
+const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>';
+---
+<Base title={p.title} description={p.description} path={p.path} ogType="article" jsonLd={jsonLd}>
+<Nav current={p.path} />
+
+<main>
+<section style="background: var(--surface-elevated); border-bottom: 1px solid var(--line); padding: var(--space-18) var(--space-6) var(--space-22)">
+<div style="max-width: var(--reading-max); margin: 0 auto">
+<nav aria-label={t.breadcrumb}>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-size: 13px; color: var(--ink-secondary)">
+<li><a class="flink" href={localize(lang, '/')}>CacheDrop</a></li>
+<li aria-hidden="true" style="display: flex"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></li>
+<li aria-current="page" style="color: var(--ink-body)">{p.crumb}</li>
+</ol>
+</nav>
+<h1 style="margin: var(--space-10) 0 0; font-size: clamp(38px, 5.4vw, 64px); line-height: 1.06; font-weight: 600; letter-spacing: -0.04em; text-wrap: balance">{p.headline}</h1>
+<h2 style="margin: var(--space-6) 0 0; font-size: 19px; line-height: 29px; font-weight: 400; letter-spacing: -0.012em; color: var(--ink-secondary); text-wrap: pretty">{p.lede}</h2>
+<div style="margin-top: 36px; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-5)">
+<a class="btn-primary" href={downloadHref} style={primaryLg}>
+<Fragment set:html={download} />
+<span>{p.cta}</span>
+</a>
+<span style="font-size: 13px; color: var(--ink-secondary)">{p.ctaNote}</span>
+</div>
+<p style="margin: var(--space-10) 0 0; font-size: 13px; color: var(--ink-secondary)">{t.updated} {p.updated} · {p.readTime}</p>
+</div>
+</section>
+
+<div style="max-width: var(--reading-max); margin: 0 auto; padding: var(--space-18) var(--space-6) 0">
+
+<slot />
+
+<section id="faq" style="padding-top: var(--space-22)">
+<h2 style={guideH2}>{p.faqTitle}</h2>
+<div style="margin-top: var(--space-6); display: flex; flex-direction: column">
+{p.faq.map(([q, a], i) => (
+<div style={faqItem(i, p.faq.length)}>
+<h3 style={faqQuestion}>{q}</h3>
+<p style="margin: var(--space-2) 0 0; font-size: 16px; line-height: 26px; color: var(--ink-body)" set:html={a}></p>
+</div>
+))}
+</div>
+</section>
+
+<aside style="margin-top: var(--space-18); padding: var(--space-7); border-radius: var(--radius-2xl); background: var(--surface-subtle); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4)">
+<div>
+<p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-secondary)">{p.other.eyebrow}</p>
+<p style="margin: var(--space-1-5) 0 0; font-size: 17px; line-height: 24px; font-weight: 600">{p.other.title}</p>
+</div>
+<a class="textlink" href={localize(lang, p.other.href)} style={arrowLink}>{p.other.link}
+<Fragment set:html={arrow} /></a>
+</aside>
+</div>
+
+<ClosingCta size="guide" title={p.closing.title} body={p.closing.body} href={downloadHref} cta={p.cta} />
+</main>
+
+<Footer path={p.path} overview trademarks={p.trademarks} />
+</Base>
+
+<style is:global>
+/* Guide-only rules from the guides' head <style>. The developer guide adds white-space: nowrap to .ic. */
+.ic{font-family:var(--font-mono);font-size:0.86em;background:var(--surface-subtle);border:1px solid var(--line);border-radius:var(--radius-xs);padding:1px var(--space-1-5)}
+.copy{transition:background .15s}
+.copy:hover{background:var(--surface)}
+.toc a{color:var(--ink-body)}
+.toc a:hover{color:var(--accent-text)}
+</style>

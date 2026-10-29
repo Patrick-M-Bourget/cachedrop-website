@@ -1,0 +1,76 @@
+---
+// The document shell every page shares: the handoff's head tags in the handoff's
+// order, the design tokens, the site-wide styles, the feedback modal, bot-check.js and site.js.
+// Keep the head tags exactly as delivered (HANDOFF.md §2); tests/head.spec.ts diffs them.
+// Decision 5 adds the hreflang alternates after the canonical, and og:locale on French pages.
+import '../../handoff/design-system/tokens.css';
+import '../styles/tokens.css';
+import '../styles/global.css';
+import FeedbackModal from '../components/FeedbackModal.astro';
+import { htmlLang, langOf, localize } from '../i18n';
+
+interface Props {
+  title: string;
+  description: string;
+  /**
+   * Root-relative English path of this page, e.g. `/` or `/download/`. Builds canonical and og:url
+   * (under /fr/ on the French page) and the hreflang alternates.
+   */
+  path: string;
+  ogType?: 'website' | 'article';
+  /** e.g. `noindex, follow` on /download/. Omitted means no robots meta. */
+  robots?: string;
+  /** Structured data for this page, serialised as one JSON-LD script. */
+  jsonLd?: object;
+}
+
+const { title, description, path, ogType = 'website', robots, jsonLd } = Astro.props;
+const site = Astro.site!.origin; // https://cachedrop.io (astro.config.mjs)
+const lang = langOf(Astro.url);
+const url = new URL(localize(lang, path), site).href;
+const alternates = [
+  ['en', new URL(path, site).href],
+  ['fr', new URL(localize('fr', path), site).href],
+  ['x-default', new URL(path, site).href],
+];
+---
+<!doctype html>
+<html lang={htmlLang[lang]}>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+{robots && <meta name="robots" content={robots}>}
+<link rel="canonical" href={url}>
+{alternates.map(([hreflang, href]) => <link rel="alternate" hreflang={hreflang} href={href}>)}
+<meta property="og:type" content={ogType}>
+<meta property="og:site_name" content="CacheDrop">
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:url" content={url}>
+{lang === 'fr' && <meta property="og:locale" content="fr_CA">}
+<meta property="og:image" content={`${site}/assets/og-image.png`}>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/cachedrop-app-icon.png">
+<link rel="preload" href="/assets/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/inter-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<slot name="head" />
+{jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd, null, 1)} />}
+</head>
+<body>
+<div style="font-family: var(--font-sans); color: var(--ink); background: var(--surface); -webkit-font-smoothing: antialiased">
+<slot />
+</div>
+<FeedbackModal />
+<!-- bot-check.js first: site.js and the /download/ form use it (Decision 12). It loads Cloudflare's script only on demand. -->
+<script is:inline src="/assets/bot-check.js" defer></script>
+<script is:inline src="/assets/site.js" defer></script>
+<!-- Vercel Web Analytics (Decision 16). analytics.js must run first: it strips download tokens. -->
+<script is:inline src="/assets/analytics.js" defer></script>
+<script is:inline src="/_vercel/insights/script.js" defer></script>
+</body>
+</html>

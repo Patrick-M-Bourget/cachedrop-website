@@ -1,0 +1,18 @@
+/* Site-wide rules from the handoff pages' head <style>, with literals swapped for tokens. */
+body{margin:0;background:var(--surface)}
+*{box-sizing:border-box}
+a{color:var(--ink);text-decoration:none}
+a:hover{color:var(--accent-text)}
+.navlink{color:var(--ink-secondary);transition:color .15s}
+.navlink:hover{color:var(--ink)}
+a.btn-primary,a.btn-primary:hover{color:var(--on-accent)}
+.btn-primary{transition:filter .15s, transform .1s}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-primary:active,.gate-btn:active{transform:translateY(1px)}
+.btn-ghost{transition:background .15s}
+.btn-ghost:hover{background:var(--surface-subtle);color:var(--ink)}
+.flink{color:var(--ink-secondary)}
+.flink:hover{color:var(--ink)}
+.textlink:hover{text-decoration:underline;text-underline-offset:3px}
+.mono{font-family:var(--font-mono)}
+@media (max-width:760px){.navlinks{display:none !important}}

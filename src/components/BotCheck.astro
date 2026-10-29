@@ -1,0 +1,27 @@
+---
+// The Turnstile widget for one form (Decision 12). Put it inside the form, just above the submit
+// button. It stays hidden and takes no space unless Cloudflare needs the person to click, which
+// most never do. /assets/bot-check.js (loaded by Base) renders it and carries the token; Cloudflare's
+// own script loads only when a form asks for a token: on /download/, and when the feedback modal opens.
+import { botCheckCopy, siteKey, type Lang } from './bot-check.ts';
+
+interface Props {
+  /** Which function the token is for; Turnstile records it as the action. */
+  form: 'signup' | 'feedback';
+  lang?: Lang;
+}
+
+const { form, lang = 'en' } = Astro.props;
+const copy = botCheckCopy[lang];
+const key = siteKey(import.meta.env.PUBLIC_TURNSTILE_SITE_KEY, process.env.VERCEL_ENV);
+---
+<div
+  data-bot-check
+  data-sitekey={key}
+  data-action={form}
+  data-msg-failed={copy.failed}
+  data-msg-limited={copy.limited}
+  data-msg-minute={copy.minute}
+  data-msg-minutes={copy.minutes}
+  hidden
+></div>

@@ -1,0 +1,217 @@
+---
+// Privacy policy (Decisions 16, 19, 29, 33), in the guide-page layout from
+// handoff/site/clear-mac-developer-caches/, built at /privacy/ and /fr/privacy/ (Decision 5).
+// A lawyer reviews this text before launch (Decision 22). Say only what the decisions say.
+// It describes the launch state, e.g. feedback in a private repository (Decision 30).
+// List items are [bold lead, rest]; the rest is HTML (it may hold the privacy@ link).
+import Base from '../../../layouts/Base.astro';
+import Nav from '../../../components/Nav.astro';
+import Footer from '../../../components/Footer.astro';
+import { guideH2, guideP } from '../../../components/guide-styles';
+import { langOf, langPaths, localize } from '../../../i18n';
+
+export const getStaticPaths = langPaths;
+
+const path = '/privacy/';
+const mail = 'color: var(--accent-text); font-weight: 500';
+const MAIL = `<a class="textlink" href="mailto:privacy@cachedrop.io" style="${mail}">privacy@cachedrop.io</a>`;
+
+const copy = {
+  en: {
+    title: 'Privacy Policy | CacheDrop',
+    description: 'What the CacheDrop website collects, why, who handles it, how long it is kept, and how to see, correct or delete your information.',
+    crumb: 'Privacy policy',
+    breadcrumb: 'Breadcrumb',
+    lede: 'What this website collects, why, who handles it, and how long we keep it. In plain words.',
+    updated: 'Updated October 2026',
+    onThisPage: 'On this page',
+    toc: ['Who is responsible', 'What we collect and why', 'Who handles your information', 'How long we keep it', 'Your rights', 'Contact us'],
+    responsible: [
+      'This policy covers the CacheDrop website, cachedrop.io, and the emails it sends.',
+      `CacheDrop’s owner is the person in charge of the protection of personal information. For any question about your information, write to ${MAIL}.`,
+    ],
+    collectIntro: 'We only collect what you give us, plus a count of page visits.',
+    collect: [
+      ['Your email address', ', when you ask for the download. We send your download link to it. We also email you when a new version is out, and about security problems. These emails never promote anything.'],
+      ['What’s filling your Mac', ', if you pick an answer: Development, Video &amp; photo, Music &amp; audio, or Other. It tells us who uses CacheDrop. It’s optional.'],
+      ['News emails', ', only if you tick the box. Then we also email you about new features, surveys and the paid launch. The box starts unticked. The download never depends on it.'],
+      ['Your language', ', English or French: the language of the page you asked for the download from. Our emails reach you in it.'],
+      ['A code in your download link', '. Anyone with the link can use it for 7 days, so don’t share it.'],
+      ['A code in each email’s unsubscribe link', '. It unsubscribes you in one click, without signing in.'],
+      ['Feedback', ' you send with the feedback form: your rating, your message, the page you sent it from, and your email if you add one. We use it to fix problems and decide what to build next.'],
+      ['System specs', ', only if you tick the box in the feedback form: what your browser reports about itself, which includes your macOS version, platform and language. They help us reproduce problems.'],
+      ['Page visits', ', counted by Vercel Web Analytics, which works without cookies. For each visit it records the page you visit, the site that sent you, and your country, browser, operating system and type of device. We remove the code from download links before a visit is counted.'],
+      ['Download counts', ', kept in our own database, not in analytics.'],
+      ['Spam protection', '. Cloudflare Turnstile checks that a form is sent by a person, using your IP address and information about your browser. It runs only when you use a form: on the download page, and when you open the feedback form. We also use your IP address to limit how many forms can be sent from one place.'],
+    ],
+    providersIntro: 'We use these services to run the website. They are all outside Quebec, so the information they handle leaves Quebec.',
+    providers: [
+      ['Supabase', ' stores signups, feedback and the app download. Its servers are in the United States (Amazon Web Services). Outside Quebec.'],
+      ['Vercel', ' hosts the website, runs the code behind its forms, and counts page visits. Outside Quebec.'],
+      ['Resend', ' sends our emails. It receives your email address and the emails we send you. Outside Quebec.'],
+      ['Cloudflare', ' runs the Turnstile spam check on our forms, so it receives your IP address and information about your browser when you use one. It also forwards email sent to privacy@cachedrop.io and hello@cachedrop.io to our inbox, so those messages pass through Cloudflare. Outside Quebec.'],
+      ['GitHub', ' holds our list of feedback about the app, in a private GitHub repository. Each piece of feedback becomes an issue with the rating, message, page and specs. It never includes your email. Outside Quebec.'],
+    ],
+    retention: [
+      ['Signups', `: your email, your answer about your Mac, your news choice and your language. We keep them until you ask us to delete them. Every email we send has an unsubscribe link. If you unsubscribe, we keep only your email address, marked so we never email you again. Write to ${MAIL} and we delete it completely.`],
+      ['Download link codes', ': a link stops working after 7 days. We delete its code 30 days after that.'],
+      ['Unsubscribe codes', ': we keep them as long as your signup, and delete them with it.'],
+      ['Feedback', ': your rating, your message, the page, your email if you added one, and the system specs if you sent them. We keep it until you ask us to delete it.'],
+      ['System specs', ': we keep them with the feedback they came with, and delete them with it.'],
+      ['IP addresses', ': we never store your IP address. To count the forms sent from one place, we keep a scrambled code made from it, for at most a day.'],
+    ],
+    rightsIntro: 'You can ask us to:',
+    rights: ['see the personal information we hold about you,', 'correct it,', 'withdraw your consent, for example to news emails,', 'delete it.'],
+    rightsHow: `Write to ${MAIL}. If you aren’t happy with our answer, you can complain to Quebec’s Commission d’accès à l’information (cai.gouv.qc.ca).`,
+    contact: `Email: ${MAIL}`,
+  },
+  fr: {
+    title: 'Politique de confidentialité | CacheDrop',
+    description: 'Ce que le site de CacheDrop recueille, pourquoi, qui traite ces renseignements, combien de temps ils sont conservés, et comment les consulter, les corriger ou les supprimer.',
+    crumb: 'Politique de confidentialité',
+    breadcrumb: 'Fil d’Ariane',
+    lede: 'Ce que ce site recueille, pourquoi, qui traite ces renseignements et combien de temps nous les gardons. En mots simples.',
+    updated: 'Mis à jour en octobre 2026',
+    onThisPage: 'Sur cette page',
+    toc: ['Qui est responsable', 'Ce que nous recueillons et pourquoi', 'Qui traite vos renseignements', 'Combien de temps nous les gardons', 'Vos droits', 'Nous joindre'],
+    responsible: [
+      'Cette politique couvre le site Web de CacheDrop, cachedrop.io, et les courriels qu’il envoie.',
+      `Le propriétaire de CacheDrop est la personne responsable de la protection des renseignements personnels. Pour toute question sur vos renseignements, écrivez à ${MAIL}.`,
+    ],
+    collectIntro: 'Nous recueillons seulement ce que vous nous donnez, plus un décompte des visites de pages.',
+    collect: [
+      ['Votre adresse courriel', ', quand vous demandez le téléchargement. Nous y envoyons votre lien de téléchargement. Nous vous écrivons aussi quand une nouvelle version sort, et au sujet des problèmes de sécurité. Ces courriels ne font jamais de promotion.'],
+      ['Ce qui remplit votre Mac', ', si vous choisissez une réponse : Développement, Vidéo et photo, Musique et audio, ou Autre. Cela nous indique qui utilise CacheDrop. C’est facultatif.'],
+      ['Les courriels de nouvelles', ', seulement si vous cochez la case. Nous vous écrivons alors aussi au sujet des nouvelles fonctionnalités, des sondages et du lancement de la version payante. La case n’est pas cochée au départ. Le téléchargement n’en dépend jamais.'],
+      ['Votre langue', ', français ou anglais : la langue de la page d’où vous avez demandé le téléchargement. Nos courriels vous sont envoyés dans cette langue.'],
+      ['Un code dans votre lien de téléchargement', '. Toute personne qui a le lien peut s’en servir pendant 7 jours. Ne le partagez donc pas.'],
+      ['Un code dans le lien de désabonnement de chaque courriel', '. Il vous désabonne en un clic, sans connexion.'],
+      ['Vos avis', ', envoyés avec le formulaire d’avis : votre note, votre message, la page d’où vous l’avez envoyé, et votre adresse courriel si vous l’ajoutez. Nous nous en servons pour corriger des problèmes et décider de la suite.'],
+      ['Les caractéristiques du système', ', seulement si vous cochez la case dans le formulaire d’avis : ce que votre navigateur indique à son sujet, dont votre version de macOS, votre plateforme et votre langue. Elles nous aident à reproduire les problèmes.'],
+      ['Les visites de pages', ', comptées par Vercel Web Analytics, qui fonctionne sans témoins (cookies). Pour chaque visite, il enregistre la page visitée, le site qui vous a dirigé vers nous, ainsi que votre pays, votre navigateur, votre système d’exploitation et votre type d’appareil. Nous retirons le code des liens de téléchargement avant qu’une visite soit comptée.'],
+      ['Le nombre de téléchargements', ', conservé dans notre propre base de données, et non dans l’outil d’analyse.'],
+      ['La protection contre les pourriels', '. Cloudflare Turnstile vérifie qu’un formulaire est envoyé par une personne, à l’aide de votre adresse IP et de renseignements sur votre navigateur. Il ne s’exécute que lorsque vous utilisez un formulaire : sur la page de téléchargement, et quand vous ouvrez le formulaire d’avis. Nous utilisons aussi votre adresse IP pour limiter le nombre de formulaires qui peuvent être envoyés d’un même endroit.'],
+    ],
+    providersIntro: 'Nous utilisons ces services pour faire fonctionner le site. Ils sont tous situés à l’extérieur du Québec. Les renseignements qu’ils traitent quittent donc le Québec.',
+    providers: [
+      ['Supabase', ' stocke les inscriptions, les avis et le fichier de l’application. Ses serveurs sont aux États-Unis (Amazon Web Services). À l’extérieur du Québec.'],
+      ['Vercel', ' héberge le site, exécute le code de ses formulaires et compte les visites de pages. À l’extérieur du Québec.'],
+      ['Resend', ' envoie nos courriels. Il reçoit votre adresse courriel et les courriels que nous vous envoyons. À l’extérieur du Québec.'],
+      ['Cloudflare', ' effectue la vérification antipourriel Turnstile de nos formulaires. Il reçoit donc votre adresse IP et des renseignements sur votre navigateur quand vous en utilisez un. Il transfère aussi à notre boîte de réception les courriels envoyés à privacy@cachedrop.io et à hello@cachedrop.io. Ces messages passent donc par Cloudflare. À l’extérieur du Québec.'],
+      ['GitHub', ' contient notre liste d’avis sur l’application, dans un dépôt GitHub privé. Chaque avis y devient un ticket (issue) avec la note, le message, la page et les caractéristiques du système. Il ne contient jamais votre adresse courriel. À l’extérieur du Québec.'],
+    ],
+    retention: [
+      ['Les inscriptions', ` : votre adresse courriel, votre réponse sur votre Mac, votre choix pour les courriels de nouvelles et votre langue. Nous les gardons jusqu’à ce que vous nous demandiez de les supprimer. Chaque courriel que nous envoyons contient un lien de désabonnement. Si vous vous désabonnez, nous gardons seulement votre adresse courriel, marquée pour ne plus jamais vous écrire. Écrivez à ${MAIL} et nous la supprimerons complètement.`],
+      ['Les codes des liens de téléchargement', ' : un lien cesse de fonctionner après 7 jours. Nous supprimons son code 30 jours plus tard.'],
+      ['Les codes de désabonnement', ' : nous les gardons aussi longtemps que votre inscription, et les supprimons avec elle.'],
+      ['Les avis', ' : votre note, votre message, la page, votre adresse courriel si vous l’avez ajoutée, et les caractéristiques du système si vous les avez envoyées. Nous les gardons jusqu’à ce que vous nous demandiez de les supprimer.'],
+      ['Les caractéristiques du système', ' : nous les gardons avec l’avis qu’elles accompagnent, et les supprimons avec lui.'],
+      ['Les adresses IP', ' : nous ne conservons jamais votre adresse IP. Pour compter les formulaires envoyés d’un même endroit, nous gardons un code brouillé tiré de celle-ci, pendant au plus une journée.'],
+    ],
+    rightsIntro: 'Vous pouvez nous demander de :',
+    rights: ['consulter les renseignements personnels que nous détenons sur vous,', 'les corriger,', 'retirer votre consentement, par exemple aux courriels de nouvelles,', 'les supprimer.'],
+    rightsHow: `Écrivez à ${MAIL}. Si notre réponse ne vous satisfait pas, vous pouvez porter plainte auprès de la Commission d’accès à l’information du Québec (cai.gouv.qc.ca).`,
+    contact: `Courriel : ${MAIL}`,
+  },
+};
+const lang = langOf(Astro.url);
+const t = copy[lang];
+
+const site = Astro.site!.origin;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'CacheDrop', item: `${site}${localize(lang, '/')}` },
+    { '@type': 'ListItem', position: 2, name: t.crumb, item: `${site}${localize(lang, path)}` },
+  ],
+};
+
+const ids = ['responsible', 'collect', 'providers', 'retention', 'rights', 'contact'];
+const toc = ids.map((id, i) => [id, t.toc[i]]);
+
+const h2 = guideH2;
+const body = `${guideP}; margin-top: var(--space-4); text-wrap: pretty`;
+const list = 'margin: var(--space-4) 0 0; padding: 0 0 0 var(--space-5); display: flex; flex-direction: column; gap: var(--space-2-5); font-size: 17px; line-height: 28px; color: var(--ink-body)';
+const section = 'padding-top: var(--space-18)';
+const lead = 'font-weight: 600; color: var(--ink)';
+---
+<Base title={t.title} description={t.description} path={path} jsonLd={jsonLd}>
+<style is:global>
+.toc a{color:var(--ink-body)}
+.toc a:hover{color:var(--accent-text)}
+</style>
+<Nav current={path} />
+
+<main>
+<section style="background: var(--surface-elevated); border-bottom: 1px solid var(--line); padding: var(--space-18) var(--space-6) var(--space-22)">
+<div style="max-width: var(--reading-max); margin: 0 auto">
+<nav aria-label={t.breadcrumb}>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-size: 13px; color: var(--ink-secondary)">
+<li><a class="flink" href={localize(lang, '/')}>CacheDrop</a></li>
+<li aria-hidden="true" style="display: flex"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></li>
+<li aria-current="page" style="color: var(--ink-body)">{t.crumb}</li>
+</ol>
+</nav>
+<h1 style="margin: var(--space-10) 0 0; font-size: clamp(38px, 5.4vw, 64px); line-height: 1.06; font-weight: 600; letter-spacing: -0.04em; text-wrap: balance">{t.crumb}</h1>
+<p style="margin: var(--space-6) 0 0; font-size: 19px; line-height: 29px; font-weight: 400; letter-spacing: -0.012em; color: var(--ink-secondary); text-wrap: pretty">{t.lede}</p>
+<p style="margin: var(--space-10) 0 0; font-size: 13px; color: var(--ink-secondary)">{t.updated}</p>
+</div>
+</section>
+
+<div style="max-width: var(--reading-max); margin: 0 auto; padding: var(--space-18) var(--space-6) var(--space-30)">
+
+<nav class="toc" aria-label={t.onThisPage} style="padding: var(--space-6) var(--space-7); border: 1px solid var(--line); border-radius: var(--radius-2xl)">
+<p style="margin: 0 0 var(--space-3); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-secondary)">{t.onThisPage}</p>
+<ol style="margin: 0; padding: 0 0 0 var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); font-size: 15px; line-height: 22px">
+{toc.map(([id, label]) => <li><a href={`#${id}`}>{label}</a></li>)}
+</ol>
+</nav>
+
+<section id="responsible" style="padding-top: var(--space-16)">
+<h2 style={h2}>{t.toc[0]}</h2>
+{t.responsible.map((p) => <p style={body} set:html={p}></p>)}
+</section>
+
+<section id="collect" style={section}>
+<h2 style={h2}>{t.toc[1]}</h2>
+<p style={body}>{t.collectIntro}</p>
+<ul style={list}>
+{t.collect.map(([name, rest]) => <li><span style={lead}>{name}</span><Fragment set:html={rest} /></li>)}
+</ul>
+</section>
+
+<section id="providers" style={section}>
+<h2 style={h2}>{t.toc[2]}</h2>
+<p style={body}>{t.providersIntro}</p>
+<ul style={list}>
+{t.providers.map(([name, rest]) => <li><span style={lead}>{name}</span><Fragment set:html={rest} /></li>)}
+</ul>
+</section>
+
+<section id="retention" style={section}>
+<h2 style={h2}>{t.toc[3]}</h2>
+<ul style={list}>
+{t.retention.map(([name, rest]) => <li><span style={lead}>{name}</span><Fragment set:html={rest} /></li>)}
+</ul>
+</section>
+
+<section id="rights" style={section}>
+<h2 style={h2}>{t.toc[4]}</h2>
+<p style={body}>{t.rightsIntro}</p>
+<ul style={list}>
+{t.rights.map((r) => <li>{r}</li>)}
+</ul>
+<p style={body} set:html={t.rightsHow}></p>
+</section>
+
+<section id="contact" style={section}>
+<h2 style={h2}>{t.toc[5]}</h2>
+<p style={body} set:html={t.contact}></p>
+</section>
+
+</div>
+</main>
+
+<Footer path={path} />
+</Base>

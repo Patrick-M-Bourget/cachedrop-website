@@ -1,0 +1,129 @@
+---
+// The feedback modal from the handoff, on every page. Opened by any [data-feedback]
+// link; behaviour (focus trap, Escape, backdrop click, submitting to /api/feedback) lives in
+// /assets/site.js. The specs box starts unticked and names what it sends (Decision 10); the
+// maxlengths match what api/feedback accepts. site.js reads its messages from the data-msg-* attributes.
+// The bot check (Decision 12) starts when the modal opens.
+import BotCheck from './BotCheck.astro';
+import { titleMd } from './guide-styles';
+import { langOf, localize } from '../i18n';
+
+const copy = {
+  en: {
+    title: 'Give Fast Feedback',
+    question: 'How is CacheDrop working for you?',
+    close: 'Close feedback',
+    thanks: 'Thanks, that helps.',
+    read: 'We read every note and use them to decide what to build next.',
+    back: 'Back to CacheDrop',
+    rating: 'Your rating',
+    ratings: ['Very unhappy', 'Unhappy', 'Neutral', 'Happy', 'Love it'],
+    email: 'Email',
+    optional: '(optional)',
+    placeholder: 'you@example.com',
+    change: 'What should we change?',
+    notes: 'Or report a bug… (Markdown supported)',
+    specs: 'Send anonymous system specs',
+    specsWhat: '(browser user agent, platform and language)',
+    privacy: 'Privacy Policy',
+    cancel: 'Cancel',
+    submit: 'Submit Feedback',
+    empty: 'Pick a rating or write a note, then submit.',
+    failed: 'We couldn’t send that. Check your connection and try again.',
+  },
+  fr: {
+    title: 'Donnez-nous votre avis',
+    question: 'Comment ça se passe avec CacheDrop?',
+    close: 'Fermer',
+    thanks: 'Merci, ça nous aide.',
+    read: 'Nous lisons chaque message et nous nous en servons pour décider de la suite.',
+    back: 'Retour à CacheDrop',
+    rating: 'Votre note',
+    ratings: ['Très insatisfait', 'Insatisfait', 'Neutre', 'Satisfait', 'J’adore'],
+    email: 'Courriel',
+    optional: '(facultatif)',
+    placeholder: 'vous@exemple.com',
+    change: 'Que devrions-nous changer?',
+    notes: 'Ou signalez un bogue… (Markdown accepté)',
+    specs: 'Envoyer les caractéristiques anonymes du système',
+    specsWhat: '(agent utilisateur du navigateur, plateforme et langue)',
+    privacy: 'Politique de confidentialité',
+    cancel: 'Annuler',
+    submit: 'Envoyer mon avis',
+    empty: 'Choisissez une note ou écrivez un message, puis envoyez.',
+    failed: 'L’envoi n’a pas fonctionné. Vérifiez votre connexion et réessayez.',
+  },
+};
+const lang = langOf(Astro.url);
+const t = copy[lang];
+const emoji = [['angry', '😡'], ['meh', '😕'], ['neutral', '😐'], ['happy', '🙂'], ['love', '😍']];
+---
+<style is:global>
+.fb-scrim{position:fixed;inset:0;z-index:var(--z-modal);display:flex;align-items:center;justify-content:center;padding:var(--space-4);background:var(--overlay);backdrop-filter:var(--backdrop-modal);-webkit-backdrop-filter:var(--backdrop-modal);font-family:var(--font-sans);color:var(--ink)}
+.fb-scrim[hidden],.fb-scrim [hidden]{display:none !important}
+.fb-card{width:100%;max-width:var(--modal-max);max-height:calc(100vh - var(--space-8));overflow:auto;background:var(--surface);border-radius:var(--radius-3xl);padding:var(--space-7);box-shadow:var(--shadow-modal);display:flex;flex-direction:column;gap:22px}
+.fb-field{transition:box-shadow .15s}
+.fb-field:focus{outline:none;box-shadow:var(--focus-ring-field)}
+.fb-field::placeholder{color:var(--ink-tertiary)}
+.fb-ta::placeholder{font-family:var(--font-mono);font-size:12px}
+.fb-emoji{height:var(--rating-height);border:0;border-radius:var(--radius-lg);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:var(--surface-subtle)}
+.fb-emoji:hover{background:var(--window-chrome)}
+.fb-emoji[aria-pressed="true"]{background:var(--accent-soft);box-shadow:var(--shadow-selected)}
+.fb-btn{height:var(--control-md);padding:0 var(--space-4);border-radius:var(--radius-md);font:inherit;font-size:14px;font-weight:500;cursor:pointer}
+.fb-ghost{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink)}
+.fb-ghost:hover{background:var(--surface-subtle)}
+.fb-primary{border:0;background:var(--accent);color:var(--on-accent);box-shadow:var(--shadow-button)}
+.fb-primary:hover{filter:brightness(1.08)}
+.fb-primary[disabled]{opacity:.6;cursor:progress}
+.fb-close{flex:none;width:var(--control-sm);height:var(--control-sm);border:0;border-radius:var(--radius-sm);background:transparent;color:var(--ink-secondary);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.fb-close:hover{background:var(--surface-subtle);color:var(--ink)}
+.fb-link{font-size:13px;color:var(--accent-text);text-decoration:none}
+.fb-link:hover{text-decoration:underline}
+.fb-scrim button:focus-visible,.fb-scrim input[type=checkbox]:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+</style>
+<div class="fb-scrim" id="feedback" hidden data-msg-empty={t.empty} data-msg-failed={t.failed}>
+<div role="dialog" aria-modal="true" aria-labelledby="fb-title" class="fb-card">
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-4)">
+<div>
+<h2 id="fb-title" style={titleMd}>{t.title}</h2>
+<p style="margin:var(--space-1) 0 0;font-size:14px;line-height:20px;color:var(--ink-secondary)">{t.question}</p>
+</div>
+<button type="button" class="fb-close" data-fb-close aria-label={t.close}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+</div>
+
+<div data-fb-done hidden style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--space-3);padding:var(--space-10) var(--space-2) var(--space-6)">
+<div style="width:var(--control-lg);height:var(--control-lg);border-radius:var(--radius-full);background:var(--success-soft);color:var(--success-ink);display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+<p style="margin:0;font-size:16px;font-weight:600">{t.thanks}</p>
+<p style="margin:0;font-size:14px;line-height:20px;color:var(--ink-secondary)">{t.read}</p>
+<button type="button" class="fb-btn fb-ghost" data-fb-close style="margin-top:var(--space-3)">{t.back}</button>
+</div>
+
+<form data-fb-form novalidate style="display:flex;flex-direction:column;gap:var(--space-5);margin:0">
+<fieldset style="margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:var(--space-2)">
+<legend style="padding:0;margin-bottom:var(--space-2);font-size:13px;font-weight:500">{t.rating}</legend>
+<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--space-2)">
+{emoji.map(([rating, face], i) => <button type="button" class="fb-emoji" data-rating={rating} aria-label={t.ratings[i]} aria-pressed="false">{face}</button>)}
+</div>
+</fieldset>
+<div style="display:flex;flex-direction:column;gap:var(--space-1-5)">
+<label for="fb-email" style="font-size:13px;font-weight:500">{t.email} <span style="font-weight:400;color:var(--ink-secondary)">{t.optional}</span></label>
+<input id="fb-email" name="email" class="fb-field" type="email" maxlength="254" autocomplete="email" placeholder={t.placeholder} style="height:var(--control-md);padding:0 var(--space-3);border:0;border-radius:var(--radius-md);background:var(--surface);box-shadow:0 0 0 1px var(--line-strong);font:inherit;font-size:14px;color:var(--ink)">
+</div>
+<div style="display:flex;flex-direction:column;gap:var(--space-1-5)">
+<label for="fb-notes" style="font-size:13px;font-weight:500">{t.change}</label>
+<textarea id="fb-notes" name="message" class="fb-field fb-ta" maxlength="5000" placeholder={t.notes} style="height:120px;padding:var(--space-2-5) var(--space-3);border:0;border-radius:var(--radius-md);background:var(--surface);box-shadow:0 0 0 1px var(--line-strong);font:inherit;font-size:14px;line-height:20px;color:var(--ink);resize:vertical"></textarea>
+<p data-fb-error hidden role="alert" style="margin:0;font-size:13px;line-height:18px;color:var(--danger-ink)"></p>
+</div>
+<label for="fb-specs" style="display:flex;align-items:flex-start;gap:var(--space-2-5);font-size:13px;line-height:18px;color:var(--ink-body);cursor:pointer">
+<input id="fb-specs" name="includeSpecs" type="checkbox" style="flex:none;margin:1px 0 0;width:16px;height:16px;accent-color:var(--accent)">
+<span>{t.specs} <span style="color:var(--ink-secondary)">{t.specsWhat}</span></span>
+</label>
+<a class="fb-link" href={localize(lang, '/privacy/')} style="align-self:flex-start;margin:calc(-1 * var(--space-3)) 0 0 26px;line-height:18px">{t.privacy}</a>
+<BotCheck form="feedback" lang={lang} />
+<div style="display:flex;justify-content:flex-end;gap:var(--space-2);padding-top:var(--space-1)">
+<button type="button" class="fb-btn fb-ghost" data-fb-close>{t.cancel}</button>
+<button type="submit" class="fb-btn fb-primary">{t.submit}</button>
+</div>
+</form>
+</div>
+</div>

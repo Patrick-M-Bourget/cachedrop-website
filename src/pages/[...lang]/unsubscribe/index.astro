@@ -1,0 +1,9 @@
+---
+// /unsubscribe/ and /fr/unsubscribe/: the page every email's unsubscribe link opens (Decision 4).
+// vercel.json serves it at /unsubscribe/<token>/. See src/components/Unsubscribe.astro.
+import Unsubscribe from '../../../components/Unsubscribe.astro';
+import { langPaths } from '../../../i18n';
+
+export const getStaticPaths = langPaths;
+---
+<Unsubscribe state="live" />

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [{ "path": "/api/feedback-retry", "schedule": "0 13 * * *" }],
+  "rewrites": [
+    { "source": "/download/:token([A-Za-z0-9_-]{43})/", "destination": "/download/link/" },
+    { "source": "/download/:token([A-Za-z0-9_-]{43})", "destination": "/download/link/" },
+    { "source": "/unsubscribe/:token([A-Za-z0-9_-]{43})/confirm", "destination": "/api/unsubscribe?token=:token&form=1" },
+    { "source": "/unsubscribe/:token([A-Za-z0-9_-]{43})/", "destination": "/unsubscribe/" },
+    { "source": "/unsubscribe/:token([A-Za-z0-9_-]{43})", "destination": "/unsubscribe/" },
+    { "source": "/fr/download/:token([A-Za-z0-9_-]{43})/", "destination": "/fr/download/link/" },
+    { "source": "/fr/download/:token([A-Za-z0-9_-]{43})", "destination": "/fr/download/link/" },
+    { "source": "/fr/unsubscribe/:token([A-Za-z0-9_-]{43})/confirm", "destination": "/api/unsubscribe?token=:token&lang=fr&form=1" },
+    { "source": "/fr/unsubscribe/:token([A-Za-z0-9_-]{43})/", "destination": "/fr/unsubscribe/" },
+    { "source": "/fr/unsubscribe/:token([A-Za-z0-9_-]{43})", "destination": "/fr/unsubscribe/" }
+  ]
+}
