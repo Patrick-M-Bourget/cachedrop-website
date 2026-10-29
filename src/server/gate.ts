@@ -2,7 +2,7 @@
 // api/download. Supabase and the mail sender come in as dependencies, so Vitest can stand in for
 // both at the boundary (Decision 27). The api/ files wire in the real ones.
 import { createHash, randomBytes } from 'node:crypto';
-import { downloadEmail } from './download-email.ts';
+import { downloadEmail } from './download-email.js';
 
 export const BUCKET = 'releases';
 /** How long a signed DMG URL works (Decision 2). */

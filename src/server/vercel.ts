@@ -2,7 +2,7 @@
 // these functions hold the service key). api/*.ts call this; the tests inject fakes instead.
 import { createClient } from '@supabase/supabase-js';
 import type { GateDb, GateDeps } from './gate.ts';
-import { mailerFor, siteUrlFrom } from './mail.ts';
+import { mailerFor, siteUrlFrom } from './mail.js';
 
 export function gateDeps(request: Request): GateDeps {
   const { SUPABASE_URL, SUPABASE_SECRET_KEY } = process.env;
