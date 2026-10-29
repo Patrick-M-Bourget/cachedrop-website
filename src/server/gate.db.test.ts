@@ -24,7 +24,7 @@ const newEmail = (name: string) => {
 const newHash = () => createHash('sha256').update(randomBytes(32)).digest('hex');
 
 async function request(email: string, news: boolean) {
-  const { error } = await db.rpc('request_download', { p_email: email, p_filling: null, p_news: news, p_token_hash: newHash() });
+  const { error } = await db.rpc('request_download', { p_email: email, p_filling: null, p_news: news, p_lang: 'en', p_token_hash: newHash() });
   expect(error).toBeNull();
 }
 
@@ -107,16 +107,14 @@ describe.skipIf(!run)('signup language on the dev database (Decision 5)', () => 
     expect(error).not.toBeNull();
   });
 
-  it('the older calls without a language store English and never change a stored language', async () => {
+  it('has only the five-argument call: the older three- and four-argument ones are gone', async () => {
     const email = newEmail('langold');
-    await request(email, false);
-    expect(await langOf(email)).toBe('en');
-    await requestIn(email, 'fr');
-    await request(email, true);
-    expect(await langOf(email)).toBe('fr');
-    const { error } = await db.rpc('request_download', { p_email: email, p_filling: null, p_token_hash: newHash() });
-    expect(error).toBeNull();
-    expect(await langOf(email)).toBe('fr');
+    const three = await db.rpc('request_download', { p_email: email, p_filling: null, p_token_hash: newHash() });
+    expect(three.error).not.toBeNull();
+    const four = await db.rpc('request_download', { p_email: email, p_filling: null, p_news: false, p_token_hash: newHash() });
+    expect(four.error).not.toBeNull();
+    const { count } = await db.from('signups').select('*', { count: 'exact', head: true }).eq('email', email);
+    expect(count).toBe(0);
   });
 });
 
@@ -180,7 +178,7 @@ async function row(email: string) {
 describe.skipIf(!run)('unsubscribe and re-consent on the dev database', () => {
   it('keeps only the address after an unsubscribe: the news opt-in goes with the rest', async () => {
     const email = newEmail('unsub');
-    const { error } = await db.rpc('request_download', { p_email: email, p_filling: 'development', p_news: true, p_token_hash: newHash() });
+    const { error } = await db.rpc('request_download', { p_email: email, p_filling: 'development', p_news: true, p_lang: 'en', p_token_hash: newHash() });
     expect(error).toBeNull();
     await unsubscribe(email);
     const r = await row(email);
@@ -237,10 +235,6 @@ describe.skipIf(!run)('unsubscribe and re-consent on the dev database', () => {
     const r = await row(email);
     expect(r.unsubscribed_at).not.toBeNull();
     expect(r).toMatchObject({ news_opt_in: false, news_opt_in_at: null });
-    expect(await subscribed(email)).toBe(false);
-    // The three-argument wrapper older previews call never opts in, so it never re-consents either.
-    const { error } = await db.rpc('request_download', { p_email: email, p_filling: null, p_token_hash: newHash() });
-    expect(error).toBeNull();
     expect(await subscribed(email)).toBe(false);
   });
 });
