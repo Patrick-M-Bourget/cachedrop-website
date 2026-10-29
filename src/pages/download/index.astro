@@ -1,6 +1,7 @@
 ---
 // The email gate (Decision 1): every Download button lands here. The form posts to /api/signup,
 // which saves the signup and emails a download link; the card then says to check the inbox.
+// /download/?link=expired is the expired-link state: the same form under "This link has expired."
 // The news checkbox starts unticked and the download never depends on it (Decision 3).
 // Built from the design system's utility-page recipe and its TextField, Checkbox, Button and
 // done-state parts (handoff/design-system/components/bundle.css), with the token page's head.
@@ -44,8 +45,15 @@ const guideLink = 'color: var(--accent-text); font-weight: 500';
 <div style="width: var(--tile-lg); height: var(--tile-lg); border-radius: var(--radius-2xl); background: var(--surface-subtle); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; color: var(--ink)">
 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg>
 </div>
-<h1 style="margin: var(--space-8) 0 0; font-size: clamp(34px, 4.6vw, 56px); line-height: 1.08; font-weight: 600; letter-spacing: -0.035em; text-wrap: balance">Get the CacheDrop beta.</h1>
-<p style="margin: 18px 0 0; max-width: 560px; font-size: 19px; line-height: 29px; color: var(--ink-secondary); text-wrap: pretty">Enter your email and we’ll send you a download link. The link works for 7 days, on any Mac. CacheDrop itself doesn’t expire.</p>
+<h1 data-gate-title style="margin: var(--space-8) 0 0; font-size: clamp(34px, 4.6vw, 56px); line-height: 1.08; font-weight: 600; letter-spacing: -0.035em; text-wrap: balance">Get the CacheDrop beta.</h1>
+<p data-gate-lede style="margin: 18px 0 0; max-width: 560px; font-size: 19px; line-height: 29px; color: var(--ink-secondary); text-wrap: pretty">Enter your email and we’ll send you a download link. The link works for 7 days, on any Mac. CacheDrop itself doesn’t expire.</p>
+<script is:inline>
+// The token page sends an expired or unknown link here (Decision 2). Swapped before first paint.
+if (new URLSearchParams(location.search).get('link') === 'expired') {
+  document.querySelector('[data-gate-title]').textContent = 'This link has expired.';
+  document.querySelector('[data-gate-lede]').textContent = 'Download links work for 7 days. Enter your email and we’ll send you a new one. CacheDrop itself doesn’t expire.';
+}
+</script>
 <p style="margin: var(--space-5) 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2) var(--space-4); font-size: 13px; color: var(--ink-secondary)">
 <span>Free while in beta</span>
 <span aria-hidden="true">·</span>

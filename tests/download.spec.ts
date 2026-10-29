@@ -20,6 +20,7 @@ test.describe('every Download button leads to the form', () => {
 
   test('and the form asks for an email', async ({ page }) => {
     await page.goto('/download/');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Get the CacheDrop beta.');
     await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
     await expect(page.getByRole('radio')).toHaveCount(4);
     await expect(page.getByRole('radio', { checked: true })).toHaveCount(0);
@@ -160,15 +161,31 @@ test.describe('the token page', () => {
     expect(starts).toEqual([`${baseURL}/api/download?token=${TOKEN}`, `${baseURL}/api/download?token=${TOKEN}`]);
   });
 
-  for (const status of [404, 410]) {
-    test(`sends a ${status} link back to the form without starting anything`, async ({ page }) => {
-      const starts = await serveTokenPage(page, { status, json: { error: status === 404 ? 'unknown' : 'expired' } });
+  for (const [status, error] of [[404, 'unknown'], [410, 'expired']] as const) {
+    test(`shows a ${status} (${error}) link as expired, with the form to get a new one`, async ({ page }) => {
+      const starts = await serveTokenPage(page, { status, json: { error } });
+      const requests = await mockSignup(page);
       await page.goto(`/download/${TOKEN}/`);
-      await expect(page).toHaveURL(/\/download\/$/);
-      await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
+      await expect(page).toHaveURL(/\/download\/\?link=expired$/);
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText('This link has expired.');
+      await expect(page.getByText('Download links work for 7 days. Enter your email and we’ll send you a new one.')).toBeVisible();
       expect(starts).toEqual([]);
+
+      await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
+      await page.getByRole('button', { name: 'Send Download Link' }).click();
+      await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
+      expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false }]);
     });
   }
+
+  test('keeps the token out of the address once it has expired', async ({ page }) => {
+    await serveTokenPage(page, { status: 410, json: { error: 'expired' } });
+    await page.goto('/');
+    await page.goto(`/download/${TOKEN}/`);
+    await expect(page).toHaveURL(/\/download\/\?link=expired$/);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/$/);
+  });
 
   test('does nothing at its own path, where there is no token', async ({ page }) => {
     let calls = 0;
