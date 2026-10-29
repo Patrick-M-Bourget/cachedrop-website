@@ -53,5 +53,8 @@ const url = new URL(path, site).href;
 </div>
 <FeedbackModal />
 <script is:inline src="/assets/site.js" defer></script>
+<!-- Vercel Web Analytics (Decision 16). analytics.js must run first: it strips download tokens. -->
+<script is:inline src="/assets/analytics.js" defer></script>
+<script is:inline src="/_vercel/insights/script.js" defer></script>
 </body>
 </html>
