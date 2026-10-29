@@ -1,8 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { pages } from './pages';
+import { withCopyFixes } from './copy-fixes';
 
-// Decision 18: the only agreed head change is cachedrop.app -> cachedrop.io.
+// Decision 18: the agreed head changes are cachedrop.app -> cachedrop.io, plus the
+// copy fixes in copy-fixes.ts (Decision 23), which also reach descriptions and JSON-LD.
 const toProductionDomain = (html: string) => html.replaceAll('cachedrop.app', 'cachedrop.io');
 
 /**
@@ -25,9 +27,9 @@ async function headEntries(page: Page, html: string) {
 }
 
 for (const p of pages.filter((p) => p.handoff)) {
-  test(`head of ${p.path} matches the handoff apart from the .io domain`, async ({ page, request }) => {
+  test(`head of ${p.path} matches the handoff apart from the .io domain and copy fixes`, async ({ page, request }) => {
     const built = await (await request.get(p.path)).text();
-    const original = toProductionDomain(await readFile(`handoff/site/${p.handoff}`, 'utf8'));
+    const original = toProductionDomain(withCopyFixes(p.handoff!, await readFile(`handoff/site/${p.handoff}`, 'utf8')));
     await page.goto('about:blank');
     expect(await headEntries(page, built)).toEqual(await headEntries(page, original));
   });
