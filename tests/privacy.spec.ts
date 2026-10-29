@@ -86,3 +86,16 @@ test('marks the mailing address as a placeholder (Decision 21)', async ({ page }
   await expect(placeholder).toBeVisible();
   await expect(placeholder).toContainText('placeholder');
 });
+
+test('says what the spam check uses, and that the IP address is never stored (Decision 12)', async ({ page }) => {
+  const spam = (await page.locator('#collect li', { hasText: 'Spam protection' }).innerText()).replace(/\s+/g, ' ');
+  for (const part of ['Cloudflare Turnstile', 'IP address', 'information about your browser', 'only when you use a form', 'limit how many forms']) {
+    expect(spam, part).toContain(part);
+  }
+  const cloudflare = (await page.locator('#providers li', { hasText: 'Cloudflare' }).innerText()).replace(/\s+/g, ' ');
+  expect(cloudflare).toContain('Turnstile');
+  expect(cloudflare).toContain('IP address');
+  const kept = (await page.locator('#retention li', { hasText: 'IP addresses' }).innerText()).replace(/\s+/g, ' ');
+  expect(kept).toContain('we never store your IP address');
+  expect(kept).toContain('at most a day');
+});

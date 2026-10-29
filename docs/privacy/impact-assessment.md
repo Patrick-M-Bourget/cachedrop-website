@@ -21,7 +21,7 @@ Low-sensitivity information only:
 - feedback: rating, message, page, optional email;
 - optional system specs: the browser's user agent, platform and language (`site.js` today; the checkbox becomes unchecked by default under Decision 10);
 - download tokens, download counts, cookieless page-visit counts;
-- IP addresses, for spam checks and per-IP rate limits (Decision 12);
+- IP addresses, for spam checks and per-IP rate limits (Decision 12). The IP itself is never stored: the rate limit keeps an HMAC of it (keyed with the Supabase service key; IPv6 by /64) for at most a day;
 - the content of emails people send to `privacy@` and `hello@cachedrop.io`.
 
 No payment details, no passwords, no health or financial information, no account.
@@ -32,7 +32,7 @@ No payment details, no passwords, no health or financial information, no account
 
 Decision 31 amends 13: the projects are in the United States, not Montreal.
 
-- **Data:** the most sensitive set on this list, because it is stored rather than passed through: signup email addresses, the optional "What's filling your Mac?" answer, the news opt-in, feedback (rating, message, page, optional email), optional specs, download tokens, download counts, and the released DMGs.
+- **Data:** the most sensitive set on this list, because it is stored rather than passed through: signup email addresses, the optional "What's filling your Mac?" answer, the news opt-in, feedback (rating, message, page, optional email), optional specs, download tokens, download counts, rate-limit counters keyed by an HMAC of the IP (kept a day at most), and the released DMGs.
 - **Why:** the site's database and file storage (Decisions 13, 15).
 - **Where:** United States. `cachedrop-dev` is in `us-east-1` (AWS N. Virginia) and `cachedrop-prod` in `us-west-2` (AWS Oregon). The owner chose to keep them there (Decision 31).
 - **Technical safeguards:** the service key lives only in the Vercel functions (Decision 12, CLAUDE.md); browsers never touch Supabase. Row Level Security is on with no policies and no grants to the public roles, so only the service key can read or write. The `releases` bucket is private: files are reachable only with the service key or a short-lived signed URL. These are in the releases migration (#7); the signups and feedback tables must follow the same pattern when they are added. HTTPS only.
@@ -69,7 +69,7 @@ Two purposes (Decision 29 amends 18).
    - **Why:** gives the site role addresses without publishing the owner's personal email.
 
 - **Where:** Cloudflare's global network.
-- **Technical safeguards:** Turnstile runs only on forms. Email Routing forwards and doesn't keep a mailbox (to check in Cloudflare's docs). DNS-only records for the site (Decision 29), so site traffic doesn't go through Cloudflare.
+- **Technical safeguards:** Turnstile runs only on forms: Cloudflare's script loads on `/download/` and, elsewhere, only when the feedback modal opens. Its widget stays invisible unless Cloudflare needs a click. Email Routing forwards and doesn't keep a mailbox (to check in Cloudflare's docs). DNS-only records for the site (Decision 29), so site traffic doesn't go through Cloudflare.
 - **Contractual safeguards:** to check: Cloudflare's Data Processing Addendum, on the Free plan.
 - **Conclusion (draft):** acceptable, with one point for the lawyer: whether forwarded privacy requests need anything more, such as replying from a provider in Canada.
 

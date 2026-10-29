@@ -87,7 +87,7 @@ const mail = 'color: var(--accent-text); font-weight: 500';
 <li><span style={lead}>System specs</span>, only if you tick the box in the feedback form: what your browser reports about itself, which includes your macOS version, platform and language. They help us reproduce problems.</li>
 <li><span style={lead}>Page visits</span>, counted by Vercel Web Analytics, which works without cookies. For each visit it records the page you visit, the site that sent you, and your country, browser, operating system and type of device. We remove the code from download links before a visit is counted.</li>
 <li><span style={lead}>Download counts</span>, kept in our own database, not in analytics.</li>
-<li><span style={lead}>Spam protection</span>. Cloudflare Turnstile checks that a form is sent by a person. We also use your IP address to limit how many forms can be sent from one place.</li>
+<li><span style={lead}>Spam protection</span>. Cloudflare Turnstile checks that a form is sent by a person, using your IP address and information about your browser. It runs only when you use a form: on the download page, and when you open the feedback form. We also use your IP address to limit how many forms can be sent from one place.</li>
 </ul>
 </section>
 
@@ -98,7 +98,7 @@ const mail = 'color: var(--accent-text); font-weight: 500';
 <li><span style={lead}>Supabase</span> stores signups, feedback and the app download. Its servers are in the United States (Amazon Web Services). Outside Quebec.</li>
 <li><span style={lead}>Vercel</span> hosts the website, runs the code behind its forms, and counts page visits. Outside Quebec.</li>
 <li><span style={lead}>Resend</span> sends our emails. It receives your email address and the emails we send you. Outside Quebec.</li>
-<li><span style={lead}>Cloudflare</span> runs the Turnstile spam check on our forms. It also forwards email sent to privacy@cachedrop.io and hello@cachedrop.io to our inbox, so those messages pass through Cloudflare. Outside Quebec.</li>
+<li><span style={lead}>Cloudflare</span> runs the Turnstile spam check on our forms, so it receives your IP address and information about your browser when you use one. It also forwards email sent to privacy@cachedrop.io and hello@cachedrop.io to our inbox, so those messages pass through Cloudflare. Outside Quebec.</li>
 <li><span style={lead}>GitHub</span> holds our list of feedback about the app, in a private GitHub repository. Each piece of feedback becomes an issue with the rating, message, page and specs. It never includes your email. Outside Quebec.</li>
 </ul>
 </section>
@@ -109,6 +109,7 @@ const mail = 'color: var(--accent-text); font-weight: 500';
 <li><span style={lead}>Signups</span>: your email, your answer about your Mac and your news choice. We keep them until you ask us to delete them. Every email we send has an unsubscribe link. If you unsubscribe, we keep only your email address, marked so we never email you again. Write to <a class="textlink" href="mailto:privacy@cachedrop.io" style={mail}>privacy@cachedrop.io</a> and we delete it completely.</li>
 <li><span style={lead}>Download link codes</span>: a link stops working after 7 days. We delete its code 30 days after that.</li>
 <li><span style={lead}>System specs</span>: we keep them with the feedback they came with, and delete them with it.</li>
+<li><span style={lead}>IP addresses</span>: we never store your IP address. To count the forms sent from one place, we keep a scrambled code made from it, for at most a day.</li>
 </ul>
 </section>
 
