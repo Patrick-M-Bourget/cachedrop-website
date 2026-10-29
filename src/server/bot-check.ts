@@ -4,8 +4,7 @@
 // (hit_rate_limit), keyed by a keyed hash of the IP: the raw IP is never stored.
 import { createHmac } from 'node:crypto';
 import { isIP } from 'node:net';
-
-type Env = Record<string, string | undefined>;
+import { json, type Env, type Result } from './shared.js';
 
 /** Cloudflare's published test secret keys (developers.cloudflare.com/turnstile/troubleshooting/testing/). */
 export const TEST_SECRETS = {
@@ -127,8 +126,6 @@ export const LIMITS = {
 } as const;
 export type Form = keyof typeof LIMITS;
 
-type Result<T> = Promise<{ data: T | null; error: { message: string } | null }>;
-
 /** What a handler needs to run the guard. The api/ files wire in the real ones. */
 export interface Guard {
   db: {
@@ -141,9 +138,6 @@ export interface Guard {
   /** rateLimitKey(request, env). */
   rateKey: string;
 }
-
-const json = (body: unknown, status: number, headers: Record<string, string> = {}) =>
-  new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', ...headers } });
 
 /**
  * The bot check, then the rate limit, for one submission of `form`: a refusal to send back, or

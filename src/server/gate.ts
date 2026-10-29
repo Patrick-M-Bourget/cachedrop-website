@@ -2,6 +2,8 @@
 // api/download. Supabase and the mail sender come in as dependencies, so Vitest can stand in for
 // both at the boundary (Decision 27). The api/ files wire in the real ones.
 import { guard, type Guard } from './bot-check.js';
+import type { Lang } from '../i18n.ts';
+import { EMAIL, json, type Result } from './shared.js';
 import { downloadEmail, pagesFor } from './download-email.js';
 import { TOKEN, hashToken, newToken } from './tokens.js';
 import { unsubscribeFor } from './unsubscribe.js';
@@ -11,11 +13,6 @@ export const BUCKET = 'releases';
 export const SIGNED_URL_SECONDS = 60;
 /** The "What's filling your Mac?" answers, as the form posts them. */
 export const FILLING = ['development', 'video-photo', 'music-audio', 'other'] as const;
-/** The site's languages (Decision 5): English at /, French at /fr/. */
-export const LANGS = ['en', 'fr'] as const;
-export type Lang = (typeof LANGS)[number];
-
-type Result<T> = Promise<{ data: T | null; error: { message: string } | null }>;
 export type TokenLookup = { status: 'ok' | 'unknown' | 'expired' | 'no_release'; version: string | null; filename: string | null };
 
 /** The slice of the supabase-js client the gate uses. */
@@ -52,12 +49,6 @@ export interface GateDeps {
 
 /** The signup also runs the bot check and rate limit (Decision 12). */
 export type SignupDeps = GateDeps & Guard;
-
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
-
-// One @, something on each side, a dot in the domain, no spaces. The emailed link is the real check.
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
  * POST /api/signup with JSON `{ email, filling?, news?, lang?, turnstile }`: saves the signup (or

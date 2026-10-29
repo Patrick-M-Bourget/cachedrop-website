@@ -13,7 +13,8 @@
 // A French email's links carry its language (Decision 5): the page is /fr/unsubscribe/<token>/,
 // and List-Unsubscribe adds &lang=fr so a GET lands on the French page.
 import { pagesFor } from './download-email.js';
-import type { GateDb, Lang } from './gate.ts';
+import type { GateDb } from './gate.ts';
+import type { Lang } from '../i18n.ts';
 import { TOKEN, hashToken } from './tokens.js';
 
 export const ONE_CLICK = 'List-Unsubscribe=One-Click';

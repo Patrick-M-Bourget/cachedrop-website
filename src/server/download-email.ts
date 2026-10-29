@@ -3,7 +3,8 @@
 // Like every email, it carries the unsubscribe link and one-click headers (Decision 4). It goes out
 // in the language the person signed up in (Decision 5); the French ships as Claude drafted it
 // (Decision 34).
-import type { Email, Lang } from './gate.ts';
+import type { Email } from './gate.ts';
+import type { Lang } from '../i18n.ts';
 
 const COPY = {
   en: {

@@ -3,8 +3,7 @@
 // dependencies, so Vitest can stand in for both at the boundary (Decision 27).
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { guard, type Guard } from './bot-check.js';
-
-type Result<T> = Promise<{ data: T | null; error: { message: string } | null }>;
+import { EMAIL, json, type Result } from './shared.js';
 
 export const RATINGS = ['angry', 'meh', 'neutral', 'happy', 'love'] as const;
 export type Rating = (typeof RATINGS)[number];
@@ -59,9 +58,6 @@ export interface RetryDeps extends FeedbackDeps {
   cronSecret: string | undefined;
   now(): number;
 }
-
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
 
 /** What an issue is made from: everything but the email, which only Supabase holds (Decision 9). */
 export interface Feedback {
@@ -147,7 +143,6 @@ const MAX_SPEC = { userAgent: 512, platform: 64, language: 35 } as const;
 /** A full 5000-character message of 4-byte characters, plus the rest, fits; anything bigger is refused. */
 const MAX_BODY_BYTES = 32 * 1024;
 
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // A site path as location.pathname sends it: no scheme, no host, nothing that is Markdown.
 const PAGE = /^\/[A-Za-z0-9\-._~/%]*$/;
 // Printable text on one line: no control characters.

@@ -2,14 +2,13 @@
 // mode every non-production deployment uses, which never touches mac-cleaner (Decision 30: the
 // repo is public until launch). The token is fine-grained: mac-cleaner only, Issues read and write.
 import { marker, type IssueDraft, type Issues } from './feedback.js';
+import type { Env } from './shared.ts';
 
 export const REPO = 'Patrick-M-Bourget/mac-cleaner';
 const API = `https://api.github.com/repos/${REPO}/issues`;
 const PAGE_SIZE = 100;
 /** Feedback arrives a few a day; ten pages of issues is far more than one retry window holds. */
 const MAX_PAGES = 10;
-
-type Env = Record<string, string | undefined>;
 
 /** mac-cleaner's issues for this deployment: real in production, test mode everywhere else. */
 export function issuesFor(env: Env, fetch: typeof globalThis.fetch): Issues {
