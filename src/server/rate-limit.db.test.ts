@@ -1,6 +1,6 @@
 // The rate limit's SQL (supabase/migrations/*_rate_limits.sql) against the dev Supabase project
 // (Decision 12). gate.test.ts and feedback.test.ts cover the handlers with a stand-in; this checks
-// hit_rate_limit itself. Skipped unless DB_TESTS=dev, with SUPABASE_URL and SUPABASE_SECRET_KEY
+// hit_rate_limit itself, and the daily cleanup that keeps a hash a day at most. Skipped unless DB_TESTS=dev, with SUPABASE_URL and SUPABASE_SECRET_KEY
 // set to the dev project (never prod), e.g.:
 //   DB_TESTS=dev node --env-file=.env.local node_modules/.bin/vitest run src/server/rate-limit.db.test.ts
 import { createHash, randomBytes } from 'node:crypto';
@@ -58,5 +58,25 @@ describe.skipIf(!run)('hit_rate_limit on the dev database', () => {
     expect(bad.error).not.toBeNull();
     const form = await db.rpc('hit_rate_limit', { p_bucket: 'other', p_ip_hash: newHash(), p_limit: 5, p_window_seconds: 3600 });
     expect(form.error).not.toBeNull();
+  });
+});
+
+describe.skipIf(!run)('the daily rate-limit cleanup on the dev database', () => {
+  it('deletes windows that started more than a day ago and keeps the rest', async () => {
+    const old = newHash();
+    const recent = newHash();
+    const now = Date.now();
+    const { error } = await db.from('rate_limits').insert([
+      { bucket: 'signup', ip_hash: old, window_start: new Date(now - 25 * 3600 * 1000).toISOString() },
+      { bucket: 'signup', ip_hash: recent, window_start: new Date(now - 23 * 3600 * 1000).toISOString() },
+    ]);
+    expect(error).toBeNull();
+
+    const cleaned = await db.rpc('delete_old_rate_limits');
+    expect(cleaned.error).toBeNull();
+    expect(cleaned.data).toBeGreaterThanOrEqual(1);
+
+    const { data } = await db.from('rate_limits').select('ip_hash').in('ip_hash', [old, recent]);
+    expect(data!.map((r) => r.ip_hash)).toEqual([recent]);
   });
 });
