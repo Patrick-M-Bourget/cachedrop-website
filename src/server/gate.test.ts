@@ -118,7 +118,9 @@ describe('signup', () => {
       expect(part).toContain('CacheDrop is a Mac storage cleaner');
       expect(part).toContain('hello@cachedrop.io');
       expect(part).toContain(`${SITE}/privacy/`);
-      expect(part).toContain('7 days');
+      expect(part).toContain('The link works for 7 days, on any Mac.');
+      expect(part).toContain('CacheDrop itself doesn’t expire.');
+      expect(part).not.toContain('It works for 7 days');
     }
   });
 

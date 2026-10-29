@@ -10,7 +10,7 @@ export function downloadEmail(to: string, link: string, siteUrl: string): Email 
     '',
     link,
     '',
-    'It works for 7 days, on any Mac.',
+    'The link works for 7 days, on any Mac. CacheDrop itself doesn’t expire.',
     '',
     'CacheDrop is a Mac storage cleaner made for developers and video editors. It is free while in beta.',
     '',
@@ -30,7 +30,8 @@ export function downloadEmail(to: string, link: string, siteUrl: string): Email 
 <div style="max-width:520px;margin:0 auto">
 <p style="${p};font-size:18px;line-height:24px;font-weight:600">Here is your CacheDrop download link</p>
 <p style="${p}"><a href="${link}" style="display:inline-block;padding:12px 20px;border-radius:9999px;background:#0071E3;color:#FFFFFF;font-weight:500;text-decoration:none">Download CacheDrop</a></p>
-<p style="${p}">It works for 7 days, on any Mac. If the button doesn’t work, paste this link into your browser:<br><a href="${link}" style="color:#0066CC;word-break:break-all">${link}</a></p>
+<p style="${p}">The link works for 7 days, on any Mac. CacheDrop itself doesn’t expire.</p>
+<p style="${p}">If the button doesn’t work, paste this link into your browser:<br><a href="${link}" style="color:#0066CC;word-break:break-all">${link}</a></p>
 <p style="${p}">CacheDrop is a Mac storage cleaner made for developers and video editors. It is free while in beta.</p>
 <p style="${p};color:#6E6E73">You asked for this link on cachedrop.io. If that wasn’t you, ignore this email.</p>
 <hr style="margin:24px 0 16px;border:0;border-top:1px solid #E5E7EB">
