@@ -5,6 +5,7 @@ import { pages } from './pages';
 // mocked. tests/gate-journey.spec.ts runs the real thing against a preview.
 
 const TOKEN = 'T'.repeat(43);
+const NEWS = 'Email me news about CacheDrop, like new features, surveys and the paid launch.';
 
 test.describe('every Download button leads to the form', () => {
   for (const p of pages.filter((p) => !p.path.startsWith('/download/'))) {
@@ -46,7 +47,7 @@ test.describe('the form', () => {
     await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeFocused();
     await expect(page.getByText('We sent a download link to ada@example.com.')).toBeVisible();
     await expect(page.getByLabel('Email', { exact: true })).toBeHidden();
-    expect(requests).toEqual([{ email: 'ada@example.com', filling: 'video-photo' }]);
+    expect(requests).toEqual([{ email: 'ada@example.com', filling: 'video-photo', news: false }]);
   });
 
   test('sends no answer when the question is skipped', async ({ page }) => {
@@ -55,7 +56,7 @@ test.describe('the form', () => {
     await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
     await page.getByLabel('Email', { exact: true }).press('Enter');
     await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
-    expect(requests).toEqual([{ email: 'ada@example.com', filling: null }]);
+    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false }]);
   });
 
   test('catches an incomplete email before sending anything', async ({ page }) => {
@@ -93,6 +94,29 @@ test.describe('the form', () => {
     await page.getByRole('button', { name: 'Use a Different Email' }).click();
     await expect(page.getByLabel('Email', { exact: true })).toBeFocused();
     await expect(page.getByLabel('Email', { exact: true })).toHaveValue('');
+  });
+
+  test('offers the news opt-in unticked, and the download never depends on it (Decision 3)', async ({ page }) => {
+    const requests = await mockSignup(page);
+    await page.goto('/download/');
+    const news = page.getByRole('checkbox', { name: NEWS, exact: true });
+    await expect(news).not.toBeChecked();
+    await expect(news).toHaveAccessibleDescription('Optional. You can unsubscribe at any time from any of our emails.');
+    await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
+    await page.getByRole('button', { name: 'Send Download Link' }).click();
+    await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
+    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false }]);
+  });
+
+  test('sends news: true only when the box is ticked, and starts unticked again for a different email', async ({ page }) => {
+    const requests = await mockSignup(page);
+    await page.goto('/download/');
+    await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
+    await page.getByRole('checkbox', { name: NEWS, exact: true }).check();
+    await page.getByRole('button', { name: 'Send Download Link' }).click();
+    await page.getByRole('button', { name: 'Use a Different Email' }).click();
+    await expect(page.getByRole('checkbox', { name: NEWS, exact: true })).not.toBeChecked();
+    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: true }]);
   });
 
   test('links to the privacy policy (Decision 19)', async ({ page }) => {

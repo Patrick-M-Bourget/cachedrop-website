@@ -1,6 +1,7 @@
 ---
 // The email gate (Decision 1): every Download button lands here. The form posts to /api/signup,
 // which saves the signup and emails a download link; the card then says to check the inbox.
+// The news checkbox starts unticked and the download never depends on it (Decision 3).
 // Built from the design system's utility-page recipe and its TextField, Checkbox, Button and
 // done-state parts (handoff/design-system/components/bundle.css), with the token page's head.
 import Base from '../../layouts/Base.astro';
@@ -68,6 +69,10 @@ const guideLink = 'color: var(--accent-text); font-weight: 500';
 ))}
 </div>
 </fieldset>
+<div>
+<label class="gate-check"><input type="checkbox" name="news" aria-describedby="gate-news-note"><span>Email me news about CacheDrop, like new features, surveys and the paid launch.</span></label>
+<p id="gate-news-note" style="margin: var(--space-1) 0 0 calc(var(--space-4) + var(--space-2-5)); font-size: 13px; line-height: 18px; color: var(--ink-secondary)">Optional. You can unsubscribe at any time from any of our emails.</p>
+</div>
 <button type="submit" class="gate-btn gate-primary">Send Download Link</button>
 <p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-secondary)">We email you the link, then only about new versions and security. <a class="textlink" href="/privacy/" style="color: var(--accent-text); font-weight: 500">Privacy Policy</a></p>
 </form>
@@ -116,7 +121,7 @@ const guideLink = 'color: var(--accent-text); font-weight: 500';
     fetch('/api/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: address, filling: choice ? choice.value : null })
+      body: JSON.stringify({ email: address, filling: choice ? choice.value : null, news: form.news.checked })
     })
       .then(function (res) {
         if (res.ok) {
