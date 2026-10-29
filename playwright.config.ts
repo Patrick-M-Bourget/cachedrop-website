@@ -13,12 +13,15 @@ export default defineConfig({
   updateSnapshots: 'none',
   snapshotPathTemplate: 'handoff/screenshots/{arg}{ext}',
   use: {
-    baseURL: `http://localhost:${PORT}`,
+    // PREVIEW_URL points the run at a Vercel preview instead (tests/gate-journey.spec.ts).
+    baseURL: process.env.PREVIEW_URL ?? `http://localhost:${PORT}`,
     ...devices['Desktop Chrome'],
   },
-  webServer: {
-    command: `npx astro preview --port ${PORT} --ignore-lock`,
-    url: `http://localhost:${PORT}/`,
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: process.env.PREVIEW_URL
+    ? undefined
+    : {
+        command: `npx astro preview --port ${PORT} --ignore-lock`,
+        url: `http://localhost:${PORT}/`,
+        reuseExistingServer: !process.env.CI,
+      },
 });
