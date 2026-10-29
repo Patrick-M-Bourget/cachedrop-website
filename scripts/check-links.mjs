@@ -6,7 +6,14 @@ import { LinkChecker } from 'linkinator';
 const PORT = 5799;
 
 // Pages the site links to that later tickets build. Add one per line; remove it when its page lands.
-const PENDING = /** @type {string[]} */ ([]);
+// The French twins of #13's later PRs (Decision 5): the footer's language switch already links to them.
+const PENDING = /** @type {string[]} */ ([
+  '/fr/clear-mac-developer-caches/',
+  '/fr/clear-adobe-media-cache-mac/',
+  '/fr/privacy/',
+  '/fr/download/',
+  '/fr/unsubscribe/',
+]);
 
 // Served by Vercel itself once Web Analytics is on (Decision 16); never in the build.
 const VERCEL_ONLY = ['/_vercel/insights/script.js'];

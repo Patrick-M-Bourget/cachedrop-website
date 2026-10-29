@@ -2,11 +2,18 @@
 // The product shot on the homepage: a static mock of the app's early "Storage overview".
 // Decision 24 replaces it with a real light/dark screenshot of the shipping Overview at launch.
 // #8A8A90 and the 7px/9px radii have no token in the design system, so they stay literal.
+// The mock shows the app as it ships, in English, on the French page too; only its label is translated.
+import { langOf } from '../i18n';
+
+const label = {
+  en: 'The CacheDrop app, showing the Storage overview',
+  fr: 'L’application CacheDrop, qui affiche l’aperçu du stockage',
+}[langOf(Astro.url)];
 ---
 <style is:global>
 @media (max-width:760px){.win-side{display:none !important}}
 </style>
-<figure aria-label="The CacheDrop app, showing the Storage overview" style="margin: var(--space-20) 0 0; width: 100%; max-width: var(--window-max); text-align: left; border-radius: var(--radius-xl); overflow: hidden; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-window)">
+<figure aria-label={label} style="margin: var(--space-20) 0 0; width: 100%; max-width: var(--window-max); text-align: left; border-radius: var(--radius-xl); overflow: hidden; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-window)">
 <div style="height: 38px; padding: 0 14px; display: flex; align-items: center; gap: var(--space-2); background: var(--window-chrome); border-bottom: 1px solid var(--line)">
 <span style="width: var(--icon-xs); height: var(--icon-xs); border-radius: var(--radius-full); background: var(--traffic-close)"></span>
 <span style="width: var(--icon-xs); height: var(--icon-xs); border-radius: var(--radius-full); background: var(--traffic-minimize)"></span>

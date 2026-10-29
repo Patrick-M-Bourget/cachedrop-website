@@ -60,7 +60,7 @@
       e.preventDefault();
       var message = form.message.value.trim();
       if (!message && !rating) {
-        error.textContent = 'Pick a rating or write a note, then submit.';
+        error.textContent = scrim.getAttribute('data-msg-empty');
         error.hidden = false;
         return;
       }
@@ -77,18 +77,20 @@
         .then(function (res) { if (!res.ok) throw new Error(res.status); })
         .then(function () { form.hidden = true; done.hidden = false; form.reset(); rating = null;
           scrim.querySelectorAll('[data-rating]').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); }); })
-        .catch(function () { error.textContent = 'We couldn’t send that. Check your connection and try again.'; error.hidden = false; })
+        .catch(function () { error.textContent = scrim.getAttribute('data-msg-failed'); error.hidden = false; })
         .then(function () { submit.disabled = false; });
     });
     if (location.hash === '#feedback') open();
   }
 
-  // Copy buttons in code blocks
+  // Copy buttons in code blocks. The button's own label comes back after "Copied" (data-copied).
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-copy]');
     if (!b) return;
     var text = b.getAttribute('data-copy');
-    function ok() { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1600); }
+    var label = b.getAttribute('data-label') || b.textContent;
+    b.setAttribute('data-label', label);
+    function ok() { b.textContent = b.getAttribute('data-copied'); setTimeout(function () { b.textContent = label; }, 1600); }
     if (navigator.clipboard) navigator.clipboard.writeText(text).then(ok, function () {});
   });
 

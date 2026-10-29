@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { pages } from './pages';
+import { pages, uiOf } from './pages';
 
 // The email gate's pages (Decisions 1, 2) against the static build, with the Vercel functions
 // mocked. tests/gate-journey.spec.ts runs the real thing against a preview.
@@ -8,13 +8,13 @@ const TOKEN = 'T'.repeat(43);
 const NEWS = 'Email me news about CacheDrop, like new features, surveys and the paid launch.';
 
 test.describe('every Download button leads to the form', () => {
-  for (const p of pages.filter((p) => !p.path.startsWith('/download/'))) {
+  for (const p of pages.filter((p) => !/^(\/fr)?\/download\//.test(p.path))) {
     test(`on ${p.path}`, async ({ page }) => {
       await page.goto(p.path);
-      const links = page.locator('a', { hasText: /download|get free beta|get your space back/i });
+      const links = page.locator('a', { hasText: /download|get free beta|get your space back|télécharg|obtenir/i });
       const hrefs = await links.evaluateAll((as) => as.map((a) => a.getAttribute('href')));
       expect(hrefs.length).toBeGreaterThan(0);
-      for (const href of hrefs) expect(href).toBe('/download/');
+      for (const href of hrefs) expect(href).toBe(uiOf(p).download);
     });
   }
 

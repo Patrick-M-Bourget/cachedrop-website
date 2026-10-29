@@ -15,6 +15,12 @@ export const handoffChanges: HandoffChange[] = [
     find: '<span>Public beta</span>',
     replace: '<span style="display: flex; gap: 16px"><a class="flink" href="/privacy/">Privacy Policy</a><span>Public beta</span></span>',
   },
+  {
+    decision: 5,
+    why: 'The footer switches to the page in French. Applied after the Decision 19 change, so it ends the same row.',
+    find: '<span>Public beta</span>',
+    replace: '<span>Public beta</span><a class="flink" href="/fr/" hreflang="fr" lang="fr">Français</a>',
+  },
 ];
 
 /** Returns the handoff page's HTML with every decided change applied. */

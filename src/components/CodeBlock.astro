@@ -1,13 +1,15 @@
 ---
 // A Terminal command or file path with a Copy button (site.js handles [data-copy]).
+import { langOf } from '../i18n';
 interface Props {
   /** Label in the block's header, e.g. `Terminal` or `Path`. */
   label: string;
   code: string;
 }
 const { label, code } = Astro.props;
+const t = { en: { copy: 'Copy', copied: 'Copied' }, fr: { copy: 'Copier', copied: 'Copié' } }[langOf(Astro.url)];
 ---
 <div style="border: 1px solid var(--line); background: var(--surface-subtle); border-radius: var(--radius-lg); overflow: hidden">
-<div style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-1-5) var(--space-1-5) var(--space-1-5) 14px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--ink-secondary)"><span>{label}</span><button type="button" class="copy" data-copy={code} style="height: var(--control-xs); padding: 0 var(--space-2-5); border: 1px solid var(--line-strong); border-radius: 7px; background: var(--surface-elevated); font: inherit; font-size: 12px; font-weight: 500; color: var(--ink); cursor: pointer">Copy</button></div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-1-5) var(--space-1-5) var(--space-1-5) 14px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--ink-secondary)"><span>{label}</span><button type="button" class="copy" data-copy={code} data-copied={t.copied} style="height: var(--control-xs); padding: 0 var(--space-2-5); border: 1px solid var(--line-strong); border-radius: 7px; background: var(--surface-elevated); font: inherit; font-size: 12px; font-weight: 500; color: var(--ink); cursor: pointer">{t.copy}</button></div>
 <pre class="mono" style="margin: 0; padding: 14px var(--space-4); font-size: 13px; line-height: 20px; color: var(--ink); overflow-x: auto"><code>{code}</code></pre>
 </div>

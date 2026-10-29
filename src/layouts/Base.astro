@@ -2,14 +2,19 @@
 // The document shell every page shares: the handoff's head tags in the handoff's
 // order, the design tokens, the site-wide styles, the feedback modal and site.js.
 // Keep the head tags exactly as delivered (HANDOFF.md §2); tests/head.spec.ts diffs them.
+// Decision 5 adds the hreflang alternates after the canonical, and og:locale on French pages.
 import '../../handoff/design-system/tokens.css';
 import '../styles/global.css';
 import FeedbackModal from '../components/FeedbackModal.astro';
+import { htmlLang, langOf, localize } from '../i18n';
 
 interface Props {
   title: string;
   description: string;
-  /** Root-relative path of this page, e.g. `/` or `/download/`. Builds canonical and og:url. */
+  /**
+   * Root-relative English path of this page, e.g. `/` or `/download/`. Builds canonical and og:url
+   * (under /fr/ on the French page) and the hreflang alternates.
+   */
   path: string;
   ogType?: 'website' | 'article';
   /** e.g. `noindex, follow` on /download/. Omitted means no robots meta. */
@@ -20,10 +25,16 @@ interface Props {
 
 const { title, description, path, ogType = 'website', robots, jsonLd } = Astro.props;
 const site = Astro.site!.origin; // https://cachedrop.io (astro.config.mjs)
-const url = new URL(path, site).href;
+const lang = langOf(Astro.url);
+const url = new URL(localize(lang, path), site).href;
+const alternates = [
+  ['en', new URL(path, site).href],
+  ['fr', new URL(localize('fr', path), site).href],
+  ['x-default', new URL(path, site).href],
+];
 ---
 <!doctype html>
-<html lang="en">
+<html lang={htmlLang[lang]}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -31,11 +42,13 @@ const url = new URL(path, site).href;
 <meta name="description" content={description}>
 {robots && <meta name="robots" content={robots}>}
 <link rel="canonical" href={url}>
+{alternates.map(([hreflang, href]) => <link rel="alternate" hreflang={hreflang} href={href}>)}
 <meta property="og:type" content={ogType}>
 <meta property="og:site_name" content="CacheDrop">
 <meta property="og:title" content={title}>
 <meta property="og:description" content={description}>
 <meta property="og:url" content={url}>
+{lang === 'fr' && <meta property="og:locale" content="fr_CA">}
 <meta property="og:image" content={`${site}/assets/og-image.png`}>
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#FFFFFF">
