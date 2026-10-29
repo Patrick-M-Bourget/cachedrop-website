@@ -3,8 +3,8 @@
   'use strict';
 
   // ---- Configuration: set these before launch -------------------------------------------
-  // The secure webhook that turns a feedback POST into a structured issue. Never shown to users.
-  var FEEDBACK_ENDPOINT = window.CACHEDROP_FEEDBACK_ENDPOINT || '[FEEDBACK_WEBHOOK_URL]';
+  // The Vercel function that saves feedback and files it as an issue (api/feedback.ts).
+  var FEEDBACK_ENDPOINT = window.CACHEDROP_FEEDBACK_ENDPOINT || '/api/feedback';
   // The signed, notarized .dmg. The download page starts it on load.
   var DMG_URL = window.CACHEDROP_DMG_URL || '[DMG_URL]';
   // ---------------------------------------------------------------------------------------
