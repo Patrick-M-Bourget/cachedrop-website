@@ -18,7 +18,7 @@ export function mailerFor(request: Request, env: Env, fetch: typeof globalThis.f
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' },
-      body: JSON.stringify({ from: FROM, to: [email.to], subject: email.subject, text: email.text, html: email.html }),
+      body: JSON.stringify({ from: FROM, to: [email.to], subject: email.subject, text: email.text, html: email.html, headers: email.headers }),
     });
     if (!res.ok) throw new Error(`Resend answered ${res.status}`);
   };

@@ -1,9 +1,15 @@
 // The download email (Decisions 2, 3). Transactional: the link, what CacheDrop is, who sent it and
 // the privacy policy. Nothing promotional. The mailing address joins the sender line once the PO
-// box exists (Decision 21, launch-blocking). The unsubscribe link and headers come with #10.
+// box exists (Decision 21, launch-blocking). Like every email, it carries the unsubscribe link and
+// one-click headers (Decision 4).
 import type { Email } from './gate.ts';
 
-export function downloadEmail(to: string, link: string, siteUrl: string): Email {
+export function downloadEmail(
+  to: string,
+  link: string,
+  siteUrl: string,
+  unsubscribe: { link: string; headers: Record<string, string> },
+): Email {
   const privacy = `${siteUrl}/privacy/`;
   const text = [
     'Here is your CacheDrop download link:',
@@ -19,6 +25,7 @@ export function downloadEmail(to: string, link: string, siteUrl: string): Email 
     '—',
     'CacheDrop · hello@cachedrop.io · cachedrop.io',
     `Privacy policy: ${privacy}`,
+    `Unsubscribe: ${unsubscribe.link}`,
   ].join('\n');
 
   // Plain markup with inline styles, which is what mail clients render reliably.
@@ -36,10 +43,10 @@ export function downloadEmail(to: string, link: string, siteUrl: string): Email 
 <p style="${p};color:#6E6E73">You asked for this link on cachedrop.io. If that wasn’t you, ignore this email.</p>
 <hr style="margin:24px 0 16px;border:0;border-top:1px solid #E5E7EB">
 <p style="${small}">CacheDrop · <a href="mailto:hello@cachedrop.io" style="color:#6E6E73">hello@cachedrop.io</a> · cachedrop.io</p>
-<p style="${small}"><a href="${privacy}" style="color:#6E6E73">Privacy policy</a></p>
+<p style="${small}"><a href="${privacy}" style="color:#6E6E73">Privacy policy</a> · <a href="${unsubscribe.link}" style="color:#6E6E73">Unsubscribe</a></p>
 </div>
 </body>
 </html>`;
 
-  return { to, subject: 'Your CacheDrop download link', text, html };
+  return { to, subject: 'Your CacheDrop download link', text, html, headers: unsubscribe.headers };
 }

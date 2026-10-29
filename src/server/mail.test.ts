@@ -34,6 +34,13 @@ describe('mailerFor', () => {
     });
   });
 
+  it('passes the email\'s headers, such as List-Unsubscribe, to Resend', async () => {
+    const resend = fakeResend();
+    const headers = { 'List-Unsubscribe': '<https://cachedrop.io/api/unsubscribe?token=t>', 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' };
+    await mailerFor(req(), { RESEND_API_KEY: 're_test' }, resend.fetch)({ ...EMAIL, headers });
+    expect(JSON.parse(resend.calls[0].init.body as string).headers).toEqual(headers);
+  });
+
   it('throws when Resend refuses, so the signup can report it', async () => {
     const send = mailerFor(req(), { RESEND_API_KEY: 're_test' }, fakeResend(422).fetch);
     await expect(send(EMAIL)).rejects.toThrow(/422/);

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { handleDownload, handleRelease, handleSignup, type Email, type GateDb } from './gate.ts';
+import { handleUnsubscribe } from './unsubscribe.ts';
 
 const SITE = 'https://preview.example.vercel.app';
 const DAY = 24 * 60 * 60 * 1000;
@@ -10,10 +11,11 @@ type Release = { id: number; version: string; filename: string; is_latest: boole
 // email-gate migration: one signup per email, tokens stored as hashes that expire after 7 days,
 // and download_for_token counting starts on the latest release.
 function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename: 'CacheDrop-1.2.0.dmg', is_latest: true, download_starts: 0 }]) {
-  const signups: Array<{ id: number; email: string; filling: string | null }> = [];
+  const signups: Array<{ id: number; email: string; filling: string | null; unsubscribed?: boolean }> = [];
   const tokens = new Map<string, { signupId: number; expiresAt: number }>();
+  const unsubscribeTokens = new Map<string, number>();
   const signed: Array<{ path: string; expiresIn: number; download: unknown }> = [];
-  const state = { signups, tokens, releases, signed, now: Date.now(), fail: false };
+  const state = { signups, tokens, unsubscribeTokens, releases, signed, now: Date.now(), fail: false };
   const db: GateDb = {
     async rpc(fn: string, args: Record<string, unknown>) {
       if (state.fail) return { data: null, error: { message: 'connection reset' } };
@@ -36,6 +38,19 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
         if (!latest) return { data: [{ status: 'no_release', ...none }], error: null };
         if (p_count) latest.download_starts++;
         return { data: [{ status: 'ok', version: latest.version, filename: latest.filename }], error: null };
+      }
+      if (fn === 'issue_unsubscribe_token') {
+        const { p_email, p_token_hash } = args as { p_email: string; p_token_hash: string };
+        const s = signups.find((x) => x.email === p_email);
+        if (!s || !/^[0-9a-f]{64}$/.test(p_token_hash)) return { data: null, error: { message: 'no signup' } };
+        unsubscribeTokens.set(p_token_hash, s.id);
+        return { data: null, error: null };
+      }
+      if (fn === 'unsubscribe') {
+        const id = unsubscribeTokens.get((args as { p_token_hash: string }).p_token_hash);
+        const s = signups.find((x) => x.id === id);
+        if (s) s.unsubscribed = true;
+        return { data: !!s, error: null };
       }
       throw new Error(`unexpected rpc ${fn}`);
     },
@@ -259,5 +274,89 @@ describe('download start (GET /api/download?token=)', () => {
     const { deps, token, state } = await signedUp();
     state.now += 7 * DAY - 1000;
     expect((await handleDownload(get(`/api/download?token=${token}`), deps)).status).toBe(302);
+  });
+});
+
+// Unsubscribe (Decision 4, #10): one link and one-click headers in every email.
+const unsubscribeLinkIn = (email: Email) => email.text.match(/https:\/\/\S+\/unsubscribe\/([A-Za-z0-9_-]{43})\//);
+const oneClickIn = (email: Email) => email.headers?.['List-Unsubscribe']?.match(/^<(https:\/\/[^>]+)>$/)?.[1];
+const oneClick = (url: string, body = 'List-Unsubscribe=One-Click') =>
+  new Request(url, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body });
+
+describe('unsubscribe', () => {
+  it('puts an unsubscribe link in the download email, and the one-click headers', async () => {
+    const { sent } = await signedUp();
+    const [email] = sent;
+    const link = unsubscribeLinkIn(email);
+    expect(link?.[0]).toMatch(new RegExp(`^${SITE}/unsubscribe/[A-Za-z0-9_-]{43}/$`));
+    expect(email.html).toContain(`href="${link![0]}"`);
+    expect(email.headers?.['List-Unsubscribe-Post']).toBe('List-Unsubscribe=One-Click');
+    expect(oneClickIn(email)).toBe(`${SITE}/api/unsubscribe?token=${link![1]}`);
+  });
+
+  it('one-click POST from the mail client unsubscribes with an empty 200, and a second POST is harmless', async () => {
+    const { deps, sent, state } = await signedUp();
+    const url = oneClickIn(sent[0])!;
+    const first = await handleUnsubscribe(oneClick(url), deps);
+    expect(first.status).toBe(200);
+    expect(first.headers.get('location')).toBeNull();
+    expect(await first.text()).toBe('');
+    expect(state.signups[0].unsubscribed).toBe(true);
+    expect((await handleUnsubscribe(oneClick(url), deps)).status).toBe(200);
+    expect(state.signups[0].unsubscribed).toBe(true);
+  });
+
+  it('the link opens the confirmation page, whose POST unsubscribes', async () => {
+    const { deps, sent, state } = await signedUp();
+    const [pageUrl, token] = unsubscribeLinkIn(sent[0])!;
+    // A GET (a mail client without one-click, or a link scanner) changes nothing; it goes to the page.
+    const opened = await handleUnsubscribe(get(`/api/unsubscribe?token=${token}`), deps);
+    expect(opened.status).toBe(303);
+    expect(new URL(opened.headers.get('location')!, SITE).href).toBe(pageUrl);
+    expect(state.signups[0].unsubscribed).toBeUndefined();
+    // The page posts the token the way a mail client does.
+    expect((await handleUnsubscribe(oneClick(`${SITE}/api/unsubscribe?token=${token}`), deps)).status).toBe(200);
+    expect(state.signups[0].unsubscribed).toBe(true);
+  });
+
+  it('gives each email its own token, and never stores the token itself', async () => {
+    const { deps, sent, state } = await signedUp();
+    await handleSignup(post({ email: 'ada@example.com' }), deps);
+    const [a, b] = sent.map((e) => unsubscribeLinkIn(e)![1]);
+    expect(a).not.toBe(b);
+    expect([...state.unsubscribeTokens.keys()]).not.toContain(a);
+    expect((await handleUnsubscribe(oneClick(oneClickIn(sent[0])!), deps)).status).toBe(200);
+    expect((await handleUnsubscribe(oneClick(oneClickIn(sent[1])!), deps)).status).toBe(200);
+  });
+
+  it.each([
+    ['a forged token', 'A'.repeat(43)],
+    ['the download token', 'download'],
+    ['a malformed token', 'not a token'],
+    ['no token', ''],
+  ])('refuses %s with 404 and unsubscribes nobody', async (_, token) => {
+    const { deps, sent, state } = await signedUp();
+    const value = token === 'download' ? linkIn(sent[0])![1] : token;
+    const res = await handleUnsubscribe(oneClick(`${SITE}/api/unsubscribe?token=${encodeURIComponent(value)}`), deps);
+    expect(res.status).toBe(404);
+    expect(state.signups[0].unsubscribed).toBeUndefined();
+  });
+
+  it('answers 503 when the database is unavailable, so the page can say to try again', async () => {
+    const { deps, sent, state } = await signedUp();
+    state.fail = true;
+    expect((await handleUnsubscribe(oneClick(oneClickIn(sent[0])!), deps)).status).toBe(503);
+  });
+
+  it('sends no download email when the unsubscribe token cannot be saved', async () => {
+    const { deps, sent } = setup();
+    const rpc = deps.db.rpc.bind(deps.db) as (fn: string, args: unknown) => Promise<unknown>;
+    const db = {
+      ...deps.db,
+      rpc: async (fn: string, args: unknown) => (fn === 'issue_unsubscribe_token' ? { data: null, error: { message: 'down' } } : rpc(fn, args)),
+    } as unknown as GateDb;
+    const res = await handleSignup(post({ email: 'ada@example.com' }), { ...deps, db });
+    expect(res.status).toBe(503);
+    expect(sent).toEqual([]);
   });
 });
