@@ -1,6 +1,7 @@
 // The email gate (Decisions 1, 2, 14): the request handlers behind api/signup, api/release and
 // api/download. Supabase and the mail sender come in as dependencies, so Vitest can stand in for
 // both at the boundary (Decision 27). The api/ files wire in the real ones.
+import { guard, type Guard } from './bot-check.js';
 import { downloadEmail } from './download-email.js';
 import { TOKEN, hashToken, newToken } from './tokens.js';
 import { unsubscribeFor } from './unsubscribe.js';
@@ -21,6 +22,7 @@ export interface GateDb {
   rpc(fn: 'issue_unsubscribe_token', args: { p_email: string; p_token_hash: string }): Result<unknown>;
   /** true when the token was known (and its address is now unsubscribed). */
   rpc(fn: 'unsubscribe', args: { p_token_hash: string }): Result<boolean>;
+  rpc(...args: Parameters<Guard['db']['rpc']>): Result<number>;
   storage: {
     from(bucket: string): {
       createSignedUrl(path: string, expiresIn: number, opts?: { download?: string | boolean }): Result<{ signedUrl: string }>;
@@ -45,6 +47,9 @@ export interface GateDeps {
   siteUrl: string;
 }
 
+/** The signup also runs the bot check and rate limit (Decision 12). */
+export type SignupDeps = GateDeps & Guard;
+
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
 
@@ -52,12 +57,13 @@ const json = (body: unknown, status = 200) =>
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * POST /api/signup with JSON `{ email, filling?, news? }`: saves the signup (or finds the one for
- * this email) and emails a new download link. Only `news: true` counts as the news opt-in, and a
- * later request without it never turns an existing yes off (Decision 3).
+ * POST /api/signup with JSON `{ email, filling?, news?, turnstile }`: saves the signup (or finds
+ * the one for this email) and emails a new download link. Only `news: true` counts as the news
+ * opt-in, and a later request without it never turns an existing yes off (Decision 3). The
+ * Turnstile token and the rate limit are checked first (Decision 12).
  */
-export async function handleSignup(request: Request, deps: GateDeps): Promise<Response> {
-  let body: { email?: unknown; filling?: unknown; news?: unknown };
+export async function handleSignup(request: Request, deps: SignupDeps): Promise<Response> {
+  let body: { email?: unknown; filling?: unknown; news?: unknown; turnstile?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -66,6 +72,8 @@ export async function handleSignup(request: Request, deps: GateDeps): Promise<Re
   const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
   if (email.length > 254 || !EMAIL.test(email)) return json({ error: 'invalid_email' }, 400);
   const filling = FILLING.find((f) => f === body.filling) ?? null;
+  const refused = await guard('signup', body.turnstile, deps);
+  if (refused) return refused;
 
   const token = newToken();
   const saved = await deps.db.rpc('request_download', {

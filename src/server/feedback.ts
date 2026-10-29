@@ -2,6 +2,7 @@
 // feedback in Supabase, then files it as a mac-cleaner issue. Supabase and GitHub come in as
 // dependencies, so Vitest can stand in for both at the boundary (Decision 27).
 import { createHash, timingSafeEqual } from 'node:crypto';
+import { guard, type Guard } from './bot-check.js';
 
 type Result<T> = Promise<{ data: T | null; error: { message: string } | null }>;
 
@@ -17,6 +18,7 @@ export interface FeedbackDb {
   ): Result<number>;
   rpc(fn: 'set_feedback_issue', args: { p_id: number; p_issue_number: number }): Result<unknown>;
   rpc(fn: 'feedback_without_issue', args: { p_created_before: string; p_limit: number }): Result<PendingRow[]>;
+  rpc(...args: Parameters<Guard['db']['rpc']>): Result<number>;
 }
 
 /** A saved row still waiting for its issue, as feedback_without_issue returns it (no email). */
@@ -48,6 +50,9 @@ export interface FeedbackDeps {
   db: FeedbackDb;
   issues: Issues;
 }
+
+/** Submitting also runs the bot check and rate limit (Decision 12). */
+export type SubmitDeps = FeedbackDeps & Guard;
 
 export interface RetryDeps extends FeedbackDeps {
   /** Vercel Cron sends it as a bearer token. Unset refuses every request. */
@@ -185,8 +190,11 @@ function parse(body: unknown): Submission | undefined {
   return { rating, email, message, page: body.page, specs };
 }
 
-/** POST /api/feedback with JSON `{ rating, email, message, page, specs }` (handoff §3). */
-export async function handleFeedback(request: Request, deps: FeedbackDeps): Promise<Response> {
+/**
+ * POST /api/feedback with JSON `{ rating, email, message, page, specs, turnstile }` (handoff §3).
+ * The Turnstile token and the rate limit are checked before anything is saved (Decision 12).
+ */
+export async function handleFeedback(request: Request, deps: SubmitDeps): Promise<Response> {
   if (Number(request.headers.get('content-length') ?? 0) > MAX_BODY_BYTES) return json({ error: 'too_large' }, 413);
   const raw = await request.text();
   if (new TextEncoder().encode(raw).length > MAX_BODY_BYTES) return json({ error: 'too_large' }, 413);
@@ -198,6 +206,8 @@ export async function handleFeedback(request: Request, deps: FeedbackDeps): Prom
   }
   const f = parse(body);
   if (!f) return json({ error: 'invalid' }, 400);
+  const refused = await guard('feedback', (body as { turnstile?: unknown }).turnstile, deps);
+  if (refused) return refused;
 
   const saved = await deps.db.rpc('save_feedback', {
     p_rating: f.rating,

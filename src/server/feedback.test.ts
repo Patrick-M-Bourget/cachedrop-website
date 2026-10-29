@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { handleFeedback, retryFeedback, type FeedbackDb, type IssueDraft, type Issues } from './feedback.ts';
+import { KEY, PASS, WAIT, fakeRateLimit, fakeTurnstile } from './bot-check.fakes.ts';
+import { LIMITS } from './bot-check.ts';
 
 const SITE = 'https://preview.example.vercel.app';
 
@@ -19,10 +21,12 @@ type Row = {
 // issue number, feedback_without_issue lists rows older than a time that still have none.
 function fakeSupabase() {
   const rows: Row[] = [];
-  const state = { rows, now: Date.parse('2026-10-29T12:00:00Z'), fail: false, failWriteBack: false };
+  const limits = fakeRateLimit();
+  const state = { rows, limits, now: Date.parse('2026-10-29T12:00:00Z'), fail: false, failWriteBack: false };
   const db: FeedbackDb = {
     async rpc(fn: string, args: Record<string, unknown>) {
       if (state.fail) return { data: null, error: { message: 'connection reset' } };
+      if (fn === 'hit_rate_limit') return limits.rpc(args as Parameters<typeof limits.rpc>[0]);
       if (fn === 'save_feedback') {
         const a = args as { p_rating: string | null; p_email: string | null; p_message: string; p_page: string; p_specs: Row['specs'] };
         const row: Row = {
@@ -77,12 +81,18 @@ function fakeGitHub() {
 function setup() {
   const supabase = fakeSupabase();
   const github = fakeGitHub();
-  const deps = { db: supabase.db, issues: github.issues, now: () => supabase.state.now };
-  return { db: supabase.state, github: github.state, deps };
+  const turnstile = fakeTurnstile();
+  const deps = { db: supabase.db, issues: github.issues, now: () => supabase.state.now, verify: turnstile.verify, ip: '203.0.113.7', rateKey: KEY };
+  return { db: supabase.state, github: github.state, turnstile, deps };
 }
 
+/** A feedback request. Objects carry a passing Turnstile token unless they say otherwise. */
 const post = (body: unknown, headers: Record<string, string> = { 'content-type': 'application/json' }) =>
-  new Request(`${SITE}/api/feedback`, { method: 'POST', headers, body: typeof body === 'string' ? body : JSON.stringify(body) });
+  new Request(`${SITE}/api/feedback`, {
+    method: 'POST',
+    headers,
+    body: typeof body === 'string' ? body : JSON.stringify({ turnstile: PASS, ...(body as object) }),
+  });
 
 const SPECS = { userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', platform: 'MacIntel', language: 'en-CA' };
 const FULL = { rating: 'happy', email: 'ada@example.com', message: 'The scan found 40 GB of DerivedData.', page: '/', specs: SPECS };
@@ -110,6 +120,53 @@ describe('feedback (POST /api/feedback)', () => {
       expect(issue.body).not.toContain('ada@example.com');
     }
     expect(github.created[0].body).toContain('> Reach me at [email removed]');
+  });
+});
+
+describe('bot check and rate limit (Decision 12)', () => {
+  it('checks the token with the client IP before saving or filing', async () => {
+    const { deps, db, turnstile } = setup();
+    expect((await handleFeedback(post(FULL), deps)).status).toBe(200);
+    expect(turnstile.checked).toEqual([{ token: PASS, ip: '203.0.113.7' }]);
+    expect(db.rows).toHaveLength(1);
+  });
+
+  it.each([
+    ['no token', { turnstile: undefined }],
+    ['a failing token', { turnstile: 'fail' }],
+    ['a token already spent', { turnstile: 'spent' }],
+  ])('refuses %s without saving, counting or filing anything', async (_, extra) => {
+    const { deps, db, github } = setup();
+    const res = await handleFeedback(post({ ...FULL, ...extra }), deps);
+    expect(res.status).toBe(403);
+    expect(await res.json()).toEqual({ error: 'bot_check' });
+    expect(db.rows).toEqual([]);
+    expect(db.limits.hits.size).toBe(0);
+    expect(github.created).toEqual([]);
+  });
+
+  it('says it is unavailable, and saves nothing, when Turnstile cannot answer', async () => {
+    const { deps, db } = setup();
+    expect((await handleFeedback(post({ ...FULL, turnstile: 'down' }), deps)).status).toBe(503);
+    expect(db.rows).toEqual([]);
+  });
+
+  it(`allows ${LIMITS.feedback.limit} notes an hour from one place, then refuses with the wait`, async () => {
+    const { deps, db, github } = setup();
+    expect(LIMITS.feedback).toEqual({ limit: 10, windowSeconds: 3600 });
+    for (let i = 0; i < 10; i++) expect((await handleFeedback(post(FULL), deps)).status).toBe(200);
+    const res = await handleFeedback(post(FULL), deps);
+    expect(res.status).toBe(429);
+    expect(res.headers.get('retry-after')).toBe(String(WAIT));
+    expect(await res.json()).toEqual({ error: 'rate_limited', retryAfter: WAIT });
+    expect(db.rows).toHaveLength(10);
+    expect(github.created).toHaveLength(10);
+  });
+
+  it('keeps the feedback and signup limits apart', async () => {
+    const { deps, db } = setup();
+    for (let i = 0; i < 10; i++) await handleFeedback(post(FULL), deps);
+    expect([...db.limits.hits.keys()]).toEqual([`feedback:${KEY}`]);
   });
 });
 

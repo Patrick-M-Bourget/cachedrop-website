@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { handleDownload, handleRelease, handleSignup, type Email, type GateDb } from './gate.ts';
 import { handleUnsubscribe } from './unsubscribe.ts';
+import { KEY, PASS, WAIT, fakeRateLimit, fakeTurnstile } from './bot-check.fakes.ts';
+import { LIMITS } from './bot-check.ts';
 
 const SITE = 'https://preview.example.vercel.app';
 const DAY = 24 * 60 * 60 * 1000;
@@ -15,10 +17,12 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
   const tokens = new Map<string, { signupId: number; expiresAt: number }>();
   const unsubscribeTokens = new Map<string, number>();
   const signed: Array<{ path: string; expiresIn: number; download: unknown }> = [];
-  const state = { signups, tokens, unsubscribeTokens, releases, signed, now: Date.now(), fail: false };
+  const limits = fakeRateLimit();
+  const state = { signups, tokens, unsubscribeTokens, releases, signed, limits, now: Date.now(), fail: false };
   const db: GateDb = {
     async rpc(fn: string, args: Record<string, unknown>) {
       if (state.fail) return { data: null, error: { message: 'connection reset' } };
+      if (fn === 'hit_rate_limit') return limits.rpc(args as Parameters<typeof limits.rpc>[0]);
       if (fn === 'request_download') {
         const { p_email, p_filling, p_token_hash, p_news } = args as { p_email: string; p_filling: string | null; p_token_hash: string; p_news: boolean };
         if (p_email !== p_email.toLowerCase()) return { data: null, error: { message: 'check constraint' } };
@@ -80,14 +84,20 @@ function inbox() {
   return { sent, send: async (e: Email) => void sent.push(e) };
 }
 
+/** A signup request. Objects carry a passing Turnstile token unless they say otherwise. */
 const post = (body: unknown, headers: Record<string, string> = { 'content-type': 'application/json' }) =>
-  new Request(`${SITE}/api/signup`, { method: 'POST', headers, body: typeof body === 'string' ? body : JSON.stringify(body) });
+  new Request(`${SITE}/api/signup`, {
+    method: 'POST',
+    headers,
+    body: typeof body === 'string' ? body : JSON.stringify({ turnstile: PASS, ...(body as object) }),
+  });
 
 function setup(releases?: Release[]) {
   const supabase = fakeSupabase(releases);
   const mail = inbox();
-  const deps = { db: supabase.db, send: mail.send, siteUrl: SITE };
-  return { ...supabase, ...mail, deps };
+  const turnstile = fakeTurnstile();
+  const deps = { db: supabase.db, send: mail.send, siteUrl: SITE, verify: turnstile.verify, ip: '203.0.113.7', rateKey: KEY };
+  return { ...supabase, ...mail, turnstile, deps };
 }
 
 const linkIn = (email: Email) => email.text.match(/https:\/\/\S+\/download\/([A-Za-z0-9_-]+)\//);
@@ -194,6 +204,58 @@ describe('signup', () => {
     const capturing = await (await handleSignup(post({ email: 'ada@example.com' }), { ...deps, send: async (e: Email) => e })).json();
     expect(capturing.captured.to).toBe('ada@example.com');
     expect(capturing.captured.text).toMatch(/\/download\/[A-Za-z0-9_-]{43}\//);
+  });
+});
+
+describe('bot check and rate limit (Decision 12)', () => {
+  it('checks the token with the client IP before saving or sending', async () => {
+    const { deps, sent, turnstile } = setup();
+    expect((await handleSignup(post({ email: 'ada@example.com' }), deps)).status).toBe(200);
+    expect(turnstile.checked).toEqual([{ token: PASS, ip: '203.0.113.7' }]);
+    expect(sent).toHaveLength(1);
+  });
+
+  it.each([
+    ['no token', { turnstile: undefined }],
+    ['an empty token', { turnstile: '' }],
+    ['a token that is not text', { turnstile: 42 }],
+    ['an oversized token', { turnstile: 'x'.repeat(2049) }],
+    ['a failing token', { turnstile: 'fail' }],
+    ['a token already spent', { turnstile: 'spent' }],
+  ])('refuses %s without saving, counting or sending anything', async (_, extra) => {
+    const { deps, sent, state } = setup();
+    const res = await handleSignup(post({ email: 'ada@example.com', ...extra }), deps);
+    expect(res.status).toBe(403);
+    expect(await res.json()).toEqual({ error: 'bot_check' });
+    expect(sent).toEqual([]);
+    expect(state.signups).toEqual([]);
+    expect(state.limits.hits.size).toBe(0);
+  });
+
+  it('says it is unavailable, and saves nothing, when Turnstile cannot answer', async () => {
+    const { deps, sent, state } = setup();
+    const res = await handleSignup(post({ email: 'ada@example.com', turnstile: 'down' }), deps);
+    expect(res.status).toBe(503);
+    expect(sent).toEqual([]);
+    expect(state.signups).toEqual([]);
+  });
+
+  it(`allows ${LIMITS.signup.limit} signups an hour from one place, then refuses with the wait`, async () => {
+    const { deps, sent, state } = setup();
+    expect(LIMITS.signup).toEqual({ limit: 5, windowSeconds: 3600 });
+    for (let i = 0; i < 5; i++) expect((await handleSignup(post({ email: `ada${i}@example.com` }), deps)).status).toBe(200);
+    const res = await handleSignup(post({ email: 'bob@example.com' }), deps);
+    expect(res.status).toBe(429);
+    expect(res.headers.get('retry-after')).toBe(String(WAIT));
+    expect(await res.json()).toEqual({ error: 'rate_limited', retryAfter: WAIT });
+    expect(sent).toHaveLength(5);
+    expect(state.signups.map((s) => s.email)).not.toContain('bob@example.com');
+  });
+
+  it('counts each place on its own', async () => {
+    const { deps } = setup();
+    for (let i = 0; i < 5; i++) await handleSignup(post({ email: `ada${i}@example.com` }), deps);
+    expect((await handleSignup(post({ email: 'bob@example.com' }), { ...deps, rateKey: 'b'.repeat(64) })).status).toBe(200);
   });
 });
 
