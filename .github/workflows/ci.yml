@@ -26,6 +26,8 @@ jobs:
         run: npm run check:links
       - name: JSON-LD validation
         run: npm run check:jsonld
+      - name: Unit tests (Vitest)
+        run: npm run test:unit
       - run: npx playwright install --with-deps chromium
       - name: Playwright (head diff, same-browser screenshots, tokens, modal)
         run: npm test -- --grep-invert "reference render"
