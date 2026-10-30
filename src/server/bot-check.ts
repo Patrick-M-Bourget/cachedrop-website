@@ -51,7 +51,11 @@ export function turnstileFor(request: Request, env: Env, fetch: typeof globalThi
         body: form.toString(),
         signal: AbortSignal.timeout(10_000),
       });
-      if (!res.ok) throw new Error(`siteverify answered ${res.status}`);
+      if (!res.ok) {
+        // Cloudflare's error codes (e.g. invalid-input-secret) name the cause; the secret is never logged.
+        const codes = await res.json().then((r: { 'error-codes'?: string[] }) => r['error-codes'] ?? [], () => []);
+        throw new Error(`siteverify answered ${res.status}${codes.length ? ` (${codes.join(', ')})` : ''}`);
+      }
       const result = (await res.json()) as { success?: boolean; 'error-codes'?: string[] };
       if (result.success === true) return 'ok';
       if (result['error-codes']?.includes('internal-error')) throw new Error('siteverify internal-error');

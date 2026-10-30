@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { TEST_HEADER, TEST_SECRETS, ipHash, rateLimitKey, turnstileFor } from './bot-check.ts';
 
 const SITE = 'https://preview.example.vercel.app';
@@ -33,6 +33,17 @@ describe('the Turnstile check', () => {
   ])('fails %s', async (_, secret) => {
     const verify = turnstileFor(req(), { TURNSTILE_SECRET_KEY: secret }, fakeSiteverify().fetch);
     expect(await verify('XXXX.DUMMY.TOKEN.XXXX', null)).toBe('failed');
+  });
+
+  it("logs Cloudflare's error codes, never the secret, when siteverify refuses the request", async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const refused = fakeSiteverify(() => Response.json({ success: false, 'error-codes': ['invalid-input-secret'] }, { status: 400 }));
+    const secret = '0x4AAA-real-secret';
+    expect(await turnstileFor(req(), { TURNSTILE_SECRET_KEY: secret }, refused.fetch)('t', null)).toBe('unavailable');
+    const logged = log.mock.calls.flat().join(' ');
+    expect(logged).toContain('invalid-input-secret');
+    expect(logged).not.toContain(secret);
+    log.mockRestore();
   });
 
   it('is unavailable, never a pass, when Cloudflare or the secret is missing', async () => {
