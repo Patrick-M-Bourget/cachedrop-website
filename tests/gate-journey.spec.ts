@@ -97,7 +97,9 @@ test('form → captured email → token page → download, and the retry link do
   expect(captured.to).toBe(email);
   expect(captured.subject).toBe('Your CacheDrop download link');
 
-  const link = new URL(captured.text.match(/https:\/\/\S+\/download\/[A-Za-z0-9_-]{43}\//)[0]);
+  const matchedLink = captured.text.match(/https:\/\/\S+\/download\/[A-Za-z0-9_-]{43}\//);
+  if (!matchedLink) throw new Error('Captured email has no download link');
+  const link = new URL(matchedLink[0]);
   expect(link.hostname).toMatch(/\.vercel\.app$/);
   tokenPath = link.pathname;
 
