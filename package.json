@@ -2,6 +2,7 @@
   "name": "cachedrop-website",
   "private": true,
   "type": "module",
+  "packageManager": "npm@11.19.1",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -12,7 +13,8 @@
     "check:html": "html-validate \"dist/**/*.html\"",
     "check:links": "node scripts/check-links.mjs",
     "check:jsonld": "node scripts/check-jsonld.mjs",
-    "check": "npm run check:html && npm run check:links && npm run check:jsonld",
+    "check": "node scripts/check.mjs",
+    "check:static": "npm run check:html && npm run check:links && npm run check:jsonld",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
