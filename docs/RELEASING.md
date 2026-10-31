@@ -40,13 +40,13 @@ For a temporary network error after promotion, first retrieve the same immutable
 
 ## Checks
 
+Use Node from `.node-version`, then run the same entry point as CI. It invokes npm pinned by `packageManager` without changing global npm, checks the lockfile with a clean install, and stops on the first failure. The default `site` profile includes typechecking, unit tests, build, HTML/link/JSON-LD checks and the existing non-reference browser suite; `reference` builds and runs the existing reference-render suite on macOS.
+
 ```sh
-npm run typecheck
-npm run test:unit
+scripts/check.sh site
+scripts/check.sh reference
 # Optional real RPC checks: strict dev guard and transaction rollback, never prod.
 DB_TESTS=dev npx vitest run scripts/release-promotion.db.test.ts
-npm run build
-npm run check
 ```
 
 Publisher tests inject storage, verification, database and feed failures. They prove appcast-last order and safe retries. Real acceptance must also demonstrate the served isolated feed and both download paths. A protected Vercel preview that redirects to login cannot serve as a Sparkle acceptance feed; use a dedicated public test deployment, never embed protection-bypass credentials in the app. Production publication and signed app A → B installation acceptance remain separate from this tooling verification.

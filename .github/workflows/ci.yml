@@ -16,21 +16,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version-file: .node-version
           cache: npm
-      - run: npm ci
-      - run: npm run build
-      - name: HTML validation
-        run: npm run check:html
-      - name: Link check
-        run: npm run check:links
-      - name: JSON-LD validation
-        run: npm run check:jsonld
-      - name: Unit tests (Vitest)
-        run: npm run test:unit
-      - run: npx playwright install --with-deps chromium
-      - name: Playwright (head diff, same-browser screenshots, tokens, modal)
-        run: npm test -- --grep-invert "reference render"
+      - name: Shared site checks
+        run: scripts/check.sh site
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -49,13 +38,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version-file: .node-version
           cache: npm
-      - run: npm ci
-      - run: npm run build
-      - run: npx playwright install chromium
-      - name: Playwright (screenshots against handoff/screenshots/)
-        run: npm test -- --grep "reference render"
+      - name: Shared reference-render checks
+        run: scripts/check.sh reference
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
