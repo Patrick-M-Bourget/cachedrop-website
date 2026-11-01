@@ -58,7 +58,7 @@ No Welcome screen in any cut. Start on Overview after a scan has finished.
 | 4 | 0:18–0:22 | Cleaning | Click **Clean up** in the sheet; progress |
 | 5 | 0:22–0:29 | Results | Hold on **Measured freed space** {M} GB, then the "In the Trash" line |
 | 6 | 0:29–0:35 | Applications | **Files from deleted apps**: the LoopSmith group, ticked, with its size |
-| 7 | 0:35–0:40 | End card | "Free for Apple Silicon Macs, macOS 26+" · cachedrop.io |
+| 7 | 0:35–0:40 | End card | "Free to try · Apple Silicon Macs, macOS 26+" · cachedrop.io |
 
 Scene 6 must come from a take filmed **before** cleaning: Smart clean includes files from deleted apps (Decision 67), so after scene 5 the LoopSmith group is gone. Film it right after a `reset` and scan, and cut it in.
 
@@ -89,7 +89,7 @@ The timings are a plan; the rehearsal take on `main` sets them (the Review sheet
 | 4 | Each item is checked again right before CacheDrop acts on it. | Chaque élément est vérifié de nouveau juste avant que CacheDrop agisse. |
 | 5 | {M} GB freed, measured on the disk, not estimated. | {M} Go libérés, mesurés sur le disque, pas estimés. |
 | 6 | Files from deleted apps, tied to each app by its bundle ID, go to the Trash. | Les fichiers d’applications supprimées, liés à chaque application par son identifiant, vont à la Corbeille. |
-| 7 | Free for Apple Silicon Macs, macOS 26+ · cachedrop.io | Gratuit pour les Mac Apple Silicon, macOS 26+ · cachedrop.io |
+| 7 | Free to try · Apple Silicon Macs, macOS 26+ · cachedrop.io | Essai gratuit · Mac Apple Silicon, macOS 26+ · cachedrop.io |
 
 ### Producers (15 s)
 
@@ -99,7 +99,7 @@ The timings are a plan; the rehearsal take on `main` sets them (the Review sheet
 | 2 | Ableton Live’s decoded samples and your music apps’ caches. Your Sets, samples and Packs are kept. | Les échantillons décodés d’Ableton Live et les caches de vos applications de musique. Vos Sets, échantillons et Packs sont conservés. |
 | 3 | See exactly what happens before anything changes. | Voyez exactement ce qui arrive avant tout changement. |
 | 4 | {M} GB freed, measured. | {M} Go libérés, mesurés. |
-| 5 | Free for Apple Silicon Macs, macOS 26+ · cachedrop.io | Gratuit pour les Mac Apple Silicon, macOS 26+ · cachedrop.io |
+| 5 | Free to try · Apple Silicon Macs, macOS 26+ · cachedrop.io | Essai gratuit · Mac Apple Silicon, macOS 26+ · cachedrop.io |
 
 ### Developers (15 s)
 
@@ -109,7 +109,7 @@ The timings are a plan; the rehearsal take on `main` sets them (the Review sheet
 | 2 | Xcode DerivedData, npm and Homebrew caches. Archives and your projects are kept. | DerivedData de Xcode, caches npm et Homebrew. Les archives et vos projets sont conservés. |
 | 3 | See exactly what happens before anything changes. | Voyez exactement ce qui arrive avant tout changement. |
 | 4 | {M} GB freed, measured. | {M} Go libérés, mesurés. |
-| 5 | Free for Apple Silicon Macs, macOS 26+ · cachedrop.io | Gratuit pour les Mac Apple Silicon, macOS 26+ · cachedrop.io |
+| 5 | Free to try · Apple Silicon Macs, macOS 26+ · cachedrop.io | Essai gratuit · Mac Apple Silicon, macOS 26+ · cachedrop.io |
 
 Wording rules followed: no "speed up your Mac", no "you have X GB" (the figure is "on this Mac"), no fear claims, and no "everything goes to the Trash" (Decision 23).
 
@@ -129,7 +129,7 @@ Wording rules followed: no "speed up your Mac", no "you have X GB" (the figure i
 | Apple Silicon, macOS 26+ | site Decision 35 (Release `ARCHS = arm64`, `MACOSX_DEPLOYMENT_TARGET = 26.0`) |
 
 **Not verified, owner to decide:**
-- **"Free" with no qualifier.** The site says "Free while in beta" / "Free for a limited time", and Decision 3 mentions a paid launch. The end card text is the issue's; "Free beta for Apple Silicon Macs, macOS 26+" would match the site.
+- **"Free to try"** (owner, 2026-11-01): generic on purpose, so the cuts stay true through the beta, trials and tiered features later. Don't change it to "Free" or "Free beta".
 - **Homebrew in another account.** `/opt/homebrew` belongs to the owner's account; `brew cleanup -s` run as demo may fail on files it can't write, and Results would show the Homebrew item as failed (`CleanupExecutor.swift:307-311`). Check in the rehearsal; if it fails, re-seed with `INCLUDE_HOMEBREW=0` and drop "Homebrew" from the developer caption 2.
 - **The figures.** {N} and {M}, and whether measured and estimated land close together, need the real 12 GB run in the demo account.
 - **Scene timings** need the rehearsal take.
