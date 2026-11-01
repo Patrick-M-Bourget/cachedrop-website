@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { clientIp, rateLimitKey, turnstileFor, type Guard } from './bot-check.js';
 import type { FeedbackDb, RetryDeps, SubmitDeps } from './feedback.ts';
 import type { GateDb, GateDeps, SignupDeps } from './gate.ts';
+import type { TelemetryDb, TelemetryDeps } from './telemetry.ts';
 import { issuesFor } from './github.js';
 import { mailerFor, siteUrlFrom } from './mail.js';
 
@@ -37,4 +38,9 @@ export function feedbackDeps(): RetryDeps {
 /** api/feedback: feedback, behind the bot check and rate limit. */
 export function submitDeps(request: Request): SubmitDeps {
   return { ...feedbackDeps(), ...guardFor(request) };
+}
+
+/** api/telemetry: the app's setup progress, behind the rate limit only (the app can't run Turnstile). */
+export function telemetryDeps(request: Request): TelemetryDeps {
+  return { db: serviceClient() as unknown as TelemetryDb, rateKey: rateLimitKey(request, process.env) };
 }
