@@ -19,7 +19,8 @@ export type TokenLookup = { status: 'ok' | 'unknown' | 'expired' | 'no_release';
 export interface GateDb {
   rpc(fn: 'request_download', args: { p_email: string; p_filling: string | null; p_news: boolean; p_lang: Lang; p_token_hash: string }): Result<unknown>;
   rpc(fn: 'download_for_token', args: { p_token_hash: string; p_count: boolean }): Result<TokenLookup[]>;
-  rpc(fn: 'save_download_ref', args: { p_ref: string; p_token_hash: string }): Result<unknown>;
+  /** true when stored; false when the token's row is gone. */
+  rpc(fn: 'save_download_ref', args: { p_ref: string; p_token_hash: string }): Result<boolean>;
   rpc(fn: 'issue_unsubscribe_token', args: { p_email: string; p_token_hash: string }): Result<unknown>;
   /** true when the token was known (and its address is now unsubscribed). */
   rpc(fn: 'unsubscribe', args: { p_token_hash: string }): Result<boolean>;
@@ -137,7 +138,7 @@ export async function handleDownload(request: Request, deps: GateDeps): Promise<
   try {
     const stored = await deps.db.rpc('save_download_ref', { p_ref: ref, p_token_hash: found.tokenHash });
     if (stored.error) console.error('download ref not stored:', stored.error.message);
-    else location += `${location.includes('?') ? '&' : '?'}ref=${ref}`;
+    else if (stored.data === true) location += `${location.includes('?') ? '&' : '?'}ref=${ref}`;
   } catch (e) {
     console.error('download ref not stored:', (e as Error).message);
   }

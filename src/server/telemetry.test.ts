@@ -93,10 +93,10 @@ describe('POST /api/telemetry', () => {
     expect(state.rows[0].signup_id).toBeNull();
   });
 
-  it('sends no download code when the body has none', async () => {
+  it('leaves the download code out of the call when the body has none', async () => {
     const { db, state } = fakeSupabase();
     await handleTelemetry(post(valid), { db, rateKey: KEY });
-    expect(state.calls[0].p_download_ref).toBeNull();
+    expect('p_download_ref' in state.calls[0]).toBe(false);
   });
 
   it('refuses a body that is not JSON', async () => {

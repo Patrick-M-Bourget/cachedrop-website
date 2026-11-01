@@ -10,7 +10,7 @@ import { createClient } from '@supabase/supabase-js';
 import { afterAll, describe, expect, it } from 'vitest';
 import { BUCKET, handleDownload, type GateDb } from './gate.ts';
 import { handleTelemetry, type TelemetryDb } from './telemetry.ts';
-import { hashToken, newToken } from './tokens.ts';
+import { hashToken, newRef, newToken } from './tokens.ts';
 
 const { DB_TESTS, SUPABASE_URL, SUPABASE_SECRET_KEY } = process.env;
 const run = DB_TESTS === 'dev' && !!SUPABASE_URL && !!SUPABASE_SECRET_KEY;
@@ -22,7 +22,6 @@ const emails: string[] = [];
 const installs: string[] = [];
 const rateKeys: string[] = [];
 
-const newRef = () => randomBytes(16).toString('base64url');
 const newInstall = () => {
   const id = randomUUID();
   installs.push(id);

@@ -14,7 +14,7 @@ export interface TelemetryDb {
   /** true when saved, false when this install ID already sent this event. */
   rpc(
     fn: 'save_telemetry_event',
-    args: { p_install_id: string; p_event: SetupEvent; p_app_version: string; p_macos_version: string; p_download_ref: string | null },
+    args: { p_install_id: string; p_event: SetupEvent; p_app_version: string; p_macos_version: string; p_download_ref?: string },
   ): Result<boolean>;
   rpc(...args: Parameters<Guard['db']['rpc']>): Result<number>;
 }
@@ -75,7 +75,8 @@ export async function handleTelemetry(request: Request, deps: TelemetryDeps): Pr
     p_event: body.event,
     p_app_version: body.appVersion,
     p_macos_version: body.macosVersion,
-    p_download_ref: body.downloadRef ?? null,
+    // Left out without a code, so this call also works on a database that predates the code (Decision 39).
+    ...(body.downloadRef ? { p_download_ref: body.downloadRef } : {}),
   });
   if (error || typeof data !== 'boolean') return json({ error: 'unavailable' }, 503);
   // A repeat of an event this install already sent is answered the same, so the app stops retrying;

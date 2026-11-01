@@ -20,7 +20,7 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
   const signed: Array<{ path: string; expiresIn: number; download: unknown }> = [];
   const refs = new Map<string, number>();
   const limits = fakeRateLimit();
-  const state = { signups, tokens, unsubscribeTokens, releases, signed, refs, limits, now: Date.now(), fail: false, failRefs: false };
+  const state = { signups, tokens, unsubscribeTokens, releases, signed, refs, limits, now: Date.now(), fail: false, failRefs: false, refStoresNothing: false };
   const db: GateDb = {
     async rpc(fn: string, args: Record<string, unknown>) {
       if (state.fail) return { data: null, error: { message: 'connection reset' } };
@@ -59,9 +59,10 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
         const { p_ref, p_token_hash } = args as { p_ref: string; p_token_hash: string };
         if (state.failRefs) return { data: null, error: { message: 'connection reset' } };
         if (!/^[A-Za-z0-9_-]{22}$/.test(p_ref) || refs.has(p_ref)) return { data: null, error: { message: 'check constraint' } };
-        const t = tokens.get(p_token_hash);
+        // Answers whether it stored the code: false when the token's row is gone.
+        const t = state.refStoresNothing ? undefined : tokens.get(p_token_hash);
         if (t) refs.set(p_ref, t.signupId);
-        return { data: null, error: null };
+        return { data: !!t, error: null };
       }
       if (fn === 'issue_unsubscribe_token') {
         const { p_email, p_token_hash } = args as { p_email: string; p_token_hash: string };
@@ -546,6 +547,14 @@ describe('download start (GET /api/download?token=)', () => {
     expect(location.searchParams.has('ref')).toBe(false);
     expect(location.searchParams.get('token')).toBe('sig1');
     expect(state.releases[0].download_starts).toBe(1);
+  });
+
+  it('leaves the code off when the save stored nothing', async () => {
+    const { deps, token, state } = await signedUp();
+    state.refStoresNothing = true;
+    const res = await handleDownload(get(`/api/download?token=${token}`), deps);
+    expect(res.status).toBe(302);
+    expect(new URL(res.headers.get('location')!).searchParams.has('ref')).toBe(false);
   });
 
   it('stores no code when no file is served', async () => {
