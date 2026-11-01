@@ -127,14 +127,20 @@ export function rateLimitKey(request: Request, env: Env): string {
 export const LIMITS = {
   signup: { limit: 5, windowSeconds: 60 * 60 },
   feedback: { limit: 10, windowSeconds: 60 * 60 },
+  // The app's opt-in setup progress (Decision 38): no Turnstile, so only this limit, and each
+  // install sends 3 events at most.
+  telemetry: { limit: 30, windowSeconds: 60 * 60 },
 } as const;
-export type Form = keyof typeof LIMITS;
+/** A rate-limit bucket: the two forms, and the app's setup progress. */
+export type Bucket = keyof typeof LIMITS;
+/** The buckets behind Turnstile. */
+export type Form = Exclude<Bucket, 'telemetry'>;
 
 /** What a handler needs to run the guard. The api/ files wire in the real ones. */
 export interface Guard {
   db: {
     /** 0 within the limit, or the seconds until the window ends (supabase/migrations/*_rate_limits.sql). */
-    rpc(fn: 'hit_rate_limit', args: { p_bucket: Form; p_ip_hash: string; p_limit: number; p_window_seconds: number }): Result<number>;
+    rpc(fn: 'hit_rate_limit', args: { p_bucket: Bucket; p_ip_hash: string; p_limit: number; p_window_seconds: number }): Result<number>;
   };
   verify: Verify;
   /** The client IP, passed on to Turnstile. Never stored. */
@@ -153,10 +159,14 @@ export async function guard(form: Form, token: unknown, deps: Guard): Promise<Re
   const verdict = await deps.verify(token, deps.ip);
   if (verdict === 'failed') return json({ error: 'bot_check' }, 403);
   if (verdict === 'unavailable') return json({ error: 'unavailable' }, 503);
+  return rateLimit(form, deps);
+}
 
-  const { limit, windowSeconds } = LIMITS[form];
+/** The rate limit alone, for one request to `form`: a refusal to send back, or null to go ahead. */
+export async function rateLimit(bucket: Bucket, deps: Pick<Guard, 'db' | 'rateKey'>): Promise<Response | null> {
+  const { limit, windowSeconds } = LIMITS[bucket];
   const { data, error } = await deps.db.rpc('hit_rate_limit', {
-    p_bucket: form,
+    p_bucket: bucket,
     p_ip_hash: deps.rateKey,
     p_limit: limit,
     p_window_seconds: windowSeconds,
