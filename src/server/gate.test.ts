@@ -3,6 +3,7 @@ import { handleDownload, handleRelease, handleSignup, type Email, type GateDb } 
 import { handleUnsubscribe } from './unsubscribe.ts';
 import { KEY, PASS, WAIT, fakeRateLimit, fakeTurnstile } from './bot-check.fakes.ts';
 import { LIMITS } from './bot-check.ts';
+import { hashToken } from './tokens.ts';
 
 const SITE = 'https://preview.example.vercel.app';
 const DAY = 24 * 60 * 60 * 1000;
@@ -17,8 +18,9 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
   const tokens = new Map<string, { signupId: number; expiresAt: number }>();
   const unsubscribeTokens = new Map<string, number>();
   const signed: Array<{ path: string; expiresIn: number; download: unknown }> = [];
+  const refs = new Map<string, number>();
   const limits = fakeRateLimit();
-  const state = { signups, tokens, unsubscribeTokens, releases, signed, limits, now: Date.now(), fail: false };
+  const state = { signups, tokens, unsubscribeTokens, releases, signed, refs, limits, now: Date.now(), fail: false, failRefs: false };
   const db: GateDb = {
     async rpc(fn: string, args: Record<string, unknown>) {
       if (state.fail) return { data: null, error: { message: 'connection reset' } };
@@ -51,6 +53,15 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
         if (!latest) return { data: [{ status: 'no_release', ...none }], error: null };
         if (p_count) latest.download_starts++;
         return { data: [{ status: 'ok', version: latest.version, filename: latest.filename }], error: null };
+      }
+      if (fn === 'save_download_ref') {
+        // Like the download-refs migration: the code's format is checked, and it maps to the token's signup.
+        const { p_ref, p_token_hash } = args as { p_ref: string; p_token_hash: string };
+        if (state.failRefs) return { data: null, error: { message: 'connection reset' } };
+        if (!/^[A-Za-z0-9_-]{22}$/.test(p_ref) || refs.has(p_ref)) return { data: null, error: { message: 'check constraint' } };
+        const t = tokens.get(p_token_hash);
+        if (t) refs.set(p_ref, t.signupId);
+        return { data: null, error: null };
       }
       if (fn === 'issue_unsubscribe_token') {
         const { p_email, p_token_hash } = args as { p_email: string; p_token_hash: string };
@@ -501,6 +512,48 @@ describe('download start (GET /api/download?token=)', () => {
     expect(res.status).toBe(410);
     expect(state.signed).toEqual([]);
     expect(state.releases[0].download_starts).toBe(0);
+  });
+
+  // Decision 39: the browser records the final URL on the DMG, so the app can read the code later.
+  it('appends a per-download code to the signed URL and stores it against the signup', async () => {
+    const { deps, token, state } = await signedUp();
+    const location = new URL((await handleDownload(get(`/api/download?token=${token}`), deps)).headers.get('location')!);
+    const ref = location.searchParams.get('ref')!;
+    expect(ref).toMatch(/^[A-Za-z0-9_-]{22}$/);
+    expect(location.searchParams.get('token')).toBe('sig1');
+    expect([...state.refs]).toEqual([[ref, 1]]);
+  });
+
+  it('gives each download start its own code, never the token or its hash', async () => {
+    const { deps, token, state } = await signedUp();
+    const refOf = async () => new URL((await handleDownload(get(`/api/download?token=${token}`), deps)).headers.get('location')!).searchParams.get('ref');
+    const a = await refOf();
+    const b = await refOf();
+    expect(a).not.toBe(b);
+    expect(state.refs.size).toBe(2);
+    for (const ref of [a!, b!]) {
+      expect(token).not.toContain(ref);
+      expect(hashToken(token)).not.toContain(ref);
+    }
+  });
+
+  it('still starts the download, without a code, when the code cannot be stored', async () => {
+    const { deps, token, state } = await signedUp();
+    state.failRefs = true;
+    const res = await handleDownload(get(`/api/download?token=${token}`), deps);
+    expect(res.status).toBe(302);
+    const location = new URL(res.headers.get('location')!);
+    expect(location.searchParams.has('ref')).toBe(false);
+    expect(location.searchParams.get('token')).toBe('sig1');
+    expect(state.releases[0].download_starts).toBe(1);
+  });
+
+  it('stores no code when no file is served', async () => {
+    const { deps, token, state } = await signedUp();
+    state.now += 7 * DAY + 1;
+    await handleDownload(get(`/api/download?token=${token}`), deps);
+    await handleDownload(get(`/api/download?token=${'A'.repeat(43)}`), deps);
+    expect(state.refs.size).toBe(0);
   });
 
   it('still works just before day 7 ends: the token is all it needs, on any Mac', async () => {

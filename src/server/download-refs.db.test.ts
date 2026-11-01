@@ -8,7 +8,8 @@
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 import { afterAll, describe, expect, it } from 'vitest';
-import { BUCKET } from './gate.ts';
+import { BUCKET, handleDownload, type GateDb } from './gate.ts';
+import { hashToken, newToken } from './tokens.ts';
 
 const { DB_TESTS, SUPABASE_URL, SUPABASE_SECRET_KEY } = process.env;
 const run = DB_TESTS === 'dev' && !!SUPABASE_URL && !!SUPABASE_SECRET_KEY;
@@ -141,5 +142,30 @@ describe.skipIf(!run)('download refs on the dev database', () => {
     expect([200, 206]).toContain(res.status);
     const bytes = new Uint8Array(await res.arrayBuffer());
     expect(bytes.length).toBeGreaterThan(0);
+  });
+
+  it('serves a download end to end: the redirect carries a stored code, and the file still downloads', async () => {
+    const email = `${prefix}-e2e@example.com`;
+    emails.push(email);
+    const token = newToken();
+    expect((await db.rpc('request_download', { p_email: email, p_filling: null, p_news: false, p_lang: 'en', p_token_hash: hashToken(token) })).error).toBeNull();
+    const { data: s } = await db.from('signups').select('id').eq('email', email).single();
+    const { data: before } = await db.from('releases').select('id, download_starts').eq('is_latest', true).single();
+    try {
+      const deps = { db: db as unknown as GateDb, send: async () => {}, siteUrl: 'https://dev.example' };
+      const res = await handleDownload(new Request(`https://dev.example/api/download?token=${token}`), deps);
+      expect(res.status).toBe(302);
+      const location = res.headers.get('location')!;
+      const ref = new URL(location).searchParams.get('ref')!;
+      expect(ref).toMatch(/^[A-Za-z0-9_-]{22}$/);
+      const { data } = await db.from('download_refs').select('signup_id').eq('ref', ref).single();
+      expect(data).toEqual({ signup_id: s!.id });
+      const file = await fetch(location, { headers: { range: 'bytes=0-15' } });
+      expect([200, 206]).toContain(file.status);
+      await file.arrayBuffer();
+    } finally {
+      // Leave dev's download count as it was.
+      await db.from('releases').update({ download_starts: before!.download_starts }).eq('id', before!.id);
+    }
   });
 });
