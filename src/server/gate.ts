@@ -5,7 +5,7 @@ import { guard, type Guard } from './bot-check.js';
 import type { Lang } from '../i18n.ts';
 import { EMAIL, json, type Result } from './shared.js';
 import { downloadEmail, pagesFor } from './download-email.js';
-import { TOKEN, hashToken, newToken } from './tokens.js';
+import { TOKEN, hashToken, newRef, newToken } from './tokens.js';
 import { unsubscribeFor } from './unsubscribe.js';
 
 export const BUCKET = 'releases';
@@ -19,6 +19,8 @@ export type TokenLookup = { status: 'ok' | 'unknown' | 'expired' | 'no_release';
 export interface GateDb {
   rpc(fn: 'request_download', args: { p_email: string; p_filling: string | null; p_news: boolean; p_lang: Lang; p_token_hash: string }): Result<unknown>;
   rpc(fn: 'download_for_token', args: { p_token_hash: string; p_count: boolean }): Result<TokenLookup[]>;
+  /** true when stored; false when the token's row is gone. */
+  rpc(fn: 'save_download_ref', args: { p_ref: string; p_token_hash: string }): Result<boolean>;
   rpc(fn: 'issue_unsubscribe_token', args: { p_email: string; p_token_hash: string }): Result<unknown>;
   /** true when the token was known (and its address is now unsubscribed). */
   rpc(fn: 'unsubscribe', args: { p_token_hash: string }): Result<boolean>;
@@ -102,23 +104,27 @@ const STATUS = { unknown: 404, expired: 410, no_release: 503 } as const;
 async function lookup(request: Request, db: GateDb, count: boolean) {
   const token = new URL(request.url).searchParams.get('token') ?? '';
   if (!TOKEN.test(token)) return { error: 'unknown', status: 404 } as const;
-  const { data, error } = await db.rpc('download_for_token', { p_token_hash: hashToken(token), p_count: count });
+  const tokenHash = hashToken(token);
+  const { data, error } = await db.rpc('download_for_token', { p_token_hash: tokenHash, p_count: count });
   const row = data?.[0];
   if (error || !row) return { error: 'unavailable', status: 503 } as const;
   if (row.status !== 'ok') return { error: row.status, status: STATUS[row.status] } as const;
-  return { version: row.version!, filename: row.filename! };
+  return { version: row.version!, filename: row.filename!, tokenHash };
 }
 
 /** GET /api/release?token=: the version and filename the token page shows. Counts nothing. */
 export async function handleRelease(request: Request, deps: GateDeps): Promise<Response> {
   const found = await lookup(request, deps.db, false);
   if ('error' in found) return json({ error: found.error }, found.status);
-  return json(found);
+  return json({ version: found.version, filename: found.filename });
 }
 
 /**
  * GET /api/download?token=: counts a download start and redirects to a fresh 60-second signed URL
- * for the latest DMG. The token page and its retry link both go through here.
+ * for the latest DMG. The token page and its retry link both go through here. Each start also gets a
+ * fresh per-download code, stored against the signup and appended as &ref=, so the browser records
+ * it on the DMG for the app to read (Decision 39). A download never fails over the code: if it can't
+ * be stored, the URL goes without it.
  */
 export async function handleDownload(request: Request, deps: GateDeps): Promise<Response> {
   const found = await lookup(request, deps.db, true);
@@ -127,5 +133,14 @@ export async function handleDownload(request: Request, deps: GateDeps): Promise<
     .from(BUCKET)
     .createSignedUrl(found.filename, SIGNED_URL_SECONDS, { download: found.filename });
   if (error || !data) return json({ error: 'unavailable' }, 503);
-  return new Response(null, { status: 302, headers: { location: data.signedUrl, 'cache-control': 'no-store' } });
+  const ref = newRef();
+  let location = data.signedUrl;
+  try {
+    const stored = await deps.db.rpc('save_download_ref', { p_ref: ref, p_token_hash: found.tokenHash });
+    if (stored.error) console.error('download ref not stored:', stored.error.message);
+    else if (stored.data === true) location += `${location.includes('?') ? '&' : '?'}ref=${ref}`;
+  } catch (e) {
+    console.error('download ref not stored:', (e as Error).message);
+  }
+  return new Response(null, { status: 302, headers: { location, 'cache-control': 'no-store' } });
 }
