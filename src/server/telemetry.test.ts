@@ -3,23 +3,28 @@ import { handleTelemetry, type TelemetryDb } from './telemetry.ts';
 import { KEY, WAIT, fakeRateLimit } from './bot-check.fakes.ts';
 import { LIMITS } from './bot-check.ts';
 
-type Row = { install_id: string; event: string; app_version: string; macos_version: string };
+type Row = { install_id: string; event: string; app_version: string; macos_version: string; signup_id?: number | null };
 
 // An in-memory stand-in for the slice of supabase-js the telemetry endpoint uses, behaving like the
 // telemetry migration: save_telemetry_event inserts once per install ID and event and answers
-// whether it inserted.
-function fakeSupabase() {
+// whether it inserted; a known download code (Decision 39) links the row to its signup, any other
+// code saves it unlinked.
+function fakeSupabase(refs: Record<string, number> = {}) {
   const rows: Row[] = [];
+  const calls: Array<Record<string, unknown>> = [];
   const limits = fakeRateLimit();
-  const state = { rows, limits, fail: false };
+  const state = { rows, calls, limits, fail: false };
   const db: TelemetryDb = {
     async rpc(fn: string, args: Record<string, unknown>) {
       if (state.fail) return { data: null, error: { message: 'connection reset' } };
       if (fn === 'hit_rate_limit') return limits.rpc(args as Parameters<typeof limits.rpc>[0]);
       if (fn === 'save_telemetry_event') {
-        const a = args as { p_install_id: string; p_event: string; p_app_version: string; p_macos_version: string };
+        calls.push(args);
+        const a = args as { p_install_id: string; p_event: string; p_app_version: string; p_macos_version: string; p_download_ref?: string | null };
         if (rows.some((r) => r.install_id === a.p_install_id && r.event === a.p_event)) return { data: false, error: null };
-        rows.push({ install_id: a.p_install_id, event: a.p_event, app_version: a.p_app_version, macos_version: a.p_macos_version });
+        const row: Row = { install_id: a.p_install_id, event: a.p_event, app_version: a.p_app_version, macos_version: a.p_macos_version };
+        if (a.p_download_ref) row.signup_id = refs[a.p_download_ref] ?? null;
+        rows.push(row);
         return { data: true, error: null };
       }
       throw new Error(`unexpected rpc ${fn}`);
@@ -57,12 +62,41 @@ describe('POST /api/telemetry', () => {
     ['a value of the wrong type', { ...valid, appVersion: 96 }],
     ['an array', [valid]],
     ['null', null],
+    ['a download code that is too short', { ...valid, downloadRef: 'abc' }],
+    ['a download code that is too long', { ...valid, downloadRef: 'A'.repeat(23) }],
+    ['a download code with other characters', { ...valid, downloadRef: `${'A'.repeat(21)}/` }],
+    ['a download code that is a token', { ...valid, downloadRef: 'A'.repeat(43) }],
+    ['a download code of the wrong type', { ...valid, downloadRef: 22 }],
+    ['a null download code', { ...valid, downloadRef: null }],
   ])('refuses %s with 400 and saves nothing', async (_, body) => {
     const { db, state } = fakeSupabase();
     const res = await handleTelemetry(post(body), { db, rateKey: KEY });
     expect(res.status).toBe(400);
     expect(await res.json()).toEqual({ error: 'invalid' });
     expect(state.rows).toEqual([]);
+  });
+
+  // Decision 39: the code the download URL carried links the event to its signup.
+  it('passes an optional download code through, and links the event when the code is known', async () => {
+    const ref = 'Ab3_-xYz0123456789abcd';
+    const { db, state } = fakeSupabase({ [ref]: 7 });
+    const res = await handleTelemetry(post({ ...valid, downloadRef: ref }), { db, rateKey: KEY });
+    expect(res.status).toBe(204);
+    expect(state.calls[0].p_download_ref).toBe(ref);
+    expect(state.rows[0].signup_id).toBe(7);
+  });
+
+  it('answers 204 to an unknown download code, and saves the event unlinked', async () => {
+    const { db, state } = fakeSupabase();
+    const res = await handleTelemetry(post({ ...valid, downloadRef: 'Ab3_-xYz0123456789abcd' }), { db, rateKey: KEY });
+    expect(res.status).toBe(204);
+    expect(state.rows[0].signup_id).toBeNull();
+  });
+
+  it('sends no download code when the body has none', async () => {
+    const { db, state } = fakeSupabase();
+    await handleTelemetry(post(valid), { db, rateKey: KEY });
+    expect(state.calls[0].p_download_ref).toBeNull();
   });
 
   it('refuses a body that is not JSON', async () => {

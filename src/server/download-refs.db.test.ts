@@ -9,6 +9,7 @@ import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 import { afterAll, describe, expect, it } from 'vitest';
 import { BUCKET, handleDownload, type GateDb } from './gate.ts';
+import { handleTelemetry, type TelemetryDb } from './telemetry.ts';
 import { hashToken, newToken } from './tokens.ts';
 
 const { DB_TESTS, SUPABASE_URL, SUPABASE_SECRET_KEY } = process.env;
@@ -19,6 +20,7 @@ const db = run ? createClient(SUPABASE_URL!, SUPABASE_SECRET_KEY!, { auth: { per
 const prefix = `download-refs-db-test+${Date.now()}-${randomBytes(3).toString('hex')}`;
 const emails: string[] = [];
 const installs: string[] = [];
+const rateKeys: string[] = [];
 
 const newRef = () => randomBytes(16).toString('base64url');
 const newInstall = () => {
@@ -59,6 +61,7 @@ async function linkedSignup(install: string) {
 afterAll(async () => {
   if (run && installs.length) await db.from('telemetry_events').delete().in('install_id', installs);
   if (run && emails.length) await db.from('signups').delete().in('email', emails);
+  if (run && rateKeys.length) await db.from('rate_limits').delete().in('ip_hash', rateKeys);
 });
 
 describe.skipIf(!run)('download refs on the dev database', () => {
@@ -167,5 +170,24 @@ describe.skipIf(!run)('download refs on the dev database', () => {
       // Leave dev's download count as it was.
       await db.from('releases').update({ download_starts: before!.download_starts }).eq('id', before!.id);
     }
+  });
+
+  it('links an app event sent to the endpoint with a code, and refuses a malformed code', async () => {
+    const s = await signup('endpoint');
+    const ref = newRef();
+    await saveRef(ref, s.tokenHash);
+    const key = createHash('sha256').update(randomBytes(32)).digest('hex');
+    rateKeys.push(key);
+    const deps = { db: db as unknown as TelemetryDb, rateKey: key };
+    const install = newInstall();
+    const send = (body: unknown) =>
+      handleTelemetry(new Request('https://dev.example/api/telemetry', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }), deps);
+    const event = { event: 'first_launch', installId: install, appVersion: '0.9.6', macosVersion: '26.1' };
+    expect((await send({ ...event, downloadRef: 'not-a-code' })).status).toBe(400);
+    expect((await send({ ...event, downloadRef: ref })).status).toBe(204);
+    expect(await linkedSignup(install)).toBe(s.id);
+    const other = newInstall();
+    expect((await send({ ...event, installId: other, downloadRef: newRef() })).status).toBe(204);
+    expect(await linkedSignup(other)).toBeNull();
   });
 });
