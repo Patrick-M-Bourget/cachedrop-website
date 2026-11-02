@@ -24,6 +24,10 @@ export const pages: PageUnderTest[] = [
   { path: '/download/', head: 'download/index.html' },
   // The token page, which vercel.json serves at /download/<token>/. Without a token it renders the handoff as is.
   { path: '/download/link/', handoff: 'download/index.html', screenshots: 'download' },
+  // The draft sale pages (Decision 43): no handoff originals.
+  { path: '/terms-of-sale/' },
+  { path: '/refund-policy/' },
+  { path: '/license-agreement/' },
   // French (Decision 5). No handoff originals: token, modal, footer, FAQ and analytics tests.
   { path: '/fr/', lang: 'fr' },
   { path: '/fr/clear-mac-developer-caches/', lang: 'fr' },
@@ -32,6 +36,9 @@ export const pages: PageUnderTest[] = [
   { path: '/fr/unsubscribe/', lang: 'fr' },
   { path: '/fr/download/', lang: 'fr' },
   { path: '/fr/download/link/', lang: 'fr' },
+  { path: '/fr/terms-of-sale/', lang: 'fr' },
+  { path: '/fr/refund-policy/', lang: 'fr' },
+  { path: '/fr/license-agreement/', lang: 'fr' },
 ];
 
 /** Each English page and its French twin: where each is built and its canonical address. */
@@ -52,6 +59,10 @@ export const pairs: Pair[] = [
   pair('/download/', false),
   pair('/download/link/', false, '/download/'),
   pair('/unsubscribe/', false),
+  // Drafts (Decision 43): kept out of the sitemap until the owner approves them.
+  pair('/terms-of-sale/', false),
+  pair('/refund-policy/', false),
+  pair('/license-agreement/', false),
 ];
 
 /** The shared interface's accessible names in each language, as the per-page tests look them up. */

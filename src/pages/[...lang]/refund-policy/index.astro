@@ -1,0 +1,116 @@
+---
+// Refund policy (Decision 43; mac-cleaner Decisions 135 and 136): a DRAFT for the owner's approval,
+// not legal advice. Built at /refund-policy/ and /fr/refund-policy/.
+import Legal from '../../../layouts/Legal.astro';
+import { HELLO, link, mail, type LegalSection } from '../../../components/legal';
+import { langOf, langPaths } from '../../../i18n';
+
+export const getStaticPaths = langPaths;
+
+const path = '/refund-policy/';
+const lang = langOf(Astro.url);
+const MAIL = mail(HELLO);
+
+// MERCHANT OF RECORD: the `link` section assumes Stripe Managed Payments. Buyers can ask Link
+// support for a refund, and Stripe may refund within 60 days of purchase whatever this policy says
+// (Stripe Managed Payments Terms §3.3; support.link.com/questions/sold-through-link-refunds).
+// Drop the section if CacheDrop sells directly instead.
+const LINK_SUPPORT = 'https://support.link.com/topics/sold-through-link';
+
+const copy = {
+  en: {
+    title: 'Refund Policy | CacheDrop',
+    description: 'A full refund within 30 days of buying CacheDrop, no questions asked: how to ask, and what happens to the license.',
+    crumb: 'Refund policy',
+    lede: 'A full refund within 30 days, no questions asked.',
+    updated: 'Updated November 2026',
+    sections: [
+      {
+        id: 'window',
+        title: '30 days, no questions asked',
+        body: [
+          'If CacheDrop isn’t right for you, ask for a refund within 30 days of buying it. You get the whole amount back, tax included, and you don’t have to give a reason.',
+        ],
+      },
+      {
+        id: 'how',
+        title: 'How to ask',
+        body: [
+          `Write to ${MAIL} from the address you bought with, or tell us that address. That’s all we need.`,
+          'The refund goes back to the way you paid. Your bank may take a few business days to show it.',
+        ],
+      },
+      {
+        id: 'link',
+        title: 'Asking Link instead',
+        body: [
+          `CacheDrop is sold through Link, Stripe’s checkout service, so you can also ask ${link(LINK_SUPPORT, 'Link support')} for a refund. Link decides those requests under its own policy, for example if your key never arrived, and can refund within 60 days of purchase.`,
+        ],
+      },
+      {
+        id: 'license',
+        title: 'What happens to the license',
+        body: [
+          'A refunded license is revoked. So is one whose payment is disputed with the bank (a chargeback).',
+          'Revoking works without any server: the license’s ID goes on a list built into the next CacheDrop release. Once you install that release, the key stops working and CacheDrop goes back to what it does without a license. Your files aren’t touched.',
+        ],
+      },
+      {
+        id: 'after',
+        title: 'After 30 days',
+        body: [
+          `Write to ${MAIL} anyway if something is wrong. Refunds after 30 days are up to us, except where the law gives you a right to one.`,
+        ],
+      },
+    ],
+  },
+  fr: {
+    title: 'Politique de remboursement | CacheDrop',
+    description: 'Un remboursement complet dans les 30 jours suivant l’achat de CacheDrop, sans avoir à vous justifier : comment le demander, et ce qu’il advient de la licence.',
+    crumb: 'Politique de remboursement',
+    lede: 'Un remboursement complet dans les 30 jours, sans avoir à vous justifier.',
+    updated: 'Mis à jour en novembre 2026',
+    sections: [
+      {
+        id: 'window',
+        title: '30 jours, sans justification',
+        body: [
+          'Si CacheDrop ne vous convient pas, demandez un remboursement dans les 30 jours suivant l’achat. Vous récupérez le montant complet, taxes comprises, et vous n’avez pas à donner de raison.',
+        ],
+      },
+      {
+        id: 'how',
+        title: 'Comment le demander',
+        body: [
+          `Écrivez à ${MAIL} à partir de l’adresse utilisée pour l’achat, ou indiquez-nous cette adresse. C’est tout ce qu’il nous faut.`,
+          'Le remboursement est versé au mode de paiement utilisé. Votre banque peut prendre quelques jours ouvrables pour l’afficher.',
+        ],
+      },
+      {
+        id: 'link',
+        title: 'Passer plutôt par Link',
+        body: [
+          `CacheDrop est vendu par l’intermédiaire de Link, le service de paiement de Stripe. Vous pouvez donc aussi demander un remboursement au ${link(LINK_SUPPORT, 'soutien de Link')}. Link traite ces demandes selon sa propre politique, par exemple si votre clé n’est jamais arrivée, et peut rembourser dans les 60 jours suivant l’achat.`,
+        ],
+      },
+      {
+        id: 'license',
+        title: 'Ce qu’il advient de la licence',
+        body: [
+          'Une licence remboursée est révoquée. Il en va de même si le paiement est contesté auprès de la banque (rétrofacturation).',
+          'La révocation se fait sans serveur : l’identifiant de la licence est ajouté à une liste intégrée à la version suivante de CacheDrop. Une fois cette version installée, la clé cesse de fonctionner et CacheDrop revient à ce qu’il fait sans licence. Vos fichiers ne sont pas touchés.',
+        ],
+      },
+      {
+        id: 'after',
+        title: 'Après 30 jours',
+        body: [
+          `Écrivez quand même à ${MAIL} si quelque chose ne va pas. Les remboursements après 30 jours sont à notre discrétion, sauf si la loi vous y donne droit.`,
+        ],
+      },
+    ],
+  },
+} satisfies Record<string, { sections: LegalSection[] } & Record<string, unknown>>;
+const t = copy[lang];
+---
+<Legal title={t.title} description={t.description} path={path} crumb={t.crumb} lede={t.lede} updated={t.updated} sections={t.sections} />
