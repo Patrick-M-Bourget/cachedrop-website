@@ -7,7 +7,7 @@
 // The logic lives in Web Crypto/fetch modules that Vitest tests too; this file only wires them up.
 import { handleResend, handleStripeWebhook, json } from './handlers.ts';
 import { importPrivateKey } from './key.ts';
-import { clientIp, corsHeaders, ipHash, resendSender, restDb, turnstile } from './services.ts';
+import { clientIp, corsHeaders, dbKey, ipHash, resendSender, restDb, turnstile } from './services.ts';
 
 interface DenoRuntime {
   env: { get(name: string): string | undefined };
@@ -23,7 +23,7 @@ const signingKey = () => (privateKey ??= importPrivateKey(env('LICENSE_PRIVATE_K
   throw e;
 }));
 
-const db = () => restDb(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'));
+const db = () => restDb(env('SUPABASE_URL'), dbKey(env));
 
 async function route(request: Request): Promise<Response> {
   const path = new URL(request.url).pathname.replace(/\/+$/, '');
@@ -47,8 +47,8 @@ async function route(request: Request): Promise<Response> {
       privateKey: signingKey,
       verify: turnstile(env('TURNSTILE_SECRET_KEY')),
       ip,
-      // The pepper is the service role key, which only the function holds (as on the site).
-      rateKey: await ipHash(ip ?? 'unknown', env('SUPABASE_SERVICE_ROLE_KEY')),
+      // The pepper is the database key, which only the function holds (as on the site).
+      rateKey: await ipHash(ip ?? 'unknown', dbKey(env)),
     });
     for (const [name, value] of Object.entries(cors)) res.headers.set(name, value);
     return res;
