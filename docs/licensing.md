@@ -32,7 +32,8 @@ npx supabase secrets set --project-ref <project-ref> \
   LICENSE_PRIVATE_KEY=<64 hex> \
   STRIPE_WEBHOOK_SECRET=<whsec_… from step 5> \
   RESEND_API_KEY=<re_…> \
-  TURNSTILE_SECRET_KEY=<the site's Turnstile secret>
+  TURNSTILE_SECRET_KEY=<the site's Turnstile secret> \
+  LICENSE_ADMIN_SECRET=<a new random secret, see "Free licenses">
 ```
 
 - `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided to every Edge Function by Supabase.
@@ -60,3 +61,22 @@ In Stripe (test mode first): Developers → Webhooks → Add endpoint.
 ## Resend my key
 
 `POST https://<project-ref>.supabase.co/functions/v1/license/resend` with JSON `{ "email", "lang": "en" | "fr", "turnstile" }` emails the keys bought with that address again. It needs a Turnstile token, so it is meant for a form on cachedrop.io; that form is a follow-up. Until it ships, a key can go out again by hand: clear `emailed_at` on the buyer's row in `public.licenses`, then resend the purchase's event from Stripe's dashboard; the function emails the same key. This works only more than 24 hours after the first email, since Resend drops a repeat of the same send within 24 hours, and only as far back as Stripe lets you resend an event.
+
+## Free licenses
+
+Decision 45. To give someone a license without Stripe, run on your Mac:
+
+```sh
+scripts/comp-license.sh prod friend@example.com --note "beta tester"            # English email
+scripts/comp-license.sh prod ami@example.com --lang fr --note "beta tester"     # French email
+```
+
+It asks the function's `/comp` route to save a license (`source = 'comp'`, no Stripe IDs, your note) and emails the key in the gift wording ("A CacheDrop license, on us", no refund line). It prints the license ID. The recipient can use "Resend my key" like a buyer, and a free license is revoked like any other. The note is up to 200 characters and only you see it; keep it to why you gave it, not personal details.
+
+Setup, once per project (`dev` first):
+
+1. Apply the migration (`npm run db:push -- dev`, then `prod`) and redeploy the function (step 3).
+2. Make a secret: `node -e 'console.log(require("crypto").randomBytes(32).toString("hex"))'`. Set it on the function (`npx supabase secrets set --project-ref <project-ref> LICENSE_ADMIN_SECRET=<it>`) and keep it in your password manager. Each project gets its own. The route answers `503` while it is unset or shorter than 32 characters.
+3. For `dev`, put `LICENSE_ADMIN_SECRET=<dev secret>` in `.env.local`. For `prod`, the script reads it only from your shell and asks you to type `prod`: ` LICENSE_ADMIN_SECRET=<prod secret> scripts/comp-license.sh prod …` (the leading space keeps it out of zsh history when `HIST_IGNORE_SPACE` is on).
+
+If the email fails, the script says so and prints the command to run again with `--id <license ID>`: that sends the same license instead of making a second one. Running a successful command again with its `--id` sends nothing. To see who got free licenses, run `select email, note, created_at from public.licenses where source = 'comp' order by created_at;` in the SQL editor.
