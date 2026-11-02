@@ -1,5 +1,5 @@
-// The license Edge Function's two requests (Decision 40): Stripe's webhook, which issues and emails
-// a key after each purchase, and "resend my key". Supabase, Resend, Turnstile and the key come in as
+// The license Edge Function's requests (Decision 40): Stripe's webhook, which issues and emails a
+// key after each purchase, "resend my key", and the owner's free licenses (Decision 45). Supabase, Resend, Turnstile and the key come in as
 // dependencies, so Vitest stands in for them at the boundary (Decision 27); index.ts wires in the
 // real ones. Web Crypto and fetch only, so the same file runs in Deno and in Node.
 import { licenseEmail, type Email, type Lang } from './email.ts';
@@ -17,6 +17,8 @@ export interface LicenseRow {
   email: string;
   lang: Lang;
   emailed_at: string | null;
+  /** 'comp' for a free license (Decision 45). issue_license leaves it out: its rows are bought. */
+  source?: 'stripe' | 'comp';
 }
 
 /** The SQL functions supabase/migrations/*_licenses.sql and *_rate_limits.sql add. */
@@ -33,6 +35,10 @@ export interface LicenseDb {
       p_macs: number;
       p_issue_day: number;
     },
+  ): Result<LicenseRow[]>;
+  rpc(
+    fn: 'comp_license',
+    args: { p_id: string; p_email: string; p_lang: Lang; p_note: string | null; p_edition: 'standard'; p_macs: number; p_issue_day: number },
   ): Result<LicenseRow[]>;
   rpc(fn: 'mark_license_emailed', args: { p_id: string }): Result<boolean>;
   rpc(fn: 'licenses_for_email', args: { p_email: string }): Result<LicenseRow[]>;
@@ -51,6 +57,9 @@ export const RESEND_LIMIT = { limit: 5, windowSeconds: 60 * 60 };
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SESSION = /^cs_(test|live)_[A-Za-z0-9]+$/;
 const CUSTOMER = /^cus_[A-Za-z0-9]+$/;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+/** The shortest LICENSE_ADMIN_SECRET the /comp route accepts. */
+export const ADMIN_SECRET_MIN = 32;
 /** The Checkout events that can complete a payment: at once, or later for delayed methods. */
 const PAID_EVENTS = ['checkout.session.completed', 'checkout.session.async_payment_succeeded'];
 
@@ -92,7 +101,27 @@ export function sessionLang(session: CheckoutSession): Lang {
 /** Signs the key from a stored row and emails it. Throws when Resend doesn't accept it. */
 async function emailKey(row: LicenseRow, lang: Lang, deps: Pick<WebhookDeps, 'send' | 'privateKey'>, idempotencyKey?: string) {
   const key = await signLicenseKey(await deps.privateKey(), { id: row.id, macs: row.macs, issueDay: row.issue_day });
-  await deps.send(licenseEmail(row.email, lang, key, row.id), idempotencyKey);
+  const kind = row.source === 'comp' ? 'gift' : 'bought';
+  await deps.send(licenseEmail(row.email, lang, key, row.id, undefined, kind), idempotencyKey);
+}
+
+/** Emails a stored row's key once and records it; the response the webhook and /comp both give. */
+async function sendAndMark(row: LicenseRow, deps: Pick<WebhookDeps, 'db' | 'send' | 'privateKey'>, extra: Record<string, unknown> = {}) {
+  if (row.emailed_at) return json({ ok: true, repeat: true, ...extra });
+  try {
+    // Resend drops a second send with the same key within 24 hours, so a retry after the email went
+    // out but before it was marked doesn't send it twice.
+    await emailKey(row, row.lang, deps, `license-${row.id}`);
+  } catch (e) {
+    console.error('license email failed:', (e as Error).message);
+    return json({ error: 'email_failed', ...extra }, 502);
+  }
+  const marked = await deps.db.rpc('mark_license_emailed', { p_id: row.id });
+  if (marked.error || marked.data !== true) {
+    console.error('mark_license_emailed failed:', marked.error?.message ?? 'no license');
+    return json({ error: 'unavailable', ...extra }, 503);
+  }
+  return json({ ok: true, ...extra });
 }
 
 /**
@@ -151,22 +180,70 @@ export async function handleStripeWebhook(request: Request, deps: WebhookDeps): 
     console.error('issue_license failed:', issued.error?.message ?? 'no row');
     return json({ error: 'unavailable' }, 503);
   }
-  if (row.emailed_at) return json({ ok: true, repeat: true });
+  return sendAndMark(row, deps);
+}
 
-  try {
-    // Resend drops a second send with the same key within 24 hours, so a retry after the email went
-    // out but before it was marked doesn't send it twice.
-    await emailKey(row, row.lang, deps, `license-${row.id}`);
-  } catch (e) {
-    console.error('license email failed:', (e as Error).message);
-    return json({ error: 'email_failed' }, 502);
-  }
-  const marked = await deps.db.rpc('mark_license_emailed', { p_id: row.id });
-  if (marked.error || marked.data !== true) {
-    console.error('mark_license_emailed failed:', marked.error?.message ?? 'no license');
+export interface CompDeps {
+  db: LicenseDb;
+  send: Send;
+  privateKey: () => Promise<CryptoKey>;
+  /** LICENSE_ADMIN_SECRET; the route answers 503 while it is unset or too short. */
+  adminSecret: string;
+  now: () => Date;
+}
+
+/** Compares two strings in time that doesn't depend on where they differ. */
+async function sameSecret(a: string, b: string): Promise<boolean> {
+  const digest = async (s: string) => new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)));
+  const [x, y] = await Promise.all([digest(a), digest(b)]);
+  let diff = 0;
+  for (let i = 0; i < x.length; i++) diff |= x[i] ^ y[i];
+  return diff === 0;
+}
+
+/**
+ * POST from the owner's scripts/comp-license.sh with `Authorization: Bearer <LICENSE_ADMIN_SECRET>`
+ * and JSON `{ id, email, lang?, note? }` (Decision 45): saves a free license under the script's
+ * UUID and emails its key in the gift wording. The same request again sends nothing more once the
+ * email went out, and sends the same key if it hadn't, so a failed run is retried with its ID.
+ */
+export async function handleComp(request: Request, deps: CompDeps): Promise<Response> {
+  if (request.method !== 'POST') return json({ error: 'method_not_allowed' }, 405, { allow: 'POST' });
+  if (deps.adminSecret.length < ADMIN_SECRET_MIN) {
+    console.error('LICENSE_ADMIN_SECRET is not set');
     return json({ error: 'unavailable' }, 503);
   }
-  return json({ ok: true });
+  const auth = request.headers.get('authorization') ?? '';
+  if (!(await sameSecret(auth, `Bearer ${deps.adminSecret}`))) return json({ error: 'unauthorized' }, 401);
+
+  let body: { id?: unknown; email?: unknown; lang?: unknown; note?: unknown };
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: 'bad_request' }, 400);
+  }
+  const id = typeof body.id === 'string' ? body.id.toLowerCase() : '';
+  const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+  const note = typeof body.note === 'string' && body.note.trim() ? body.note.trim() : null;
+  if (!UUID.test(id)) return json({ error: 'invalid_id' }, 400);
+  if (email.length > 254 || !EMAIL.test(email)) return json({ error: 'invalid_email' }, 400);
+  if (body.lang !== undefined && body.lang !== 'en' && body.lang !== 'fr') return json({ error: 'invalid_lang' }, 400);
+  if ((body.note !== undefined && body.note !== null && typeof body.note !== 'string') || (note && note.length > 200)) {
+    return json({ error: 'invalid_note' }, 400);
+  }
+  const lang: Lang = body.lang === 'fr' ? 'fr' : 'en';
+
+  const issued = await deps.db.rpc('comp_license', {
+    p_id: id, p_email: email, p_lang: lang, p_note: note, p_edition: EDITION, p_macs: MACS, p_issue_day: issueDay(deps.now()),
+  });
+  if (issued.error) {
+    console.error('comp_license failed:', issued.error.message);
+    return json({ error: 'unavailable' }, 503);
+  }
+  const row = issued.data?.[0];
+  // The ID belongs to a bought license, or to a free one for someone else: never send that key.
+  if (!row || row.email !== email) return json({ error: 'id_taken' }, 409);
+  return sendAndMark(row, deps, { id: row.id });
 }
 
 export type Verdict = 'ok' | 'failed' | 'unavailable';

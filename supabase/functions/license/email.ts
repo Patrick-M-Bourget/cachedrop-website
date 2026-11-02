@@ -42,9 +42,33 @@ const COPY = {
   },
 } satisfies Record<Lang, Record<string, string>>;
 
+// A free license (Decision 45): no thanks for buying, no proof of purchase, and no refund line.
+const GIFT = {
+  en: {
+    heading: 'A CacheDrop license, on us',
+    keep: 'Keep this email. If you lose the key, you can have it sent again from cachedrop.io.',
+    refund: '',
+  },
+  fr: {
+    heading: 'Une licence CacheDrop, offerte',
+    keep: 'Gardez ce courriel. Si vous perdez la clé, vous pouvez la recevoir de nouveau à partir de cachedrop.io.',
+    refund: '',
+  },
+} satisfies Record<Lang, Partial<Record<keyof (typeof COPY)['en'], string>>>;
+
+/** A bought license, or one the owner gave away (Decision 45). */
+export type LicenseKind = 'bought' | 'gift';
+
 /** The key email for `to`. `key` is the canonical 140-character key; `licenseId` its UUID. */
-export function licenseEmail(to: string, lang: Lang, key: string, licenseId: string, siteUrl = 'https://cachedrop.io'): Email {
-  const c = COPY[lang];
+export function licenseEmail(
+  to: string,
+  lang: Lang,
+  key: string,
+  licenseId: string,
+  siteUrl = 'https://cachedrop.io',
+  kind: LicenseKind = 'bought',
+): Email {
+  const c = kind === 'gift' ? { ...COPY[lang], ...GIFT[lang] } : COPY[lang];
   const base = lang === 'fr' ? `${siteUrl}/fr` : siteUrl;
   const privacy = `${base}/privacy/`;
   // "cachedrop.io" in the keep line points at the resend page (#72, Decision 42).
@@ -63,8 +87,7 @@ export function licenseEmail(to: string, lang: Lang, key: string, licenseId: str
     '',
     `${keepBefore}${resend}${keepAfter}`,
     '',
-    c.refund,
-    '',
+    ...(c.refund ? [c.refund, ''] : []),
     `${c.licenseId}${c.colon} ${licenseId}`,
     '',
     '—',
@@ -88,8 +111,7 @@ export function licenseEmail(to: string, lang: Lang, key: string, licenseId: str
 <p style="${p}">${c.activate}</p>
 <p style="${p}">${c.covers}</p>
 <p style="${p}">${keepBefore}<a href="${resend}" style="color:#0066CC">cachedrop.io</a>${keepAfter}</p>
-<p style="${p};color:#6E6E73">${c.refund}</p>
-<p style="${p};color:#6E6E73">${c.licenseId}${c.colon} ${licenseId}</p>
+${c.refund ? `<p style="${p};color:#6E6E73">${c.refund}</p>\n` : ''}<p style="${p};color:#6E6E73">${c.licenseId}${c.colon} ${licenseId}</p>
 <hr style="margin:24px 0 16px;border:0;border-top:1px solid #E5E7EB">
 <p style="${small}">CacheDrop · <a href="mailto:hello@cachedrop.io" style="color:#6E6E73">hello@cachedrop.io</a> · cachedrop.io</p>
 <p style="${small}"><a href="${privacy}" style="color:#6E6E73">${c.privacy}</a></p>

@@ -21,4 +21,16 @@ describe('license email (#72)', () => {
     const email = licenseEmail('a@example.com', 'en', KEY, ID, 'https://preview.example');
     expect(email.html).toContain('href="https://preview.example/resend-license-key/"');
   });
+
+  it('words a free license as a gift, without proof of purchase or refunds (Decision 45)', () => {
+    for (const lang of ['en', 'fr'] as const) {
+      const gift = licenseEmail('a@example.com', lang, KEY, ID, undefined, 'gift');
+      const bought = licenseEmail('a@example.com', lang, KEY, ID);
+      expect(gift.subject).toBe(bought.subject);
+      expect(gift.text).toContain(KEY);
+      expect(gift.text).not.toMatch(/achet|buying|purchase|preuve|refund|rembours/i);
+      expect(gift.html).not.toMatch(/achet|buying|purchase|preuve|refund|rembours/i);
+      expect(gift.html).toContain(lang === 'fr' ? '/fr/resend-license-key/' : 'https://cachedrop.io/resend-license-key/');
+    }
+  });
 });
