@@ -3,6 +3,8 @@
   "crons": [{ "path": "/api/feedback-retry", "schedule": "0 13 * * *" }],
   "rewrites": [
     { "source": "/updates/appcast.xml", "destination": "/api/appcast" },
+    { "source": "/buy", "destination": "/api/buy" },
+    { "source": "/buy/", "destination": "/api/buy" },
     { "source": "/download/:token([A-Za-z0-9_-]{43})/", "destination": "/download/link/" },
     { "source": "/download/:token([A-Za-z0-9_-]{43})", "destination": "/download/link/" },
     { "source": "/unsubscribe/:token([A-Za-z0-9_-]{43})/confirm", "destination": "/api/unsubscribe?token=:token&form=1" },
