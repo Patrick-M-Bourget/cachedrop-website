@@ -1,0 +1,205 @@
+---
+// License agreement (Decision 43; mac-cleaner Decisions 3, 135 and 136): a DRAFT for the owner's
+// approval, not legal advice. Built at /license-agreement/ and /fr/license-agreement/.
+// The warranty and liability sections are limited by consumer protection law, which the owner
+// checks (Decision 43); they say so rather than claiming more than the law allows.
+import Legal from '../../../layouts/Legal.astro';
+import { HELLO, link, mail, type LegalSection } from '../../../components/legal';
+import { langOf, langPaths, localize } from '../../../i18n';
+
+export const getStaticPaths = langPaths;
+
+const path = '/license-agreement/';
+const lang = langOf(Astro.url);
+const to = (english: string, text: string) => link(localize(lang, english), text);
+const MAIL = mail(HELLO);
+
+const copy = {
+  en: {
+    title: 'License Agreement | CacheDrop',
+    description: 'What a CacheDrop license lets you do, how it’s checked, when it can be revoked, and what CacheDrop does and doesn’t promise.',
+    crumb: 'License agreement',
+    lede: 'What your CacheDrop license lets you do, and what CacheDrop does and doesn’t promise.',
+    updated: 'Updated November 2026',
+    sections: [
+      {
+        id: 'agreement',
+        title: 'This agreement',
+        body: [
+          'This agreement is between you and CacheDrop’s owner, an independent developer in Quebec, Canada. It applies when you use CacheDrop, with or without a license. The parts about the license apply once you’ve bought one.',
+          `Buying is covered by the ${to('/terms-of-sale/', 'terms of sale')} and the ${to('/refund-policy/', 'refund policy')}.`,
+        ],
+      },
+      {
+        id: 'use',
+        title: 'What your license lets you do',
+        body: [
+          [
+            ['Personal use', ': a license is for one person. You can use CacheDrop for yourself, including for your own work.'],
+            ['Up to 3 Macs', ': you can activate your key on up to 3 Macs that you use.'],
+            ['Every 1.x release', ': your license covers every CacheDrop 1.x release. A future CacheDrop 2.0 may be a paid upgrade.'],
+          ],
+        ],
+      },
+      {
+        id: 'honour',
+        title: 'No account, no activation server',
+        body: [
+          'Your key is checked on your Mac, without an internet connection. Activating it, checking it and removing it all work offline, and nothing reports how many Macs use it.',
+          'So the 3-Mac limit is on your honour. We trust you to keep to it.',
+        ],
+      },
+      {
+        id: 'limits',
+        title: 'What you can’t do',
+        body: [
+          [
+            'Share or publish your key, or sell it.',
+            'Change CacheDrop, or use a tool, to get around the license check.',
+          ],
+        ],
+      },
+      {
+        id: 'revocation',
+        title: 'When a license is revoked',
+        body: [
+          'We revoke a license that is refunded, whose payment is disputed with the bank (a chargeback), or whose key is leaked, for example posted online.',
+          'Revoking works without any server: the license’s ID goes on a list built into the next CacheDrop release. Once that release is installed, the key stops working and CacheDrop goes back to what it does without a license. Your files aren’t touched.',
+          `If you think your license was revoked by mistake, write to ${MAIL}.`,
+        ],
+      },
+      {
+        id: 'files',
+        title: 'What CacheDrop does to your files',
+        body: [
+          'CacheDrop changes nothing until you’ve reviewed a cleanup plan and confirmed it. Your files go to the Trash, so changing your mind is one drag away. Caches and build files that their tools rebuild are deleted.',
+          'Read the plan before you confirm it, and keep a backup of anything you can’t replace.',
+        ],
+      },
+      {
+        id: 'warranty',
+        title: 'Warranty',
+        body: [
+          'We work hard to make CacheDrop careful and correct, but it’s provided as is. We don’t promise it’s free of bugs or right for every Mac. The free trial is there so you can check it on yours before you buy.',
+        ],
+      },
+      {
+        id: 'liability',
+        title: 'Liability',
+        body: [
+          'As far as the law allows, we aren’t responsible for indirect losses, like lost work time or files you chose to remove, and our total responsibility is limited to what you paid for your license.',
+          'This doesn’t limit any right that the consumer protection law where you live gives you and that can’t be waived, such as under Quebec’s Consumer Protection Act.',
+        ],
+      },
+      {
+        id: 'law',
+        title: 'Changes and the law',
+        body: [
+          'This agreement is governed by the laws of Quebec and the federal laws of Canada that apply there.',
+          'If we change it, the new version is posted here. A change never takes away a license you’ve already bought.',
+          'You can stop using CacheDrop at any time.',
+        ],
+      },
+      {
+        id: 'contact',
+        title: 'Contact us',
+        body: [`Email: ${MAIL}`],
+      },
+    ],
+  },
+  fr: {
+    title: 'Contrat de licence | CacheDrop',
+    description: 'Ce que permet une licence CacheDrop, comment elle est vérifiée, quand elle peut être révoquée, et ce que CacheDrop promet ou non.',
+    crumb: 'Contrat de licence',
+    lede: 'Ce que votre licence CacheDrop vous permet de faire, et ce que CacheDrop promet ou non.',
+    updated: 'Mis à jour en novembre 2026',
+    sections: [
+      {
+        id: 'agreement',
+        title: 'Ce contrat',
+        body: [
+          'Ce contrat est conclu entre vous et le propriétaire de CacheDrop, un développeur indépendant au Québec, Canada. Il s’applique quand vous utilisez CacheDrop, avec ou sans licence. Les parties qui portent sur la licence s’appliquent une fois que vous en avez acheté une.',
+          `L’achat est régi par les ${to('/terms-of-sale/', 'conditions de vente')} et la ${to('/refund-policy/', 'politique de remboursement')}.`,
+        ],
+      },
+      {
+        id: 'use',
+        title: 'Ce que votre licence vous permet',
+        body: [
+          [
+            ['Usage personnel', ' : une licence est pour une personne. Vous pouvez utiliser CacheDrop pour vous-même, y compris pour votre propre travail.'],
+            ['Jusqu’à 3 Mac', ' : vous pouvez activer votre clé sur un maximum de 3 Mac que vous utilisez.'],
+            ['Toutes les versions 1.x', ' : votre licence couvre toutes les versions 1.x de CacheDrop. Un futur CacheDrop 2.0 pourrait être une mise à niveau payante.'],
+          ],
+        ],
+      },
+      {
+        id: 'honour',
+        title: 'Aucun compte, aucun serveur d’activation',
+        body: [
+          'Votre clé est vérifiée sur votre Mac, sans connexion Internet. L’activation, la vérification et le retrait fonctionnent hors ligne, et rien ne signale combien de Mac l’utilisent.',
+          'La limite de 3 Mac repose donc sur votre parole. Nous vous faisons confiance pour la respecter.',
+        ],
+      },
+      {
+        id: 'limits',
+        title: 'Ce que vous ne pouvez pas faire',
+        body: [
+          [
+            'Partager ou publier votre clé, ou la vendre.',
+            'Modifier CacheDrop, ou utiliser un outil, pour contourner la vérification de la licence.',
+          ],
+        ],
+      },
+      {
+        id: 'revocation',
+        title: 'Quand une licence est révoquée',
+        body: [
+          'Nous révoquons une licence remboursée, dont le paiement est contesté auprès de la banque (rétrofacturation), ou dont la clé a fuité, par exemple publiée en ligne.',
+          'La révocation se fait sans serveur : l’identifiant de la licence est ajouté à une liste intégrée à la version suivante de CacheDrop. Une fois cette version installée, la clé cesse de fonctionner et CacheDrop revient à ce qu’il fait sans licence. Vos fichiers ne sont pas touchés.',
+          `Si vous croyez que votre licence a été révoquée par erreur, écrivez à ${MAIL}.`,
+        ],
+      },
+      {
+        id: 'files',
+        title: 'Ce que CacheDrop fait à vos fichiers',
+        body: [
+          'CacheDrop ne change rien tant que vous n’avez pas examiné et confirmé un plan de nettoyage. Vos fichiers vont à la Corbeille : changer d’avis ne demande qu’un glisser-déposer. Les caches et les fichiers de compilation que leurs outils recréent sont supprimés.',
+          'Lisez le plan avant de le confirmer, et gardez une sauvegarde de ce que vous ne pouvez pas remplacer.',
+        ],
+      },
+      {
+        id: 'warranty',
+        title: 'Garantie',
+        body: [
+          'Nous travaillons fort pour que CacheDrop soit prudent et exact, mais il est fourni tel quel. Nous ne promettons pas qu’il est exempt de bogues ni qu’il convient à tous les Mac. L’essai gratuit vous permet de le vérifier sur le vôtre avant d’acheter.',
+        ],
+      },
+      {
+        id: 'liability',
+        title: 'Responsabilité',
+        body: [
+          'Dans la mesure permise par la loi, nous ne sommes pas responsables des pertes indirectes, comme du temps de travail perdu ou des fichiers que vous avez choisi de retirer, et notre responsabilité totale se limite au montant payé pour votre licence.',
+          'Cela ne limite aucun droit que vous accorde la loi sur la protection du consommateur de l’endroit où vous habitez et auquel on ne peut renoncer, par exemple en vertu de la Loi sur la protection du consommateur du Québec.',
+        ],
+      },
+      {
+        id: 'law',
+        title: 'Modifications et loi applicable',
+        body: [
+          'Ce contrat est régi par les lois du Québec et les lois fédérales du Canada qui s’y appliquent.',
+          'Si nous le modifions, la nouvelle version est publiée sur cette page. Une modification ne vous retire jamais une licence déjà achetée.',
+          'Vous pouvez cesser d’utiliser CacheDrop en tout temps.',
+        ],
+      },
+      {
+        id: 'contact',
+        title: 'Nous joindre',
+        body: [`Courriel : ${MAIL}`],
+      },
+    ],
+  },
+} satisfies Record<string, { sections: LegalSection[] } & Record<string, unknown>>;
+const t = copy[lang];
+---
+<Legal title={t.title} description={t.description} path={path} crumb={t.crumb} lede={t.lede} updated={t.updated} sections={t.sections} />

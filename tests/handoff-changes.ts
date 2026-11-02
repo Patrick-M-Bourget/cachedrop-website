@@ -16,6 +16,12 @@ export const handoffChanges: HandoffChange[] = [
     replace: '<span style="display: flex; gap: 16px"><a class="flink" href="/privacy/">Privacy Policy</a><span>Public beta</span></span>',
   },
   {
+    decision: 43,
+    why: 'The footer also links to the terms of sale, refund policy and license agreement, in a row that wraps.',
+    find: '<span style="display: flex; gap: 16px"><a class="flink" href="/privacy/">Privacy Policy</a>',
+    replace: '<span style="display: flex; flex-wrap: wrap; gap: 8px 16px"><a class="flink" href="/privacy/">Privacy Policy</a><a class="flink" href="/terms-of-sale/">Terms of Sale</a><a class="flink" href="/refund-policy/">Refund Policy</a><a class="flink" href="/license-agreement/">License Agreement</a>',
+  },
+  {
     decision: 5,
     why: 'The footer switches to the page in French. Applied after the Decision 19 change, so it ends the same row.',
     find: '<span>Public beta</span>',

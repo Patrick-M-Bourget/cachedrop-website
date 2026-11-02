@@ -41,4 +41,34 @@
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/privacy/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/privacy/"/>
   </url>
+  <url><loc>https://cachedrop.io/terms-of-sale/</loc><lastmod>2026-11-01</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/terms-of-sale/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/terms-of-sale/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/terms-of-sale/"/>
+  </url>
+  <url><loc>https://cachedrop.io/fr/terms-of-sale/</loc><lastmod>2026-11-01</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/terms-of-sale/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/terms-of-sale/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/terms-of-sale/"/>
+  </url>
+  <url><loc>https://cachedrop.io/refund-policy/</loc><lastmod>2026-11-01</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/refund-policy/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/refund-policy/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/refund-policy/"/>
+  </url>
+  <url><loc>https://cachedrop.io/fr/refund-policy/</loc><lastmod>2026-11-01</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/refund-policy/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/refund-policy/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/refund-policy/"/>
+  </url>
+  <url><loc>https://cachedrop.io/license-agreement/</loc><lastmod>2026-11-01</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/license-agreement/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/license-agreement/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/license-agreement/"/>
+  </url>
+  <url><loc>https://cachedrop.io/fr/license-agreement/</loc><lastmod>2026-11-01</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/license-agreement/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/license-agreement/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/license-agreement/"/>
+  </url>
 </urlset>

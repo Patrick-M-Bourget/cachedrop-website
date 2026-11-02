@@ -1,0 +1,174 @@
+---
+// Terms of sale (Decision 43; mac-cleaner Decision 135): a DRAFT for the owner's approval, not
+// legal advice. Say only what the decisions say. Built at /terms-of-sale/ and /fr/terms-of-sale/.
+import Legal from '../../../layouts/Legal.astro';
+import { HELLO, link, mail, type LegalSection } from '../../../components/legal';
+import { langOf, langPaths, localize } from '../../../i18n';
+
+export const getStaticPaths = langPaths;
+
+const path = '/terms-of-sale/';
+const lang = langOf(Astro.url);
+const to = (english: string, text: string) => link(localize(lang, english), text);
+const MAIL = mail(HELLO);
+
+// MERCHANT OF RECORD: the `seller` paragraphs assume Stripe Managed Payments, where Link is the
+// seller of record (docs.stripe.com/payments/managed-payments/how-it-works). That choice waits on a
+// test purchase (mac-cleaner #593). If CacheDrop sells directly instead, these paragraphs change.
+const copy = {
+  en: {
+    title: 'Terms of Sale | CacheDrop',
+    description: 'What you buy when you buy CacheDrop, what it costs, who sells it and how you get your license key.',
+    crumb: 'Terms of sale',
+    lede: 'What you buy when you buy CacheDrop, what it costs, who sells it to you and how you get it.',
+    updated: 'Updated November 2026',
+    sections: [
+      {
+        id: 'what',
+        title: 'What you buy',
+        body: [
+          `A license to use CacheDrop, the Mac app, on the terms of the ${to('/license-agreement/', 'license agreement')}. You pay once. There is no subscription: nothing renews and you are never charged again.`,
+          'Your license covers every CacheDrop 1.x release. A future CacheDrop 2.0 may be a paid upgrade; if it is, your license keeps working with 1.x.',
+          'CacheDrop runs on Apple Silicon Macs with macOS 26 or later.',
+        ],
+      },
+      {
+        id: 'trial',
+        title: 'Try it first',
+        body: [
+          'You don’t need a license to see what CacheDrop would do on your Mac.',
+          [
+            ['Always free', ': scanning, the overview and the cleanup plan.'],
+            ['Free until they’ve freed 2 GB on your Mac', ': Clean up and Applications uninstall. After that, they need a license.'],
+          ],
+        ],
+      },
+      {
+        id: 'price',
+        title: 'Price',
+        body: [
+          'The regular price is 29.99, shown discounted to 19.99. It’s the same numbers in US dollars, Canadian dollars, euros, pounds sterling and Australian dollars.',
+          'Sales tax, like GST, QST or VAT, depends on where you live. Checkout shows the total, with any tax, before you pay.',
+          'Prices may change. A change never affects a license you’ve already bought.',
+        ],
+      },
+      {
+        id: 'seller',
+        title: 'Who sells it',
+        body: [
+          'CacheDrop is sold through Link, Stripe’s checkout service. Link is the seller on your receipt: it takes your payment, collects and pays the sales tax, and emails your receipt. Your statement shows the charge from LINK.COM.',
+          `CacheDrop itself, the license key and help with the app come from CacheDrop’s owner, an independent developer in Quebec, Canada. Write to ${MAIL}.`,
+        ],
+      },
+      {
+        id: 'delivery',
+        title: 'Getting your license key',
+        body: [
+          'After you pay, your license key is emailed to the address you gave at checkout. Paste it into CacheDrop under Settings → License.',
+          'There is no account to create. The key is checked on your Mac, without an internet connection.',
+          `If the email doesn’t arrive, check your spam folder. You can have the key sent again from cachedrop.io, or write to ${MAIL}.`,
+        ],
+      },
+      {
+        id: 'refunds',
+        title: 'Refunds',
+        body: [
+          `You can get a full refund within 30 days, no questions asked. The ${to('/refund-policy/', 'refund policy')} says how, and what happens to the license.`,
+        ],
+      },
+      {
+        id: 'law',
+        title: 'Your rights and the law',
+        body: [
+          'These terms, the refund policy and the license agreement are governed by the laws of Quebec and the federal laws of Canada that apply there.',
+          'Nothing in them takes away a right that the consumer protection law where you live gives you and that can’t be waived, such as under Quebec’s Consumer Protection Act.',
+          'If we change these terms, the new version applies to purchases made after it’s posted here.',
+        ],
+      },
+      {
+        id: 'contact',
+        title: 'Contact us',
+        body: [`Email: ${MAIL}`],
+      },
+    ],
+  },
+  fr: {
+    title: 'Conditions de vente | CacheDrop',
+    description: 'Ce que vous achetez quand vous achetez CacheDrop, ce que ça coûte, qui le vend et comment recevoir votre clé de licence.',
+    crumb: 'Conditions de vente',
+    lede: 'Ce que vous achetez quand vous achetez CacheDrop, ce que ça coûte, qui vous le vend et comment vous le recevez.',
+    updated: 'Mis à jour en novembre 2026',
+    sections: [
+      {
+        id: 'what',
+        title: 'Ce que vous achetez',
+        body: [
+          `Une licence d’utilisation de CacheDrop, l’application pour Mac, aux conditions du ${to('/license-agreement/', 'contrat de licence')}. Vous payez une seule fois. Il n’y a pas d’abonnement : rien ne se renouvelle et aucun autre montant ne vous est facturé.`,
+          'Votre licence couvre toutes les versions 1.x de CacheDrop. Un futur CacheDrop 2.0 pourrait être une mise à niveau payante. Le cas échéant, votre licence continue de fonctionner avec les versions 1.x.',
+          'CacheDrop fonctionne sur les Mac avec puce Apple Silicon et macOS 26 ou version ultérieure.',
+        ],
+      },
+      {
+        id: 'trial',
+        title: 'Essayez d’abord',
+        body: [
+          'Vous n’avez pas besoin d’une licence pour voir ce que CacheDrop ferait sur votre Mac.',
+          [
+            ['Toujours gratuits', ' : l’analyse, l’aperçu et le plan de nettoyage.'],
+            ['Gratuits jusqu’à ce qu’ils aient libéré 2 Go sur votre Mac', ' : Clean up et Applications uninstall. Ensuite, il faut une licence.'],
+          ],
+        ],
+      },
+      {
+        id: 'price',
+        title: 'Prix',
+        body: [
+          'Le prix courant est de 29,99, affiché avec un rabais à 19,99. Ce sont les mêmes chiffres en dollars américains, en dollars canadiens, en euros, en livres sterling et en dollars australiens.',
+          'Les taxes de vente, comme la TPS, la TVQ ou la TVA, dépendent de l’endroit où vous habitez. La page de paiement affiche le total, taxes comprises, avant que vous payiez.',
+          'Les prix peuvent changer. Un changement ne touche jamais une licence déjà achetée.',
+        ],
+      },
+      {
+        id: 'seller',
+        title: 'Qui le vend',
+        body: [
+          'CacheDrop est vendu par l’intermédiaire de Link, le service de paiement de Stripe. Link est le vendeur inscrit sur votre reçu : il reçoit votre paiement, perçoit et verse les taxes de vente, et vous envoie votre reçu par courriel. Votre relevé indique un achat chez LINK.COM.',
+          `CacheDrop lui-même, la clé de licence et l’aide sur l’application viennent du propriétaire de CacheDrop, un développeur indépendant au Québec, Canada. Écrivez à ${MAIL}.`,
+        ],
+      },
+      {
+        id: 'delivery',
+        title: 'Recevoir votre clé de licence',
+        body: [
+          'Après le paiement, votre clé de licence est envoyée à l’adresse courriel donnée lors du paiement. Collez-la dans CacheDrop, sous Settings → License.',
+          'Aucun compte à créer. La clé est vérifiée sur votre Mac, sans connexion Internet.',
+          `Si le courriel n’arrive pas, vérifiez votre dossier de courrier indésirable. Vous pouvez faire renvoyer la clé à partir de cachedrop.io, ou écrire à ${MAIL}.`,
+        ],
+      },
+      {
+        id: 'refunds',
+        title: 'Remboursements',
+        body: [
+          `Vous pouvez obtenir un remboursement complet dans les 30 jours, sans avoir à vous justifier. La ${to('/refund-policy/', 'politique de remboursement')} explique comment, et ce qu’il advient de la licence.`,
+        ],
+      },
+      {
+        id: 'law',
+        title: 'Vos droits et la loi',
+        body: [
+          'Ces conditions, la politique de remboursement et le contrat de licence sont régis par les lois du Québec et les lois fédérales du Canada qui s’y appliquent.',
+          'Rien dans ces documents ne vous retire un droit que vous accorde la loi sur la protection du consommateur de l’endroit où vous habitez et auquel on ne peut renoncer, par exemple en vertu de la Loi sur la protection du consommateur du Québec.',
+          'Si nous modifions ces conditions, la nouvelle version s’applique aux achats faits après sa publication sur cette page.',
+        ],
+      },
+      {
+        id: 'contact',
+        title: 'Nous joindre',
+        body: [`Courriel : ${MAIL}`],
+      },
+    ],
+  },
+} satisfies Record<string, { sections: LegalSection[] } & Record<string, unknown>>;
+const t = copy[lang];
+---
+<Legal title={t.title} description={t.description} path={path} crumb={t.crumb} lede={t.lede} updated={t.updated} sections={t.sections} />

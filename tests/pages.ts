@@ -24,6 +24,10 @@ export const pages: PageUnderTest[] = [
   { path: '/download/', head: 'download/index.html' },
   // The token page, which vercel.json serves at /download/<token>/. Without a token it renders the handoff as is.
   { path: '/download/link/', handoff: 'download/index.html', screenshots: 'download' },
+  // The draft sale pages (Decision 43): no handoff originals.
+  { path: '/terms-of-sale/' },
+  { path: '/refund-policy/' },
+  { path: '/license-agreement/' },
   { path: '/resend-license-key/' }, // new (Decision 42): no handoff original
   // French (Decision 5). No handoff originals: token, modal, footer, FAQ and analytics tests.
   { path: '/fr/', lang: 'fr' },
@@ -33,6 +37,9 @@ export const pages: PageUnderTest[] = [
   { path: '/fr/unsubscribe/', lang: 'fr' },
   { path: '/fr/download/', lang: 'fr' },
   { path: '/fr/download/link/', lang: 'fr' },
+  { path: '/fr/terms-of-sale/', lang: 'fr' },
+  { path: '/fr/refund-policy/', lang: 'fr' },
+  { path: '/fr/license-agreement/', lang: 'fr' },
   { path: '/fr/resend-license-key/', lang: 'fr' },
 ];
 
@@ -54,6 +61,9 @@ export const pairs: Pair[] = [
   pair('/download/', false),
   pair('/download/link/', false, '/download/'),
   pair('/unsubscribe/', false),
+  pair('/terms-of-sale/', true),
+  pair('/refund-policy/', true),
+  pair('/license-agreement/', true),
   pair('/resend-license-key/', false),
 ];
 
@@ -63,6 +73,11 @@ export const ui = {
     home: '/',
     download: '/download/',
     privacy: ['Privacy Policy', '/privacy/'],
+    legal: [
+      ['Terms of Sale', '/terms-of-sale/'],
+      ['Refund Policy', '/refund-policy/'],
+      ['License Agreement', '/license-agreement/'],
+    ],
     resendKey: ['Resend License Key', '/resend-license-key/'],
     dialog: 'Give Fast Feedback',
     veryUnhappy: 'Very unhappy',
@@ -74,6 +89,11 @@ export const ui = {
     home: '/fr/',
     download: '/fr/download/',
     privacy: ['Politique de confidentialité', '/fr/privacy/'],
+    legal: [
+      ['Conditions de vente', '/fr/terms-of-sale/'],
+      ['Politique de remboursement', '/fr/refund-policy/'],
+      ['Contrat de licence', '/fr/license-agreement/'],
+    ],
     resendKey: ['Renvoyer la clé de licence', '/fr/resend-license-key/'],
     dialog: 'Donnez-nous votre avis',
     veryUnhappy: 'Très insatisfait',
