@@ -3,6 +3,7 @@
 // purpose (HANDOFF.md §4); don't rename them.
 // The "Privacy Policy" link in the bottom row is Decision 19; the handoff has none.
 // The language switch after "Public beta" is Decision 5: it opens this page in the other language.
+// "Resend License Key" at the end of Product is Decision 42.
 import BrandMark from './BrandMark.astro';
 import { langOf, localize, other } from '../i18n';
 
@@ -25,6 +26,7 @@ const copy = {
     overview: 'Overview',
     download: 'Download Free Beta',
     feedback: 'Provide Feedback',
+    resendKey: 'Resend License Key',
     platform: 'Platform',
     chips: 'Apple Silicon',
     macos: 'macOS 26 or later',
@@ -42,6 +44,7 @@ const copy = {
     overview: 'Aperçu',
     download: 'Télécharger la bêta gratuite',
     feedback: 'Donner votre avis',
+    resendKey: 'Renvoyer la clé de licence',
     platform: 'Plateforme',
     chips: 'Apple Silicon',
     macos: 'macOS 26 ou version ultérieure',
@@ -77,6 +80,7 @@ const { path, overview = false, trademarks = t.trademarks } = Astro.props;
 {overview && <a class="flink" href={href('/')}>{t.overview}</a>}
 <a class="flink" href={href('/download/')}>{t.download}</a>
 <a class="flink" href="#feedback" data-feedback>{t.feedback}</a>
+<a class="flink" href={href('/resend-license-key/')}>{t.resendKey}</a>
 </nav>
 <div style="display: flex; flex-direction: column; gap: var(--space-2-5); font-size: 13px; color: var(--ink-secondary)">
 <h3 style="margin: 0 0 var(--space-1); font-size: 13px; font-weight: 600; color: var(--ink)">{t.platform}</h3>

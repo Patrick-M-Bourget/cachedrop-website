@@ -21,6 +21,12 @@ export const handoffChanges: HandoffChange[] = [
     find: '<span>Public beta</span>',
     replace: '<span>Public beta</span><a class="flink" href="/fr/" hreflang="fr" lang="fr">Français</a>',
   },
+  {
+    decision: 42,
+    why: 'The footer\'s Product column links to the page that re-sends a license key.',
+    find: '<a class="flink" href="#feedback" data-feedback>Provide Feedback</a>',
+    replace: '<a class="flink" href="#feedback" data-feedback>Provide Feedback</a><a class="flink" href="/resend-license-key/">Resend License Key</a>',
+  },
 ];
 
 /** Returns the handoff page's HTML with every decided change applied. */
