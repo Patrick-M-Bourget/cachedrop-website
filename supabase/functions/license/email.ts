@@ -30,15 +30,15 @@ const COPY = {
   fr: {
     subject: 'Votre clé de licence CacheDrop',
     heading: 'Merci d’avoir acheté CacheDrop',
-    intro: 'Voici votre clé de licence :',
+    intro: 'Voici votre clé de licence :',
     activate:
       'Pour l’activer, ouvrez CacheDrop, allez dans Settings → License, collez la clé dans le champ License key et cliquez sur Activate. Aucune connexion Internet n’est nécessaire.',
     covers: 'Votre licence couvre jusqu’à 3 de vos Mac et toutes les versions 1.x de CacheDrop.',
-    keep: 'Gardez ce courriel : c’est votre preuve d’achat. Si vous perdez la clé, vous pouvez la recevoir de nouveau à partir de cachedrop.io.',
-    refund: 'Vous avez changé d’avis ? Écrivez à hello@cachedrop.io dans les 30 jours pour un remboursement complet, sans question.',
+    keep: 'Gardez ce courriel : c’est votre preuve d’achat. Si vous perdez la clé, vous pouvez la recevoir de nouveau à partir de cachedrop.io.',
+    refund: 'Vous avez changé d’avis? Écrivez à hello@cachedrop.io dans les 30 jours pour un remboursement complet, sans question.',
     licenseId: 'Numéro de licence',
     privacy: 'Politique de confidentialité',
-    colon: ' :',
+    colon: ' :',
   },
 } satisfies Record<Lang, Record<string, string>>;
 
