@@ -14,6 +14,8 @@ The target is Quebec French, following the Office québécois de la langue fran�
 - **macOS's own French names** for things the reader sees on their Mac: Corbeille, Données système, Réglages Système, dossier Téléchargements, dossier Applications.
 - **The app itself is in English.** The homepage's app window shows the app as it ships, so it stays in English on the French page; only its accessible label is translated.
 - **Menu paths in Xcode, Premiere Pro and Final Cut Pro** are given in English, as the menus read in an English install, because the French menu names couldn't be checked against the apps. *Owner: say if you'd rather have the French menu names.*
+- **Prices** keep the number format the decisions use (« 29,99 », « 19,99 ») with the decimal comma and no currency symbol when the same number applies in every currency. With a symbol, it follows the number after a non-breaking space: « 19,99 $ », « 19,99 € ».
+- **The app’s feature names stay in English** on the sale pages (Clean up, Applications uninstall, Settings → License), as they read in the app.
 - **Addresses keep their English slugs** under `/fr/` (`/fr/clear-adobe-media-cache-mac/`), so every page's twin is its path with `/fr` in front. French titles, descriptions and headings carry the French search terms. *Owner: translated slugs (`/fr/vider-cache-adobe-mac/`) are possible later; they need a redirect for each.*
 
 ## Terms
@@ -41,7 +43,7 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | break (a project) | briser | Quebec usage; France says « casser ». |
 | build artifacts | artefacts de compilation | |
 | scan | analyse | « en une seule analyse ». |
-| Developer caches and build files (app category) | stays in English | The app's own label, as it appears in the app. |
+| Developer caches and build files (app category) | stays in English | The app’s own label, as it appears in the app. |
 | ~/Library | dossier Bibliothèque | Finder's French name in prose; paths stay `~/Library/…`. |
 | cookies | témoins | OQLF; the reader knows them as cookies too. |
 | app | application | OQLF prefers it to « app ». |
@@ -58,7 +60,7 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | unsubscribe | se désabonner | The page says « Désabonnement confirmé. », which avoids choosing a gender for « vous êtes désabonné(e) ». |
 | Check your inbox | Vérifiez vos courriels | |
 | disk image | image disque | |
-| Locations & access (app section) | stays in English | The app's own label. |
+| Locations & access (app section) | stays in English | The app’s own label. |
 | repository (GitHub) | dépôt | |
 | issue (GitHub) | ticket (issue) | |
 | spam protection | protection contre les pourriels | « vérification antipourriel » for Turnstile. |
@@ -71,3 +73,23 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | Overview (footer link) | Aperçu | |
 | system specs | caractéristiques du système | |
 | macOS 26 or later | macOS 26 ou version ultérieure | |
+| terms of sale | conditions de vente | Decision 43. |
+| refund policy | politique de remboursement | |
+| license agreement | contrat de licence | French spells it « licence »; the English pages keep the app’s US spelling. |
+| license, license key | licence, clé de licence | |
+| one-time (payment) | une seule fois | « Vous payez une seule fois. » |
+| subscription | abonnement | |
+| refund | remboursement, rembourser | |
+| no questions asked | sans avoir à vous justifier | |
+| chargeback | rétrofacturation | Followed by « contesté auprès de la banque » so it reads plainly. *Owner: check the term.* |
+| revoke, revoked | révoquer, révoquée | |
+| merchant of record, seller of record | vendeur inscrit sur votre reçu | Described rather than translated as a term. |
+| checkout (page) | page de paiement | « lors du paiement » in running text. |
+| sales tax, GST, QST, VAT | taxes de vente, TPS, TVQ, TVA | |
+| personal use | usage personnel | |
+| activation server | serveur d’activation | |
+| on your honour | repose sur votre parole | |
+| as is | tel quel | |
+| Consumer Protection Act (Quebec) | Loi sur la protection du consommateur | The Act’s French title, capitalized as published. |
+| Link support | soutien de Link | « support » is an anglicism in this sense. |
+| upgrade (paid) | mise à niveau payante | |
