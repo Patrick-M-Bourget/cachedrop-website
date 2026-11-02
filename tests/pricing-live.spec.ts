@@ -18,15 +18,17 @@ const copy = {
     buy: ['Buy a License', '/buy'],
     legal: [['terms of sale', '/terms-of-sale/'], ['refund policy', '/refund-policy/'], ['license agreement', '/license-agreement/']],
     tried: ['Already tried it?', 'Buy a license'],
+    news: 'Email me news about CacheDrop, like new features and surveys.',
   },
   fr: {
-    pricing: ['Prix', '/fr/pricing/'],
+    pricing: ['Tarifs', '/fr/pricing/'],
     download: 'Télécharger gratuitement',
     title: 'Essayez-le gratuitement. Payez une seule fois.',
     spoken: 'Prix régulier 29,99 $, maintenant 19,99 $, une seule fois.',
     shown: ['29,99 $', '19,99 $', 'une seule fois'],
     currencies: 'Payez en USD, CAD, EUR, GBP ou AUD : le même montant dans chaque devise.',
     items: ['Nettoyage gratuit jusqu’à 2 Go, et l’analyse est toujours gratuite', 'Sur un maximum de 3 de vos Mac', 'Toutes les versions 1.x', 'Remboursement dans les 30 jours, sans avoir à vous justifier'],
+    news: 'Envoyez-moi des nouvelles de CacheDrop par courriel : nouvelles fonctionnalités et sondages.',
     buy: ['Acheter une licence', '/buy?lang=fr'],
     legal: [['conditions de vente', '/fr/terms-of-sale/'], ['politique de remboursement', '/fr/refund-policy/'], ['contrat de licence', '/fr/license-agreement/']],
     tried: ['Vous l’avez déjà essayé?', 'Achetez une licence'],
@@ -69,6 +71,11 @@ for (const lang of ['en', 'fr'] as const) {
     await expect(page.getByRole('banner').getByRole('link', { name: copy[lang].pricing[0] })).toHaveAttribute('aria-current', 'page');
   });
 
+  test(`${lang}: the news box no longer mentions the paid launch`, async ({ page }) => {
+    await page.goto(lang === 'en' ? '/download/' : '/fr/download/');
+    await expect(page.getByRole('checkbox', { name: copy[lang].news, exact: true })).toBeVisible();
+  });
+
   test(`${lang}: the download page offers "Already tried it? Buy a license", also once the link is sent`, async ({ page }) => {
     const [tried, buy] = copy[lang].tried;
     await page.route('**/api/signup', (route) => route.fulfill({ json: { ok: true } }));
@@ -103,7 +110,7 @@ for (const p of live) {
     await expect(nav.getByText(/^(BETA|BÊTA)$/)).toHaveCount(0);
     const primary = nav.getByRole('navigation');
     const links = await primary.getByRole('link').allTextContents();
-    expect(links.slice(0, 3)).toEqual(lang === 'en' ? ['For Developers', 'For Creators', 'Pricing'] : ['Pour les développeurs', 'Pour les créateurs', 'Prix']);
+    expect(links.slice(0, 3)).toEqual(lang === 'en' ? ['For Developers', 'For Creators', 'Pricing'] : ['Pour les développeurs', 'Pour les créateurs', 'Tarifs']);
     await expect(primary.getByRole('link', { name: c.pricing[0], exact: true })).toHaveAttribute('href', c.pricing[1]);
     await expect(nav.getByRole('link', { name: c.download, exact: true })).toHaveAttribute('href', ui[lang].download);
     await expect(nav.locator('a[href^="/buy"]')).toHaveCount(0);

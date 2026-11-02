@@ -68,10 +68,10 @@ const copy = {
     failed: 'Le lien n’a pas pu être envoyé. Vérifiez votre connexion et réessayez.',
   },
 };
-// Decision 44: with pricing live, the title drops "beta" and a Buy link sits under the card.
+// Decision 44: with pricing live, the title drops "beta", the news box drops "the paid launch", and a Buy link sits under the card.
 const launch = {
-  en: { title: 'Try CacheDrop free.', tried: 'Already tried it?', buy: 'Buy a license' },
-  fr: { title: 'Essayez CacheDrop gratuitement.', tried: 'Vous l’avez déjà essayé?', buy: 'Achetez une licence' },
+  en: { title: 'Try CacheDrop free.', tried: 'Already tried it?', buy: 'Buy a license', news: 'Email me news about CacheDrop, like new features and surveys.' },
+  fr: { title: 'Essayez CacheDrop gratuitement.', tried: 'Vous l’avez déjà essayé?', buy: 'Achetez une licence', news: 'Envoyez-moi des nouvelles de CacheDrop par courriel : nouvelles fonctionnalités et sondages.' },
 };
 const lang = langOf(Astro.url);
 const t = withLaunch({ ...copy[lang], tried: '', buy: '' }, launch[lang]);

@@ -42,7 +42,7 @@ export const pricingCopy = {
     legal: ['Read the ', 'terms of sale', ', the ', 'refund policy', ' and the ', 'license agreement', '.'],
   },
   fr: {
-    eyebrow: 'Prix',
+    eyebrow: 'Tarifs',
     title: 'Essayez-le gratuitement. Payez une seule fois.',
     body: 'L’analyse est toujours gratuite, et vous pouvez nettoyer jusqu’à 2 Go avant d’acheter. Une licence vous donne toutes les versions 1.x.',
     name: 'Licence CacheDrop',

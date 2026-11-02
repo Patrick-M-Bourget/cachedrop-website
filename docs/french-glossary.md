@@ -55,7 +55,7 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | Get Free Beta (nav) | Obtenir la bêta gratuite | |
 | Download Free (nav, footer, pricing; Decision 44) | Télécharger gratuitement | Replaces the two beta labels above once pricing is live. |
 | free to try | essai gratuit; vous pouvez l’essayer gratuitement | « Essai gratuit » as a label, the verb in a sentence. |
-| Pricing (nav link, section) | Prix | *Owner*: « Tarifs » is the other common choice; one price reads better as « Prix ». |
+| Pricing (nav link, section) | Tarifs | Owner, 2026-11-02. |
 | Try it free. Pay once. | Essayez-le gratuitement. Payez une seule fois. | The pricing section's title. |
 | Buy a License (button) | Acheter une licence | |
 | Already tried it? Buy a license | Vous l’avez déjà essayé? Achetez une licence | The download page's line. |

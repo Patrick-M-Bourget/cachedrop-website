@@ -20,7 +20,7 @@ const copy = {
 };
 const launch = {
   en: { pricing: 'Pricing', download: 'Download Free' },
-  fr: { pricing: 'Prix', download: 'Télécharger gratuitement' },
+  fr: { pricing: 'Tarifs', download: 'Télécharger gratuitement' },
 };
 const lang = langOf(Astro.url);
 const t = withLaunch({ ...copy[lang], pricing: '' }, launch[lang]);
