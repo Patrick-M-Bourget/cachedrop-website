@@ -81,7 +81,9 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | trademarks | marques de commerce | Canadian legal term. |
 | Overview (footer link) | Aperçu | |
 | system specs | caractéristiques du système | |
-| macOS 26 or later | macOS 26 ou version ultérieure | |
+| macOS 14 or later | macOS 14 ou version ultérieure | |
+| macOS 14 Sonoma and later / or later | macOS 14 Sonoma ou version ultérieure | |
+| universal app (Apple Silicon and Intel) | application universelle | |
 | terms of sale | conditions de vente | Decision 43. |
 | refund policy | politique de remboursement | |
 | license agreement | contrat de licence | French spells it « licence »; the English pages keep the app’s US spelling. |
