@@ -1,11 +1,12 @@
 // The license Supabase Edge Function (Decision 40; cachedrop-website#64). Deployed with JWT
 // verification off, since Stripe can't send a Supabase token; the Stripe signature and Turnstile are
-// the checks. Two routes:
+// the checks, and LICENSE_ADMIN_SECRET for the owner's route. Three routes:
 //   POST /functions/v1/license/stripe-webhook  Stripe's checkout.session.* events (handlers.ts)
 //   POST /functions/v1/license/resend          "resend my key": { email, lang?, turnstile }
+//   POST /functions/v1/license/comp            a free license (Decision 45): { id, email, lang?, note? }
 // Secrets come only from the environment (supabase secrets set; docs/licensing.md); none is logged.
 // The logic lives in Web Crypto/fetch modules that Vitest tests too; this file only wires them up.
-import { handleResend, handleStripeWebhook, json } from './handlers.ts';
+import { handleComp, handleResend, handleStripeWebhook, json } from './handlers.ts';
 import { importPrivateKey } from './key.ts';
 import { clientIp, corsHeaders, dbKey, ipHash, resendSender, restDb, turnstile } from './services.ts';
 
@@ -35,6 +36,16 @@ async function route(request: Request): Promise<Response> {
       webhookSecret: env('STRIPE_WEBHOOK_SECRET'),
       now: () => new Date(),
       newId: () => crypto.randomUUID(),
+    });
+  }
+  if (path.endsWith('/comp')) {
+    // Called by scripts/comp-license.sh, never from a browser, so it sends no CORS headers.
+    return handleComp(request, {
+      db: db(),
+      send: resendSender(env('RESEND_API_KEY')),
+      privateKey: signingKey,
+      adminSecret: env('LICENSE_ADMIN_SECRET'),
+      now: () => new Date(),
     });
   }
   if (path.endsWith('/resend')) {

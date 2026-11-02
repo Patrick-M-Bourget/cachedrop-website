@@ -2,7 +2,7 @@
 // (Decision 27). The SQL functions are faked in memory with the migration's semantics.
 import { describe, expect, it, vi } from 'vitest';
 import type { Email } from './email.ts';
-import { handleResend, handleStripeWebhook, MACS, RESEND_LIMIT, type LicenseDb, type LicenseRow, type ResendDeps, type WebhookDeps } from './handlers.ts';
+import { handleComp, handleResend, handleStripeWebhook, MACS, RESEND_LIMIT, type CompDeps, type LicenseDb, type LicenseRow, type ResendDeps, type WebhookDeps } from './handlers.ts';
 import { importPrivateKey } from './key.ts';
 import { signStripePayload } from './stripe-signature.ts';
 import { TEST_SEED } from './test-key.ts';
@@ -13,9 +13,9 @@ const SESSION = 'cs_test_a1B2c3D4';
 const URL_ = 'https://example.supabase.co/functions/v1/license/stripe-webhook';
 const KEY_LINE = /^CD1-[A-Z2-7]{136}$/m;
 
-/** issue_license, mark_license_emailed, licenses_for_email and hit_rate_limit, in memory. */
+/** issue_license, comp_license, mark_license_emailed, licenses_for_email and hit_rate_limit, in memory. */
 function fakeDb(opts: { failIssue?: boolean } = {}) {
-  const rows = new Map<string, LicenseRow & { session: string; customer: string | null }>();
+  const rows = new Map<string, LicenseRow & { session: string | null; customer: string | null; note?: string | null }>();
   const hits = new Map<string, number>();
   const db = {
     rows,
@@ -27,11 +27,24 @@ function fakeDb(opts: { failIssue?: boolean } = {}) {
           row = {
             id: a.p_id as string, edition: 'standard', macs: a.p_macs as number, issue_day: a.p_issue_day as number,
             email: a.p_email as string, lang: a.p_lang as 'en' | 'fr', emailed_at: null,
-            session: a.p_stripe_session_id as string, customer: a.p_stripe_customer_id as string | null,
+            session: a.p_stripe_session_id as string, customer: a.p_stripe_customer_id as string | null, source: 'stripe',
           };
           rows.set(row.id, row);
         }
-        return { data: [{ ...row }], error: null };
+        const { source: _, ...bought } = row; // issue_license's columns don't include source
+        return { data: [bought], error: null };
+      }
+      if (fn === 'comp_license') {
+        let row = rows.get(a.p_id as string);
+        if (!row) {
+          row = {
+            id: a.p_id as string, edition: 'standard', macs: a.p_macs as number, issue_day: a.p_issue_day as number,
+            email: a.p_email as string, lang: a.p_lang as 'en' | 'fr', emailed_at: null,
+            session: null, customer: null, source: 'comp', note: a.p_note as string | null,
+          };
+          rows.set(row.id, row);
+        }
+        return { data: row.source === 'comp' ? [{ ...row }] : [], error: null };
       }
       if (fn === 'mark_license_emailed') {
         const row = rows.get(a.p_id as string);
@@ -271,5 +284,89 @@ describe('handleResend', () => {
   it('refuses a bad email before the bot check', async () => {
     const { send } = fakeSend();
     expect((await handleResend(resendRequest('not-an-email'), resendDeps(fakeDb(), send))).status).toBe(400);
+  });
+});
+
+const ADMIN = 's'.repeat(40);
+const COMP_ID = '6a1f3c2e-8b4d-4e5f-9a0b-1c2d3e4f5a6b';
+const compRequest = (body: Record<string, unknown>, auth: string | null = `Bearer ${ADMIN}`) =>
+  new Request('https://example.supabase.co/functions/v1/license/comp', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', ...(auth ? { authorization: auth } : {}) },
+    body: JSON.stringify({ id: COMP_ID, email: 'Friend@Example.com', ...body }),
+  });
+const compDeps = (db: LicenseDb, send: CompDeps['send'], adminSecret = ADMIN): CompDeps =>
+  ({ db, send, adminSecret, privateKey: () => importPrivateKey(TEST_SEED), now: () => NOW });
+
+describe('handleComp (Decision 45)', () => {
+  it('stores a free 3-Mac license with its note and emails the key in the gift wording', async () => {
+    const db = fakeDb();
+    const { send, sent } = fakeSend();
+    const res = await handleComp(compRequest({ note: ' beta tester ' }), compDeps(db, send));
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true, id: COMP_ID });
+    const row = db.rows.get(COMP_ID)!;
+    expect(row).toMatchObject({ source: 'comp', email: 'friend@example.com', macs: MACS, note: 'beta tester', session: null, issue_day: 20758 });
+    expect(row.emailed_at).not.toBeNull();
+    expect(sent).toHaveLength(1);
+    expect(sent[0].idempotencyKey).toBe(`license-${COMP_ID}`);
+    expect(sent[0].email.text).toMatch(KEY_LINE);
+    expect(sent[0].email.text).toContain('A CacheDrop license, on us');
+    expect(sent[0].email.text).not.toContain('refund');
+  });
+
+  it('sends nothing more when run again with the same ID, and the same key after a failed email', async () => {
+    const db = fakeDb();
+    expect((await handleComp(compRequest({ lang: 'fr' }), compDeps(db, fakeSend(true).send))).status).toBe(502);
+    const first = fakeSend();
+    expect((await handleComp(compRequest({ lang: 'fr' }), compDeps(db, first.send))).status).toBe(200);
+    expect(first.sent[0].email.subject).toBe('Votre clé de licence CacheDrop');
+    const again = fakeSend();
+    const res = await handleComp(compRequest({ lang: 'fr' }), compDeps(db, again.send));
+    expect(await res.json()).toEqual({ ok: true, repeat: true, id: COMP_ID });
+    expect(again.sent).toHaveLength(0);
+    expect(db.rows.size).toBe(1);
+  });
+
+  it('never sends the key of a license with the same ID for another address or a purchase', async () => {
+    const db = fakeDb();
+    await handleComp(compRequest({}), compDeps(db, fakeSend().send));
+    const { send, sent } = fakeSend();
+    expect((await handleComp(compRequest({ email: 'other@example.com' }), compDeps(db, send))).status).toBe(409);
+    await handleStripeWebhook(await stripeRequest(event(session())), webhookDeps(db, fakeSend().send));
+    const boughtId = [...db.rows.values()].find((r) => r.source === 'stripe')!.id;
+    expect((await handleComp(compRequest({ id: boughtId, email: 'buyer@example.com' }), compDeps(db, send))).status).toBe(409);
+    expect(sent).toHaveLength(0);
+  });
+
+  it('refuses a missing or wrong secret, and everything while the secret is unset', async () => {
+    const db = fakeDb();
+    const { send, sent } = fakeSend();
+    expect((await handleComp(compRequest({}, null), compDeps(db, send))).status).toBe(401);
+    expect((await handleComp(compRequest({}, `Bearer ${'t'.repeat(40)}`), compDeps(db, send))).status).toBe(401);
+    expect((await handleComp(compRequest({}, ADMIN), compDeps(db, send))).status).toBe(401);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect((await handleComp(compRequest({}, 'Bearer '), compDeps(db, send, ''))).status).toBe(503);
+    expect((await handleComp(compRequest({}, 'Bearer short'), compDeps(db, send, 'short'))).status).toBe(503);
+    expect(db.rows.size).toBe(0);
+    expect(sent).toHaveLength(0);
+  });
+
+  it('refuses a bad ID, email, language or note', async () => {
+    const { send } = fakeSend();
+    const status = async (body: Record<string, unknown>) => (await handleComp(compRequest(body), compDeps(fakeDb(), send))).status;
+    expect(await status({ id: 'not-a-uuid' })).toBe(400);
+    expect(await status({ email: 'nope' })).toBe(400);
+    expect(await status({ lang: 'de' })).toBe(400);
+    expect(await status({ note: 'x'.repeat(201) })).toBe(400);
+    expect(await status({ note: 42 })).toBe(400);
+  });
+
+  it('resends a free license in the gift wording', async () => {
+    const db = fakeDb();
+    await handleComp(compRequest({}), compDeps(db, fakeSend().send));
+    const { send, sent } = fakeSend();
+    expect((await handleResend(resendRequest('friend@example.com'), resendDeps(db, send))).status).toBe(200);
+    expect(sent[0].email.text).toContain('A CacheDrop license, on us');
   });
 });
