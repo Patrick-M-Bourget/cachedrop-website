@@ -60,3 +60,17 @@ In Stripe (test mode first): Developers → Webhooks → Add endpoint.
 ## Resend my key
 
 `POST https://<project-ref>.supabase.co/functions/v1/license/resend` with JSON `{ "email", "lang": "en" | "fr", "turnstile" }` emails the keys bought with that address again. It needs a Turnstile token, so it is meant for a form on cachedrop.io; that form is a follow-up. Until it ships, a key can go out again by hand: clear `emailed_at` on the buyer's row in `public.licenses`, then resend the purchase's event from Stripe's dashboard; the function emails the same key. This works only more than 24 hours after the first email, since Resend drops a repeat of the same send within 24 hours, and only as far back as Stripe lets you resend an event.
+
+## Agent read access (#80)
+
+Two read-only scripts let Claude check Stripe and the function's logs without asking you. Set up once:
+
+1. **Stripe:** Dashboard (live mode) → Developers → API keys → **Create restricted key**. Give it **Read** on Checkout Sessions, Events, Webhook Endpoints, Payment Links, Prices, Products, Coupons and Promotion Codes, and **None** on everything else. Save it: `mkdir -p ~/.config/cachedrop && pbpaste > ~/.config/cachedrop/stripe-readonly.key && chmod 600 ~/.config/cachedrop/stripe-readonly.key`. The script refuses anything but an `rk_` key.
+2. **Supabase logs:** Account → Access Tokens → generate a token named `claude-logs` (pick the narrowest scope Supabase offers; a full-access token works but the script only reads logs). Save it to `~/.config/cachedrop/supabase-logs.token` the same way.
+3. **Allow the two scripts** in `~/.claude/settings.json` under `permissions.allow`:
+   ```json
+   "Bash(scripts/stripe-read.sh:*)",
+   "Bash(scripts/function-logs.sh:*)"
+   ```
+
+Use: `scripts/stripe-read.sh 'events?type=checkout.session.completed&limit=3'`, `scripts/stripe-read.sh webhook_endpoints`, `scripts/function-logs.sh prod 120`. Neither prints a key. Revoke either credential at any time; the scripts then just say it's missing.
