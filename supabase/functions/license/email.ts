@@ -45,7 +45,11 @@ const COPY = {
 /** The key email for `to`. `key` is the canonical 140-character key; `licenseId` its UUID. */
 export function licenseEmail(to: string, lang: Lang, key: string, licenseId: string, siteUrl = 'https://cachedrop.io'): Email {
   const c = COPY[lang];
-  const privacy = `${lang === 'fr' ? `${siteUrl}/fr` : siteUrl}/privacy/`;
+  const base = lang === 'fr' ? `${siteUrl}/fr` : siteUrl;
+  const privacy = `${base}/privacy/`;
+  // "cachedrop.io" in the keep line points at the resend page (#72, Decision 42).
+  const resend = `${base}/resend-license-key/`;
+  const [keepBefore, keepAfter] = c.keep.split(/cachedrop\.io(?=\.$)/);
   const text = [
     c.heading,
     '',
@@ -57,7 +61,7 @@ export function licenseEmail(to: string, lang: Lang, key: string, licenseId: str
     '',
     c.covers,
     '',
-    c.keep,
+    `${keepBefore}${resend}${keepAfter}`,
     '',
     c.refund,
     '',
@@ -70,7 +74,7 @@ export function licenseEmail(to: string, lang: Lang, key: string, licenseId: str
 
   // Plain markup with inline styles, as in src/server/download-email.ts. Light-mode tokens from
   // handoff/design-system/tokens.css: #1D1D1F --ink, #6E6E73 --ink-secondary, #FFFFFF --surface,
-  // #E5E7EB --line. #F5F5F7 is --surface-subtle, behind the key. The app reads a key whatever
+  // #E5E7EB --line, #0066CC --accent-text (the resend link). #F5F5F7 is --surface-subtle, behind the key. The app reads a key whatever
   // its line breaks, so letting it wrap is safe.
   const p = 'margin:0 0 16px;font-size:15px;line-height:23px;color:#1D1D1F';
   const small = 'margin:0 0 6px;font-size:12px;line-height:18px;color:#6E6E73';
@@ -83,7 +87,7 @@ export function licenseEmail(to: string, lang: Lang, key: string, licenseId: str
 <p style="${p};padding:12px 14px;border-radius:8px;background:#F5F5F7;font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:20px;word-break:break-all">${key}</p>
 <p style="${p}">${c.activate}</p>
 <p style="${p}">${c.covers}</p>
-<p style="${p}">${c.keep}</p>
+<p style="${p}">${keepBefore}<a href="${resend}" style="color:#0066CC">cachedrop.io</a>${keepAfter}</p>
 <p style="${p};color:#6E6E73">${c.refund}</p>
 <p style="${p};color:#6E6E73">${c.licenseId}${c.colon} ${licenseId}</p>
 <hr style="margin:24px 0 16px;border:0;border-top:1px solid #E5E7EB">
