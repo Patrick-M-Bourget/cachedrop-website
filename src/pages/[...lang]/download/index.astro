@@ -12,6 +12,7 @@ import Base from '../../../layouts/Base.astro';
 import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
 import BotCheck from '../../../components/BotCheck.astro';
+import { buyHref, pricingLive, withLaunch } from '../../../components/pricing';
 import { downloadHead, downloadMeta, guideLinks } from './_head.ts';
 import { titleMd } from '../../../components/guide-styles';
 import { langOf, langPaths, localize } from '../../../i18n';
@@ -67,8 +68,13 @@ const copy = {
     failed: 'Le lien n’a pas pu être envoyé. Vérifiez votre connexion et réessayez.',
   },
 };
+// Decision 44: with pricing live, the title drops "beta", the news box drops "the paid launch", and a Buy link sits under the card.
+const launch = {
+  en: { title: 'Try CacheDrop free.', tried: 'Already tried it?', buy: 'Buy a license', news: 'Email me news about CacheDrop, like new features and surveys.' },
+  fr: { title: 'Essayez CacheDrop gratuitement.', tried: 'Vous l’avez déjà essayé?', buy: 'Achetez une licence', news: 'Envoyez-moi des nouvelles de CacheDrop par courriel : nouvelles fonctionnalités et sondages.' },
+};
 const lang = langOf(Astro.url);
-const t = copy[lang];
+const t = withLaunch({ ...copy[lang], tried: '', buy: '' }, launch[lang]);
 const meta = downloadMeta[lang];
 const filling = ['development', 'video-photo', 'music-audio', 'other'].map((value, i) => [value, t.filling[i]]);
 const expired = { title: t.expiredTitle, lede: t.expiredLede };
@@ -132,6 +138,8 @@ if (new URLSearchParams(location.search).get('link') === 'expired') {
 <button type="button" class="gate-btn gate-quiet" data-gate-again style="margin-top: var(--space-1)">{t.again}</button>
 </div>
 </div>
+
+{pricingLive && <p data-buy style="margin: var(--space-8) 0 0; font-size: 14px; color: var(--ink-secondary)">{t.tried} <a class="textlink" href={buyHref(lang)} style={guideLink}>{t.buy}</a></p>}
 
 <div style="margin-top: var(--space-18); display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3) var(--space-8); font-size: 14px">
 <span style="color: var(--ink-secondary)">{t.wait}</span>

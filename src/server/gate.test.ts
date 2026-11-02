@@ -171,6 +171,24 @@ describe('signup', () => {
     }
   });
 
+  // Decision 44: the server reads PUBLIC_PRICING_LIVE at run time; with it on, "free to try".
+  for (const [lang, beta, free] of [
+    ['en', 'It is free while in beta.', 'It is free to try.'],
+    ['fr', 'Il est gratuit pendant la bêta.', 'Vous pouvez l’essayer gratuitement.'],
+  ] as const) {
+    it(`${lang}: says "free while in beta" with pricing off and "free to try" with it on`, async () => {
+      const off = setup();
+      await handleSignup(post({ email: 'ada@example.com', lang }), off.deps);
+      const on = setup();
+      await handleSignup(post({ email: 'ada@example.com', lang }), { ...on.deps, pricingLive: true });
+      for (const part of [off.sent[0].text, off.sent[0].html]) expect(part).toContain(beta);
+      for (const part of [on.sent[0].text, on.sent[0].html]) {
+        expect(part).toContain(free);
+        expect(part).not.toMatch(/beta|bêta/i);
+      }
+    });
+  }
+
   it('gives each request its own link, and never stores the token itself', async () => {
     const { deps, sent, state } = setup();
     await handleSignup(post({ email: 'ada@example.com' }), deps);

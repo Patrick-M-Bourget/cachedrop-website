@@ -11,6 +11,7 @@
 import Base from '../../../../layouts/Base.astro';
 import Nav from '../../../../components/Nav.astro';
 import Footer from '../../../../components/Footer.astro';
+import { withLaunch } from '../../../../components/pricing';
 import { downloadHead, downloadMeta, guideLinks } from '../_head.ts';
 import { titleMd } from '../../../../components/guide-styles';
 import { langOf, langPaths, localize } from '../../../../i18n';
@@ -47,8 +48,19 @@ const copy = {
     installing: 'Pendant l’installation :',
   },
 };
+// Decision 44: with pricing live, "beta" gives way to "free to try".
+const launch = {
+  en: {
+    lede: 'Thanks for trying CacheDrop. It takes about a minute to set up.',
+    helpBody: 'CacheDrop is free to try. If a scan misses something or a result surprises you, tell us. It takes thirty seconds.',
+  },
+  fr: {
+    lede: 'Merci d’essayer CacheDrop. L’installation prend environ une minute.',
+    helpBody: 'Vous pouvez essayer CacheDrop gratuitement. Si une analyse oublie quelque chose ou qu’un résultat vous surprend, dites-le-nous. Ça prend trente secondes.',
+  },
+};
 const lang = langOf(Astro.url);
-const t = copy[lang];
+const t = withLaunch(copy[lang], launch[lang]);
 const meta = downloadMeta[lang];
 const expiredForm = `${localize(lang, '/download/')}?link=expired`;
 

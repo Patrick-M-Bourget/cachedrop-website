@@ -8,6 +8,7 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { guideH2, primaryLg, arrowLink, faqItem, faqQuestion } from '../components/guide-styles';
 import ClosingCta from '../components/ClosingCta.astro';
+import { withLaunch } from '../components/pricing';
 import { langOf, localize } from '../i18n';
 
 interface Props {
@@ -34,13 +35,20 @@ interface Props {
   faq: Array<[question: string, answerHtml: string]>;
   /** The other guide; `href` is its English path. */
   other: { eyebrow: string; title: string; href: string; link: string };
+  /** The closing title and line; the layout adds the price sentence after the line. */
   closing: { title: string; body: string };
   trademarks: string;
 }
 
 const p = Astro.props;
 const lang = langOf(Astro.url);
-const t = { en: { breadcrumb: 'Breadcrumb', updated: 'Updated' }, fr: { breadcrumb: 'Fil d’Ariane', updated: 'Mis à jour en' } }[lang];
+const copy = {
+  en: { breadcrumb: 'Breadcrumb', updated: 'Updated', price: 'Free while in beta.' },
+  fr: { breadcrumb: 'Fil d’Ariane', updated: 'Mis à jour en', price: 'Gratuit pendant la bêta.' },
+};
+// Decision 44: with pricing live, the closing line says "Free to try." instead.
+const launch = { en: { price: 'Free to try.' }, fr: { price: 'Essai gratuit.' } };
+const t = withLaunch(copy[lang], launch[lang]);
 const site = Astro.site!.origin;
 const url = new URL(localize(lang, p.path), site).href;
 const home = `${site}${localize(lang, '/')}`;
@@ -128,7 +136,7 @@ const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" strok
 </aside>
 </div>
 
-<ClosingCta size="guide" title={p.closing.title} body={p.closing.body} href={downloadHref} cta={p.cta} />
+<ClosingCta size="guide" title={p.closing.title} body={`${p.closing.body} ${t.price}`} href={downloadHref} cta={p.cta} />
 </main>
 
 <Footer path={p.path} overview trademarks={p.trademarks} />

@@ -45,6 +45,8 @@ export interface GateDeps {
   send(email: Email): Promise<Email | void>;
   /** Origin the emailed link points at, e.g. https://cachedrop.io. */
   siteUrl: string;
+  /** PUBLIC_PRICING_LIVE is "1" (Decision 44): the download email says "free to try". */
+  pricingLive?: boolean;
 }
 
 /** The signup also runs the bot check and rate limit (Decision 12). */
@@ -88,7 +90,7 @@ export async function handleSignup(request: Request, deps: SignupDeps): Promise<
   let captured: Email | void;
   try {
     const link = `${pagesFor(deps.siteUrl, lang)}/download/${token}/`;
-    captured = await deps.send(downloadEmail(email, lang, link, deps.siteUrl, unsubscribeFor(deps.siteUrl, unsubscribe, lang)));
+    captured = await deps.send(downloadEmail(email, lang, link, deps.siteUrl, unsubscribeFor(deps.siteUrl, unsubscribe, lang), deps.pricingLive));
   } catch (e) {
     console.error('download email failed:', (e as Error).message);
     return json({ error: 'email_failed' }, 502);
