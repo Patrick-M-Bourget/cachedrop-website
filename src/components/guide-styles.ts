@@ -24,5 +24,17 @@ export const guideSection = 'padding-top: var(--space-18); display: flex; flex-d
 /** The large primary download button used in the hero and the closing call to action. */
 export const primaryLg = 'display: inline-flex; align-items: center; gap: var(--space-2-5); height: var(--control-lg); padding: 0 var(--space-6); border-radius: var(--radius-full); background: var(--accent); font-size: 15px; font-weight: 500; box-shadow: var(--shadow-button)';
 
+/** The large secondary button beside it in the hero ("Give Fast Feedback"). */
+export const secondaryLg = 'display: inline-flex; align-items: center; height: var(--control-lg); padding: 0 22px; border-radius: var(--radius-full); border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 15px; font-weight: 500';
+
+/** A homepage card: the feature cards and the pricing card. */
+export const card = 'background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-2xl); padding: var(--space-8); box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: var(--space-6)';
+
+/** A homepage section's eyebrow above its heading ("Built for workstations"). */
+export const eyebrow = 'margin: 0 0 var(--space-3); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-secondary)';
+
+/** A homepage section heading (H2), the design system's `headline-lg`. */
+export const sectionH2 = 'margin: 0; font-size: clamp(28px, 3.4vw, 40px); line-height: 1.2; font-weight: 600; letter-spacing: -0.025em';
+
 /** "Get CacheDrop free" style text link with a trailing arrow. */
 export const arrowLink = 'display: inline-flex; align-items: center; gap: var(--space-1-5); font-size: 15px; font-weight: 500; color: var(--accent-text)';
