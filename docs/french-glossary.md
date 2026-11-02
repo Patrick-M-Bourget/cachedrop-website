@@ -71,3 +71,5 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | Overview (footer link) | Aperçu | |
 | system specs | caractéristiques du système | |
 | macOS 26 or later | macOS 26 ou version ultérieure | |
+| license, license key | licence, clé de licence | As in the license email (#64). |
+| Resend License Key | Renvoyer la clé de licence | The resend page's button and footer link (Decision 42). |

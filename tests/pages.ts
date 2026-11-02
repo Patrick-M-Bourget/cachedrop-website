@@ -24,6 +24,7 @@ export const pages: PageUnderTest[] = [
   { path: '/download/', head: 'download/index.html' },
   // The token page, which vercel.json serves at /download/<token>/. Without a token it renders the handoff as is.
   { path: '/download/link/', handoff: 'download/index.html', screenshots: 'download' },
+  { path: '/resend-license-key/' }, // new (Decision 42): no handoff original
   // French (Decision 5). No handoff originals: token, modal, footer, FAQ and analytics tests.
   { path: '/fr/', lang: 'fr' },
   { path: '/fr/clear-mac-developer-caches/', lang: 'fr' },
@@ -32,6 +33,7 @@ export const pages: PageUnderTest[] = [
   { path: '/fr/unsubscribe/', lang: 'fr' },
   { path: '/fr/download/', lang: 'fr' },
   { path: '/fr/download/link/', lang: 'fr' },
+  { path: '/fr/resend-license-key/', lang: 'fr' },
 ];
 
 /** Each English page and its French twin: where each is built and its canonical address. */
@@ -52,6 +54,7 @@ export const pairs: Pair[] = [
   pair('/download/', false),
   pair('/download/link/', false, '/download/'),
   pair('/unsubscribe/', false),
+  pair('/resend-license-key/', false),
 ];
 
 /** The shared interface's accessible names in each language, as the per-page tests look them up. */
