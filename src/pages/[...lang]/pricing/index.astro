@@ -1,0 +1,32 @@
+---
+// /pricing/ and /fr/pricing/ (Decision 44): the homepage's pricing section as a page of its own,
+// built only when the launch setting is on. With it off, getStaticPaths builds nothing.
+import Base from '../../../layouts/Base.astro';
+import Nav from '../../../components/Nav.astro';
+import Footer from '../../../components/Footer.astro';
+import PricingSection from '../../../components/PricingSection.astro';
+import { pricingLive } from '../../../components/pricing';
+import { langOf, langPaths } from '../../../i18n';
+
+export const getStaticPaths = () => (pricingLive ? langPaths() : []);
+
+const copy = {
+  en: {
+    title: 'CacheDrop Pricing – $19.99 One-Time Mac Cleaner License',
+    description: 'CacheDrop is free to try: scanning is always free and you can clean up to 2\u00a0GB. A license is $19.99 once, for up to 3 Macs and every 1.x release, with 30-day refunds.',
+  },
+  fr: {
+    title: 'Prix de CacheDrop – Licence à 19,99\u00a0$ payée une seule fois',
+    description: 'CacheDrop s’essaie gratuitement\u00a0: l’analyse est toujours gratuite et vous pouvez nettoyer jusqu’à 2\u00a0Go. La licence coûte 19,99\u00a0$ une seule fois, pour un maximum de 3 Mac et toutes les versions 1.x, remboursable dans les 30 jours.',
+  },
+};
+const lang = langOf(Astro.url);
+const t = copy[lang];
+---
+<Base title={t.title} description={t.description} path="/pricing/">
+<Nav current="/pricing/" />
+<main>
+<PricingSection level={1} />
+</main>
+<Footer path="/pricing/" overview />
+</Base>

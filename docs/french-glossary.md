@@ -53,6 +53,15 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | beta, public beta | bêta, bêta publique | With the accent; the nav tag reads BÊTA. |
 | Download Free Beta | Télécharger la bêta gratuite | |
 | Get Free Beta (nav) | Obtenir la bêta gratuite | |
+| Download Free (nav, footer, pricing; Decision 44) | Télécharger gratuitement | Replaces the two beta labels above once pricing is live. |
+| free to try | essai gratuit; vous pouvez l’essayer gratuitement | « Essai gratuit » as a label, the verb in a sentence. |
+| Pricing (nav link, section) | Prix | *Owner*: « Tarifs » is the other common choice; one price reads better as « Prix ». |
+| Try it free. Pay once. | Essayez-le gratuitement. Payez une seule fois. | The pricing section's title. |
+| Buy a License (button) | Acheter une licence | |
+| Already tried it? Buy a license | Vous l’avez déjà essayé? Achetez une licence | The download page's line. |
+| Was $29.99, now $19.99 (spoken) | Prix régulier 29,99 $, maintenant 19,99 $ | What screen readers hear for the struck-through price. |
+| the same number in each (currency) | le même montant dans chaque devise | |
+| What’s included | Ce qui est inclus | |
 | email (address) | courriel, adresse courriel | OQLF. |
 | email (a message) | courriel | |
 | spam folder | dossier de courrier indésirable | Apple Mail's name. |

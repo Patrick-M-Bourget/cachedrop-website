@@ -6,6 +6,8 @@ import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import AppWindow from '../../components/AppWindow.astro';
 import ClosingCta from '../../components/ClosingCta.astro';
+import PricingSection from '../../components/PricingSection.astro';
+import { pricingLive, withLaunch } from '../../components/pricing';
 import { card, eyebrow, faqItem, faqQuestion, primaryLg, secondaryLg, sectionH2, titleMd } from '../../components/guide-styles';
 import { langOf, langPaths, localize } from '../../i18n';
 
@@ -118,8 +120,28 @@ const copy = {
     closingLink: 'Vous l’utilisez déjà? Dites-nous quoi corriger en premier →',
   },
 };
+// Decision 44: with pricing live, the beta copy gives way to "free to try" and the FAQ's price answer.
+const launch = {
+  en: {
+    description: 'Free up space on your Mac. CacheDrop finds hidden caches, Xcode DerivedData, node_modules and video caches, and clears them safely. Free to try.',
+    badge: 'Mac storage cleaner · Free to try',
+    download: 'Download Free',
+    meta: 'Free to try · Pay once · macOS 26+ on Apple Silicon',
+    priceAnswer: ['Is CacheDrop free, and which Macs does it support?', 'It’s free to try: scanning is always free, and you can clean up to 2\u00a0GB before you buy. A license is $19.99, paid once, for up to 3 Macs. It runs on Apple Silicon Macs with macOS 26 or later.'],
+    closingBody: 'Free to try. For Apple Silicon Macs on macOS 26 or later.',
+  },
+  fr: {
+    description: 'Libérez de l’espace sur votre Mac. CacheDrop repère les caches invisibles, les DerivedData de Xcode, les dossiers node_modules et les caches vidéo, puis les vide en toute sécurité. Essai gratuit.',
+    badge: 'Nettoyeur de stockage pour Mac · Essai gratuit',
+    download: 'Télécharger gratuitement',
+    meta: 'Essai gratuit · Payez une seule fois · macOS 26+ sur Apple Silicon',
+    priceAnswer: ['CacheDrop est-il gratuit, et sur quels Mac fonctionne-t-il?', 'Vous pouvez l’essayer gratuitement\u00a0: l’analyse est toujours gratuite, et vous pouvez nettoyer jusqu’à 2\u00a0Go avant d’acheter. La licence coûte 19,99\u00a0$, payée une seule fois, pour un maximum de 3 Mac. Il fonctionne sur les Mac Apple Silicon sous macOS 26 ou version ultérieure.'],
+    closingBody: 'Essai gratuit. Pour les Mac Apple Silicon sous macOS 26 ou version ultérieure.',
+  },
+};
 const lang = langOf(Astro.url);
-const t = copy[lang];
+const { priceAnswer, ...launchCopy } = launch[lang];
+const t = withLaunch(copy[lang], { ...launchCopy, faq: [...copy[lang].faq.slice(0, -1), priceAnswer] });
 const download = localize(lang, '/download/');
 
 const site = Astro.site!.origin;
@@ -135,7 +157,7 @@ const jsonLd = {
       operatingSystem: t.operatingSystem,
       description: t.description,
       publisher: { '@id': `${site}/#org` },
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      offers: { '@type': 'Offer', price: pricingLive ? '19.99' : '0', priceCurrency: 'USD' },
     },
     {
       '@type': 'FAQPage',
@@ -249,6 +271,8 @@ const steps = t.steps.map(([title, body], i) => [`0${i + 1}`, title, body]);
 </ol>
 </div>
 </section>
+
+{pricingLive && <PricingSection />}
 
 <section id="faq" style="padding: 0 var(--space-6) var(--space-32)">
 <div style="max-width: var(--container-max); margin: 0 auto; padding-top: var(--space-28); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: var(--space-16); align-items: start">

@@ -16,3 +16,5 @@ a.btn-primary,a.btn-primary:hover{color:var(--on-accent)}
 .textlink:hover{text-decoration:underline;text-underline-offset:3px}
 .mono{font-family:var(--font-mono)}
 @media (max-width:760px){.navlinks{display:none !important}}
+/* Text for screen readers only (Decision 44: the pricing card's spoken price). */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
