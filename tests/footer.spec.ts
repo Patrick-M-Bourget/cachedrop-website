@@ -12,3 +12,12 @@ for (const p of pages) {
     await expect(page).toHaveURL(new RegExp(`${href}$`));
   });
 }
+
+// Decision 42: the Product column links to the page that re-sends a license key.
+for (const p of pages) {
+  test(`${p.path} footer links to the resend-key page`, async ({ page }) => {
+    const [name, href] = uiOf(p).resendKey;
+    await page.goto(p.path);
+    await expect(page.getByRole('contentinfo').getByRole('navigation', { name: 'Product' }).getByRole('link', { name })).toHaveAttribute('href', href);
+  });
+}
