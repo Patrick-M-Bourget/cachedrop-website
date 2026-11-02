@@ -2,6 +2,7 @@
 // Site footer from the handoff. The "Cleaning Guides" anchors are exact-match on
 // purpose (HANDOFF.md §4); don't rename them.
 // The "Privacy Policy" link in the bottom row is Decision 19; the handoff has none.
+// The terms of sale, refund policy and license agreement links after it are Decision 43; the row wraps.
 // The language switch after "Public beta" is Decision 5: it opens this page in the other language.
 import BrandMark from './BrandMark.astro';
 import { langOf, localize, other } from '../i18n';
@@ -30,6 +31,9 @@ const copy = {
     macos: 'macOS 26 or later',
     trademarks: 'Apple, Mac, and macOS are trademarks of Apple Inc.',
     privacy: 'Privacy Policy',
+    terms: 'Terms of Sale',
+    refunds: 'Refund Policy',
+    license: 'License Agreement',
     beta: 'Public beta',
     switchTo: 'Français',
   },
@@ -47,6 +51,9 @@ const copy = {
     macos: 'macOS 26 ou version ultérieure',
     trademarks: 'Apple, Mac et macOS sont des marques de commerce d’Apple Inc.',
     privacy: 'Politique de confidentialité',
+    terms: 'Conditions de vente',
+    refunds: 'Politique de remboursement',
+    license: 'Contrat de licence',
     beta: 'Bêta publique',
     switchTo: 'English',
   },
@@ -86,7 +93,7 @@ const { path, overview = false, trademarks = t.trademarks } = Astro.props;
 </div>
 <div style="margin-top: var(--space-14); padding-top: var(--space-6); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3); font-size: 12px; color: var(--ink-secondary)">
 <span>© 2026 CacheDrop. {trademarks}</span>
-<span style="display: flex; gap: var(--space-4)"><a class="flink" href={href('/privacy/')}>{t.privacy}</a><span>{t.beta}</span><a class="flink" href={localize(to, path)} hreflang={to} lang={to}>{t.switchTo}</a></span>
+<span style="display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4)"><a class="flink" href={href('/privacy/')}>{t.privacy}</a><a class="flink" href={href('/terms-of-sale/')}>{t.terms}</a><a class="flink" href={href('/refund-policy/')}>{t.refunds}</a><a class="flink" href={href('/license-agreement/')}>{t.license}</a><span>{t.beta}</span><a class="flink" href={localize(to, path)} hreflang={to} lang={to}>{t.switchTo}</a></span>
 </div>
 </div>
 </footer>

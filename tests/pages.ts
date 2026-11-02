@@ -71,6 +71,11 @@ export const ui = {
     home: '/',
     download: '/download/',
     privacy: ['Privacy Policy', '/privacy/'],
+    legal: [
+      ['Terms of Sale', '/terms-of-sale/'],
+      ['Refund Policy', '/refund-policy/'],
+      ['License Agreement', '/license-agreement/'],
+    ],
     dialog: 'Give Fast Feedback',
     veryUnhappy: 'Very unhappy',
     close: 'Close feedback',
@@ -81,6 +86,11 @@ export const ui = {
     home: '/fr/',
     download: '/fr/download/',
     privacy: ['Politique de confidentialité', '/fr/privacy/'],
+    legal: [
+      ['Conditions de vente', '/fr/terms-of-sale/'],
+      ['Politique de remboursement', '/fr/refund-policy/'],
+      ['Contrat de licence', '/fr/license-agreement/'],
+    ],
     dialog: 'Donnez-nous votre avis',
     veryUnhappy: 'Très insatisfait',
     close: 'Fermer',
