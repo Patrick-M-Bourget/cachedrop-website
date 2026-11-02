@@ -31,6 +31,7 @@ test('lists what is collected and why', async ({ page }) => {
     'System specs',
     'Page visits',
     'Download counts',
+    'Your license', // Decision 40
   ]) {
     expect(text, item).toContain(item);
   }
@@ -49,7 +50,7 @@ test('says what Vercel Web Analytics records about a visit (Decision 16)', async
 
 test('lists every provider and says which are outside Quebec', async ({ page }) => {
   const text = await sectionText(page, 'Who handles your information');
-  for (const provider of ['Supabase', 'Vercel', 'Resend', 'Cloudflare', 'GitHub']) expect(text, provider).toContain(provider);
+  for (const provider of ['Supabase', 'Vercel', 'Resend', 'Cloudflare', 'Stripe', 'GitHub']) expect(text, provider).toContain(provider);
   // Decision 31 (amends 13): Supabase is in AWS US regions, so it is listed as outside Quebec.
   const supabase = (await page.locator('#providers li', { hasText: 'Supabase' }).innerText()).replace(/\s+/g, ' ');
   expect(supabase).toContain('Outside Quebec');
@@ -107,11 +108,13 @@ const policy = {
     collect: 'What we collect and why',
     retention: 'How long we keep it',
     token: ['Anyone with the link can use it for 7 days, so don’t share it.'],
-    collected: ['Your language', 'A code in each email’s unsubscribe link'],
+    collected: ['Your language', 'A code in each email’s unsubscribe link', 'Stripe takes the payment; we never see your card.'],
     kept: [
       'Feedback: your rating, your message, the page, your email if you added one, and the system specs if you sent them. We keep it until you ask us to delete it.',
       'your news choice and your language',
       'Unsubscribe codes: we keep them as long as your signup, and delete them with it.',
+      // Decision 40: the license record, and why it is kept.
+      'We keep them as long as your license can be used, so we can send your key again, refund it or revoke it.',
     ],
   },
   fr: {
@@ -119,11 +122,12 @@ const policy = {
     collect: 'Ce que nous recueillons et pourquoi',
     retention: 'Combien de temps nous les gardons',
     token: ['Toute personne qui a le lien peut s’en servir pendant 7 jours. Ne le partagez donc pas.'],
-    collected: ['Votre langue', 'Un code dans le lien de désabonnement de chaque courriel'],
+    collected: ['Votre langue', 'Un code dans le lien de désabonnement de chaque courriel', 'Stripe traite le paiement; nous ne voyons jamais votre carte.'],
     kept: [
       'Les avis : votre note, votre message, la page, votre adresse courriel si vous l’avez ajoutée, et les caractéristiques du système si vous les avez envoyées. Nous les gardons jusqu’à ce que vous nous demandiez de les supprimer.',
       'votre choix pour les courriels de nouvelles et votre langue',
       'Les codes de désabonnement : nous les gardons aussi longtemps que votre inscription, et les supprimons avec elle.',
+      'Nous les gardons tant que votre licence peut servir, pour pouvoir vous renvoyer votre clé, la rembourser ou la révoquer.',
     ],
   },
 };
@@ -140,12 +144,12 @@ for (const [lang, p] of Object.entries(policy)) {
       expect(text).not.toMatch(/only for you|ne fonctionne que pour vous/);
     });
 
-    test('lists the stored language and the unsubscribe codes', async ({ page }) => {
+    test('lists the stored language, the unsubscribe codes and the license purchase', async ({ page }) => {
       const text = await sectionText(page, p.collect);
       for (const item of p.collected) expect(text, item).toContain(item);
     });
 
-    test('states how long feedback, the language and unsubscribe codes are kept', async ({ page }) => {
+    test('states how long feedback, the language, unsubscribe codes and license records are kept', async ({ page }) => {
       const text = await sectionText(page, p.retention);
       for (const line of p.kept) expect(text, line).toContain(line);
     });
