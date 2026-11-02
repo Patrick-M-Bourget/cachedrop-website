@@ -59,10 +59,9 @@ export const pairs: Pair[] = [
   pair('/download/', false),
   pair('/download/link/', false, '/download/'),
   pair('/unsubscribe/', false),
-  // Drafts (Decision 43): kept out of the sitemap until the owner approves them.
-  pair('/terms-of-sale/', false),
-  pair('/refund-policy/', false),
-  pair('/license-agreement/', false),
+  pair('/terms-of-sale/', true),
+  pair('/refund-policy/', true),
+  pair('/license-agreement/', true),
 ];
 
 /** The shared interface's accessible names in each language, as the per-page tests look them up. */
