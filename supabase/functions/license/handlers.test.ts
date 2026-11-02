@@ -1,6 +1,6 @@
 // The license function's handlers with Supabase, Resend and Turnstile stood in for at the boundary
 // (Decision 27). The SQL functions are faked in memory with the migration's semantics.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { Email } from './email.ts';
 import { handleResend, handleStripeWebhook, MACS, RESEND_LIMIT, type LicenseDb, type LicenseRow, type ResendDeps, type WebhookDeps } from './handlers.ts';
 import { importPrivateKey } from './key.ts';
@@ -137,6 +137,14 @@ describe('handleStripeWebhook', () => {
     const res = await handleStripeWebhook(await stripeRequest(event(session())), webhookDeps(fakeDb({ failIssue: true }), send));
     expect(res.status).toBe(503);
     expect(sent).toHaveLength(0);
+  });
+
+  it('logs why the license could not be stored (#76)', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { send } = fakeSend();
+    await handleStripeWebhook(await stripeRequest(event(session())), webhookDeps(fakeDb({ failIssue: true }), send));
+    expect(log).toHaveBeenCalledWith('issue_license failed:', 'down');
+    log.mockRestore();
   });
 
   it('rejects forged, unsigned, stale and tampered requests and issues nothing', async () => {

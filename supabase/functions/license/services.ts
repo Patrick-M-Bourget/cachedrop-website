@@ -7,13 +7,29 @@ import type { LicenseDb, Send, Verdict } from './handlers.ts';
 
 export const FROM = 'CacheDrop <hello@cachedrop.io>';
 
-/** rpc() against `${url}/rest/v1/rpc/<fn>` with the service role key, as supabase-js sends it. */
+/**
+ * The key the function reaches the database with (#76): `LICENSE_DB_SECRET_KEY`, a function secret
+ * holding a new-style `sb_secret_…` key for projects whose legacy API keys are off (Supabase
+ * forbids custom secret names starting `SUPABASE_`), else the legacy service role key Supabase
+ * injects.
+ */
+export function dbKey(env: (name: string) => string): string {
+  return env('LICENSE_DB_SECRET_KEY') || env('SUPABASE_SERVICE_ROLE_KEY');
+}
+
+/**
+ * rpc() against `${url}/rest/v1/rpc/<fn>`. A legacy service role key is a JWT and goes in both
+ * headers, as supabase-js sends it; a new-style `sb_…` key isn't a JWT, so it goes in `apikey` only.
+ */
 export function restDb(url: string, serviceKey: string, fetchFn: typeof fetch = fetch): LicenseDb {
+  const auth: Record<string, string> = serviceKey.startsWith('sb_')
+    ? { apikey: serviceKey }
+    : { apikey: serviceKey, authorization: `Bearer ${serviceKey}` };
   const rpc = async (fn: string, args: Record<string, unknown>) => {
     try {
       const res = await fetchFn(`${url}/rest/v1/rpc/${fn}`, {
         method: 'POST',
-        headers: { apikey: serviceKey, authorization: `Bearer ${serviceKey}`, 'content-type': 'application/json' },
+        headers: { ...auth, 'content-type': 'application/json' },
         body: JSON.stringify(args),
       });
       if (!res.ok) return { data: null, error: { message: `${fn} answered ${res.status}` } };

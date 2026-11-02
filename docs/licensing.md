@@ -36,6 +36,7 @@ npx supabase secrets set --project-ref <project-ref> \
 ```
 
 - `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided to every Edge Function by Supabase.
+- `LICENSE_DB_SECRET_KEY` (#76) is needed only when the project's **legacy API keys are disabled**: the injected `SUPABASE_SERVICE_ROLE_KEY` is then rejected and every purchase answers `503`. Create a secret key in Settings → API Keys (`sb_secret_…`, e.g. named `license-function`) and set it here. When set, the function uses it instead of the legacy key. Database errors are logged by name and status (`issue_license failed: issue_license answered 401`) in the function's logs, never with a secret.
 - `SITE_ORIGINS` (optional) lists the origins allowed to call `/resend` from a browser, comma-separated; it defaults to `https://cachedrop.io`. Add a preview origin to test the form there.
 - `STRIPE_SECRET_KEY` isn't needed: the function never calls Stripe's API, it only reads the signed event.
 - Keep copies in `.env.local` only if you need them locally; never commit them.

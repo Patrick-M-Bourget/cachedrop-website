@@ -146,7 +146,11 @@ export async function handleStripeWebhook(request: Request, deps: WebhookDeps): 
     p_issue_day: issueDay(deps.now()),
   });
   const row = issued.data?.[0];
-  if (issued.error || !row) return json({ error: 'unavailable' }, 503);
+  if (issued.error || !row) {
+    // The message names the call and its status (services.ts), never a secret (#76).
+    console.error('issue_license failed:', issued.error?.message ?? 'no row');
+    return json({ error: 'unavailable' }, 503);
+  }
   if (row.emailed_at) return json({ ok: true, repeat: true });
 
   try {
@@ -158,7 +162,10 @@ export async function handleStripeWebhook(request: Request, deps: WebhookDeps): 
     return json({ error: 'email_failed' }, 502);
   }
   const marked = await deps.db.rpc('mark_license_emailed', { p_id: row.id });
-  if (marked.error || marked.data !== true) return json({ error: 'unavailable' }, 503);
+  if (marked.error || marked.data !== true) {
+    console.error('mark_license_emailed failed:', marked.error?.message ?? 'no license');
+    return json({ error: 'unavailable' }, 503);
+  }
   return json({ ok: true });
 }
 
@@ -205,11 +212,17 @@ export async function handleResend(request: Request, deps: ResendDeps): Promise<
     p_limit: RESEND_LIMIT.limit,
     p_window_seconds: RESEND_LIMIT.windowSeconds,
   });
-  if (hit.error || typeof hit.data !== 'number') return json({ error: 'unavailable' }, 503);
+  if (hit.error || typeof hit.data !== 'number') {
+    console.error('hit_rate_limit failed:', hit.error?.message ?? 'no count');
+    return json({ error: 'unavailable' }, 503);
+  }
   if (hit.data > 0) return json({ error: 'rate_limited', retryAfter: hit.data }, 429, { 'retry-after': String(hit.data) });
 
   const found = await deps.db.rpc('licenses_for_email', { p_email: email });
-  if (found.error || !found.data) return json({ error: 'unavailable' }, 503);
+  if (found.error || !found.data) {
+    console.error('licenses_for_email failed:', found.error?.message ?? 'no rows');
+    return json({ error: 'unavailable' }, 503);
+  }
   try {
     for (const row of found.data) await emailKey(row, lang, deps);
   } catch (e) {

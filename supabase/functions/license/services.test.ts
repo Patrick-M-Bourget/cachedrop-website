@@ -2,7 +2,7 @@
 // download form's (src/server/bot-check.ts), so both count a place the same way.
 import { describe, expect, it } from 'vitest';
 import { ipHash as siteIpHash } from '../../../src/server/bot-check.ts';
-import { clientIp, corsHeaders, ipHash, resendSender, restDb, turnstile } from './services.ts';
+import { clientIp, corsHeaders, dbKey, ipHash, resendSender, restDb, turnstile } from './services.ts';
 
 function fakeFetch(status: number, body: unknown) {
   const calls: Array<{ url: string; init: RequestInit }> = [];
@@ -41,11 +41,28 @@ describe('restDb', () => {
     expect(JSON.parse(calls[0].init.body as string)).toEqual({ p_id: 'x' });
   });
 
+  it('sends a new-style secret key (sb_secret_…) as apikey only, never as a Bearer token (#76)', async () => {
+    const { fetchFn, calls } = fakeFetch(200, true);
+    await restDb('https://ref.supabase.co', 'sb_secret_abc', fetchFn).rpc('mark_license_emailed', { p_id: 'x' });
+    const headers = calls[0].init.headers as Record<string, string>;
+    expect(headers.apikey).toBe('sb_secret_abc');
+    expect(headers.authorization).toBeUndefined();
+  });
+
   it('turns an error status into an error', async () => {
     const { fetchFn } = fakeFetch(500, { message: 'boom' });
     const result = await restDb('https://ref.supabase.co', 'k', fetchFn).rpc('mark_license_emailed', { p_id: 'x' });
     expect(result.data).toBeNull();
     expect(result.error?.message).toMatch(/500/);
+  });
+});
+
+describe('dbKey (#76)', () => {
+  it('prefers LICENSE_DB_SECRET_KEY, then the injected legacy service role key', () => {
+    const env = (vars: Record<string, string>) => (name: string) => vars[name] ?? '';
+    expect(dbKey(env({ LICENSE_DB_SECRET_KEY: 'sb_secret_new', SUPABASE_SERVICE_ROLE_KEY: 'legacy' }))).toBe('sb_secret_new');
+    expect(dbKey(env({ SUPABASE_SERVICE_ROLE_KEY: 'legacy' }))).toBe('legacy');
+    expect(dbKey(env({}))).toBe('');
   });
 });
 
