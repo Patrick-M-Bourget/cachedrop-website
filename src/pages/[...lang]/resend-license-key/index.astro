@@ -1,0 +1,168 @@
+---
+// "Resend my license key" (Decision 42): one email field, the bot check and a submit button, built
+// like the download form (Decision 1) with its styles (src/styles/gate.css), done state and error
+// handling. It posts { email, lang, turnstile } to the license function's resend route (Decision 40),
+// whose URL comes from SUPABASE_URL at build time (src/components/license-resend.ts). The answer is
+// the same whether or not the address bought a license, so the page never says who is a buyer.
+// Built at /resend-license-key/ and /fr/resend-license-key/ (Decision 5); `lang` picks the email's language.
+import Base from '../../../layouts/Base.astro';
+import Nav from '../../../components/Nav.astro';
+import Footer from '../../../components/Footer.astro';
+import BotCheck from '../../../components/BotCheck.astro';
+import { resendEndpoint } from '../../../components/license-resend';
+import { titleMd } from '../../../components/guide-styles';
+import { langOf, langPaths, localize } from '../../../i18n';
+import '../../../styles/gate.css';
+
+export const getStaticPaths = langPaths;
+
+const copy = {
+  en: {
+    head: {
+      title: 'Resend Your CacheDrop License Key',
+      description: 'Lost the email with your CacheDrop license key? Enter the address you bought it with and we’ll send the key again.',
+    },
+    title: 'Get your license key again.',
+    lede: 'Enter the email address you bought CacheDrop with and we’ll send your license key to it again.',
+    email: 'Email',
+    placeholder: 'you@example.com',
+    send: 'Resend License Key',
+    promise: 'We use the address only to find your license.',
+    privacy: 'Privacy Policy',
+    sentTitle: 'Check your inbox',
+    sent: 'If that address bought a license, its key is on its way. If it isn’t there in a minute, check your spam folder.',
+    again: 'Use a Different Email',
+    help: 'Still nothing?',
+    write: 'Write to hello@cachedrop.io',
+    badEmail: 'Enter a full email address, like you@example.com.',
+    unavailable: 'We couldn’t send the key right now. Try again in a few minutes.',
+    failed: 'We couldn’t send the key. Check your connection and try again.',
+  },
+  fr: {
+    head: {
+      title: 'Recevoir de nouveau votre clé de licence CacheDrop',
+      description: 'Vous avez perdu le courriel contenant votre clé de licence CacheDrop? Entrez l’adresse utilisée pour l’achat et nous vous enverrons la clé de nouveau.',
+    },
+    title: 'Recevez de nouveau votre clé de licence.',
+    lede: 'Entrez l’adresse courriel utilisée pour acheter CacheDrop et nous vous enverrons de nouveau votre clé de licence.',
+    email: 'Courriel',
+    placeholder: 'vous@exemple.com',
+    send: 'Renvoyer la clé de licence',
+    promise: 'Nous utilisons votre adresse uniquement pour trouver votre licence.',
+    privacy: 'Politique de confidentialité',
+    sentTitle: 'Vérifiez vos courriels',
+    sent: 'Si une licence a été achetée avec cette adresse, sa clé est en route. Si le courriel n’est pas arrivé d’ici une minute, vérifiez votre dossier de courrier indésirable.',
+    again: 'Utiliser une autre adresse',
+    help: 'Toujours rien?',
+    write: 'Écrivez à hello@cachedrop.io',
+    badEmail: 'Entrez une adresse courriel complète, comme vous@exemple.com.',
+    unavailable: 'La clé n’a pas pu être envoyée pour le moment. Réessayez dans quelques minutes.',
+    failed: 'La clé n’a pas pu être envoyée. Vérifiez votre connexion et réessayez.',
+  },
+};
+const lang = langOf(Astro.url);
+const t = copy[lang];
+const endpoint = resendEndpoint(import.meta.env.SUPABASE_URL, process.env.VERCEL_ENV);
+const msg = { lang, endpoint, badEmail: t.badEmail, unavailable: t.unavailable, failed: t.failed };
+const label = 'font-size: 13px; line-height: 18px; font-weight: 500';
+const link = 'color: var(--accent-text); font-weight: 500';
+---
+<Base {...t.head} path="/resend-license-key/" robots="noindex, follow">
+<Nav />
+
+<main style="padding: 104px var(--space-6) var(--space-32)">
+<div style="max-width: var(--window-max); margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center">
+<div style="width: var(--tile-lg); height: var(--tile-lg); border-radius: var(--radius-2xl); background: var(--surface-subtle); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; color: var(--ink)">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"></circle><path d="M10.8 12.2L20 3"></path><path d="M16 7l3 3"></path><path d="M14 9l2 2"></path></svg>
+</div>
+<h1 style="margin: var(--space-8) 0 0; font-size: clamp(34px, 4.6vw, 56px); line-height: 1.08; font-weight: 600; letter-spacing: -0.035em; text-wrap: balance">{t.title}</h1>
+<p style="margin: 18px 0 0; max-width: 560px; font-size: 19px; line-height: 29px; color: var(--ink-secondary); text-wrap: pretty">{t.lede}</p>
+
+<div data-gate style="margin-top: var(--space-12); width: 100%; max-width: var(--modal-max); padding: var(--space-8); border: 1px solid var(--line); border-radius: var(--radius-2xl); background: var(--surface-raised); box-shadow: var(--shadow-card); text-align: left">
+<form data-gate-form novalidate style="display: flex; flex-direction: column; gap: var(--space-5); margin: 0">
+<div style="display: flex; flex-direction: column; gap: var(--space-1-5)">
+<label for="gate-email" style={label}>{t.email}</label>
+<input id="gate-email" name="email" class="gate-input" type="email" autocomplete="email" required placeholder={t.placeholder} aria-describedby="gate-error">
+<p id="gate-error" data-gate-error hidden role="alert" style="margin: 0; font-size: 13px; line-height: 18px; color: var(--danger-ink)"></p>
+</div>
+<BotCheck form="license" lang={lang} />
+<button type="submit" class="gate-btn gate-primary">{t.send}</button>
+<p style="margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-secondary)">{t.promise} <a class="textlink" href={localize(lang, '/privacy/')} style={link}>{t.privacy}</a></p>
+</form>
+
+<div data-gate-done hidden aria-live="polite" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-3); padding: var(--space-6) 0 var(--space-2)">
+<div style="width: var(--control-lg); height: var(--control-lg); border-radius: var(--radius-full); background: var(--success-soft); color: var(--success-ink); display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
+<h2 data-gate-done-title tabindex="-1" style={`${titleMd}; outline: none`}>{t.sentTitle}</h2>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-secondary)">{t.sent}</p>
+<button type="button" class="gate-btn gate-quiet" data-gate-again style="margin-top: var(--space-1)">{t.again}</button>
+</div>
+</div>
+
+<p style="margin: var(--space-18) 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3) var(--space-2); font-size: 14px">
+<span style="color: var(--ink-secondary)">{t.help}</span>
+<a class="textlink" href="mailto:hello@cachedrop.io" style={link}>{t.write}</a>
+</p>
+</div>
+</main>
+
+<Footer path="/resend-license-key/" overview />
+
+<script is:inline define:vars={{ msg }}>
+(function () {
+  var form = document.querySelector('[data-gate-form]');
+  var done = document.querySelector('[data-gate-done]');
+  var error = document.querySelector('[data-gate-error]');
+  var check = form.querySelector('[data-bot-check]');
+  var email = form.email;
+  var submit = form.querySelector('[type=submit]');
+  // bot-check.js is deferred, so it runs after this and before DOMContentLoaded.
+  document.addEventListener('DOMContentLoaded', function () { window.CacheDropBotCheck.prepare(check); });
+
+  function fail(message, field) {
+    error.textContent = message;
+    error.hidden = false;
+    if (field) { email.setAttribute('aria-invalid', 'true'); email.focus(); }
+  }
+  function clear() { error.hidden = true; email.removeAttribute('aria-invalid'); }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    clear();
+    var address = email.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) return fail(msg.badEmail, true);
+    var bot = window.CacheDropBotCheck;
+    submit.disabled = true;
+    bot.token(check)
+      .then(function (token) {
+        return fetch(msg.endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: address, lang: msg.lang, turnstile: token })
+        }).then(function (res) {
+          bot.reset(check); // a token works once
+          if (res.ok) {
+            form.hidden = true;
+            done.hidden = false;
+            document.querySelector('[data-gate-done-title]').focus();
+            return;
+          }
+          return res.json().catch(function () { return {}; }).then(function (body) {
+            var refused = bot.message(check, res, body);
+            if (refused) fail(refused);
+            else if (body.error === 'invalid_email') fail(msg.badEmail, true);
+            else fail(msg.unavailable);
+          });
+        }, function () { bot.reset(check); fail(msg.failed); });
+      }, function () { fail(bot.failed(check)); })
+      .then(function () { submit.disabled = false; });
+  });
+  email.addEventListener('input', clear);
+  document.querySelector('[data-gate-again]').addEventListener('click', function () {
+    form.reset();
+    done.hidden = true;
+    form.hidden = false;
+    email.focus();
+  });
+})();
+</script>
+</Base>

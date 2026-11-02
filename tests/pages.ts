@@ -28,6 +28,7 @@ export const pages: PageUnderTest[] = [
   { path: '/terms-of-sale/' },
   { path: '/refund-policy/' },
   { path: '/license-agreement/' },
+  { path: '/resend-license-key/' }, // new (Decision 42): no handoff original
   // French (Decision 5). No handoff originals: token, modal, footer, FAQ and analytics tests.
   { path: '/fr/', lang: 'fr' },
   { path: '/fr/clear-mac-developer-caches/', lang: 'fr' },
@@ -39,6 +40,7 @@ export const pages: PageUnderTest[] = [
   { path: '/fr/terms-of-sale/', lang: 'fr' },
   { path: '/fr/refund-policy/', lang: 'fr' },
   { path: '/fr/license-agreement/', lang: 'fr' },
+  { path: '/fr/resend-license-key/', lang: 'fr' },
 ];
 
 /** Each English page and its French twin: where each is built and its canonical address. */
@@ -62,6 +64,7 @@ export const pairs: Pair[] = [
   pair('/terms-of-sale/', true),
   pair('/refund-policy/', true),
   pair('/license-agreement/', true),
+  pair('/resend-license-key/', false),
 ];
 
 /** The shared interface's accessible names in each language, as the per-page tests look them up. */
@@ -75,6 +78,7 @@ export const ui = {
       ['Refund Policy', '/refund-policy/'],
       ['License Agreement', '/license-agreement/'],
     ],
+    resendKey: ['Resend License Key', '/resend-license-key/'],
     dialog: 'Give Fast Feedback',
     veryUnhappy: 'Very unhappy',
     close: 'Close feedback',
@@ -90,6 +94,7 @@ export const ui = {
       ['Politique de remboursement', '/fr/refund-policy/'],
       ['Contrat de licence', '/fr/license-agreement/'],
     ],
+    resendKey: ['Renvoyer la clé de licence', '/fr/resend-license-key/'],
     dialog: 'Donnez-nous votre avis',
     veryUnhappy: 'Très insatisfait',
     close: 'Fermer',

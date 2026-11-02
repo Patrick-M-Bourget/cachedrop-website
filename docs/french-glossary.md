@@ -76,7 +76,6 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | terms of sale | conditions de vente | Decision 43. |
 | refund policy | politique de remboursement | |
 | license agreement | contrat de licence | French spells it « licence »; the English pages keep the app’s US spelling. |
-| license, license key | licence, clé de licence | |
 | one-time (payment) | une seule fois | « Vous payez une seule fois. » |
 | subscription | abonnement | |
 | refund | remboursement, rembourser | |
@@ -93,3 +92,5 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | Consumer Protection Act (Quebec) | Loi sur la protection du consommateur | The Act’s French title, capitalized as published. |
 | Link support | soutien de Link | « support » is an anglicism in this sense. |
 | upgrade (paid) | mise à niveau payante | |
+| license, license key | licence, clé de licence | As in the license email (#64). |
+| Resend License Key | Renvoyer la clé de licence | The resend page's button and footer link (Decision 42). |

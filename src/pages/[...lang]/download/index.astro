@@ -15,6 +15,7 @@ import BotCheck from '../../../components/BotCheck.astro';
 import { downloadHead, downloadMeta, guideLinks } from './_head.ts';
 import { titleMd } from '../../../components/guide-styles';
 import { langOf, langPaths, localize } from '../../../i18n';
+import '../../../styles/gate.css';
 
 export const getStaticPaths = langPaths;
 
@@ -76,23 +77,6 @@ const label = 'font-size: 13px; line-height: 18px; font-weight: 500';
 const guideLink = 'color: var(--accent-text); font-weight: 500';
 ---
 <Base {...downloadHead[lang]}>
-<style is:global>
-.gate-input{height:var(--control-md);padding:0 var(--space-3);border:0;border-radius:var(--radius-md);background:var(--surface);box-shadow:0 0 0 1px var(--line-strong);font:inherit;font-size:14px;color:var(--ink);transition:box-shadow .15s}
-.gate-input::placeholder{color:var(--ink-tertiary)}
-.gate-input:focus{outline:none;box-shadow:var(--focus-ring-field)}
-.gate-input[aria-invalid="true"]{box-shadow:0 0 0 1px var(--danger-ink)}
-.gate-check{display:flex;align-items:flex-start;gap:var(--space-2-5);font-size:13px;line-height:18px;color:var(--ink-body);cursor:pointer}
-.gate-check input{margin:1px 0 0;width:16px;height:16px;accent-color:var(--accent);flex:none}
-.gate-check input:focus-visible{outline:none;box-shadow:var(--focus-ring)}
-.gate-btn{display:inline-flex;align-items:center;justify-content:center;height:var(--control-md);padding:0 var(--space-4);border:0;border-radius:var(--radius-md);font:inherit;font-size:14px;font-weight:500;cursor:pointer;transition:filter .15s,background-color .15s,transform .1s}
-.gate-btn:focus-visible{outline:none;box-shadow:var(--focus-ring)}
-.gate-primary{background:var(--accent);color:var(--on-accent);box-shadow:var(--shadow-button)}
-.gate-primary:hover{background:var(--accent-hover)}
-.gate-primary[disabled]{opacity:.45;pointer-events:none}
-.gate-quiet{background:transparent;color:var(--ink)}
-.gate-quiet:hover{background:var(--surface-subtle)}
-[data-gate] [hidden]{display:none !important}
-</style>
 <Nav />
 
 <main style="padding: 104px var(--space-6) var(--space-32)">
