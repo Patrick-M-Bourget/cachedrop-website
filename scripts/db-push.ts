@@ -3,7 +3,8 @@
 // The connection string comes from .env.local (SUPABASE_DEV_DB_URL or SUPABASE_PROD_DB_URL) and goes
 // to the CLI without being printed. prod is migrated at launch.
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+import { missingMigrations } from './db-push-guard.ts';
 import { resolve } from 'node:path';
 import { parseEnv } from 'node:util';
 
@@ -13,6 +14,18 @@ if (target !== 'dev' && target !== 'prod') {
   process.exit(2);
 }
 const root = resolve(import.meta.dirname, '..');
+// #78: this checkout must hold every migration on origin/main, or the push silently skips them.
+const git = (...args: string[]) => spawnSync('git', ['-C', root, ...args], { encoding: 'utf8' });
+const remote = git('fetch', '-q', 'origin', 'main').status === 0 ? git('ls-tree', '--name-only', 'origin/main', 'supabase/migrations/') : null;
+if (!remote || remote.status !== 0) {
+  console.error("Couldn't read origin/main's migrations (git fetch failed); not pushing.");
+  process.exit(2);
+}
+const missing = missingMigrations(remote.stdout.split('\n').filter(Boolean), readdirSync(resolve(root, 'supabase/migrations')));
+if (missing.length) {
+  console.error(`This checkout lacks migrations on origin/main: ${missing.join(', ')}. Push from an up-to-date checkout of main.`);
+  process.exit(2);
+}
 const name = target === 'dev' ? 'SUPABASE_DEV_DB_URL' : 'SUPABASE_PROD_DB_URL';
 let url: string | undefined;
 try {

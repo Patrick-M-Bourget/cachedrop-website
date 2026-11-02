@@ -1,6 +1,6 @@
 // #43: exercise the shared check command at its npm process boundary.
 import { afterEach, expect, test } from 'vitest';
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, copyFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, copyFileSync, rmSync, symlinkSync, chmodSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -22,6 +22,10 @@ function fixture() {
     appendFileSync(process.env.TEST_CALLS,JSON.stringify(args)+'\\n');
     if(args[0]==='ci' && process.env.TEST_LOCK_FAILURE) process.exit(42);
   `);
+  // #78: a stand-in for the Decisions order check, failing when TEST_DECISIONS_FAILURE is set.
+  const decisions = join(dir, 'scripts/check-decisions.sh');
+  writeFileSync(decisions, '#!/bin/sh\n[ -z "$TEST_DECISIONS_FAILURE" ]\n');
+  chmodSync(decisions, 0o755);
   const calls = join(dir, 'calls.jsonl');
   writeFileSync(calls, '');
   return {
@@ -65,5 +69,21 @@ test('Node and npm mismatches stop before installing or checking the project', (
   expect(f.calls()).toEqual([]);
   writeFileSync(join(f.dir, '.node-version'), '0.0.0');
   expect(f.run().status).toBe(2);
+  expect(f.calls()).toEqual([]);
+});
+
+test('#78: a node_modules symlink stops before npm ci can empty its target', () => {
+  const f = fixture();
+  mkdirSync(join(f.dir, 'elsewhere'));
+  symlinkSync(join(f.dir, 'elsewhere'), join(f.dir, 'node_modules'));
+  const result = f.run();
+  expect(result.status).toBe(2);
+  expect(result.stderr).toMatch(/node_modules is a symlink/);
+  expect(f.calls()).toEqual([]);
+});
+
+test('#78: Decisions out of order stop before npm ci', () => {
+  const f = fixture();
+  expect(f.run('site', { TEST_DECISIONS_FAILURE: '1' }).status).not.toBe(0);
   expect(f.calls()).toEqual([]);
 });
