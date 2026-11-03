@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { handleDownload, handleRelease, handleSignup, type Email, type GateDb } from './gate.ts';
+import { UTM_MAX, handleDownload, handleRelease, handleSignup, utmArgs, type Email, type GateDb } from './gate.ts';
 import { handleUnsubscribe } from './unsubscribe.ts';
 import { KEY, PASS, WAIT, fakeRateLimit, fakeTurnstile } from './bot-check.fakes.ts';
 import { LIMITS } from './bot-check.ts';
@@ -18,7 +18,9 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
   const unsubscribeTokens = new Map<string, number>();
   const signed: Array<{ path: string; expiresIn: number; download: unknown }> = [];
   const limits = fakeRateLimit();
-  const state = { signups, tokens, unsubscribeTokens, releases, signed, limits, now: Date.now(), fail: false };
+  // Campaign tags by signup id (#93), kept apart so the signup rows above stay as they were.
+  const utm = new Map<number, Record<string, string | null>>();
+  const state = { signups, tokens, unsubscribeTokens, releases, signed, limits, utm, now: Date.now(), fail: false };
   const db: GateDb = {
     async rpc(fn: string, args: Record<string, unknown>) {
       if (state.fail) return { data: null, error: { message: 'connection reset' } };
@@ -38,6 +40,10 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
         // consent after an unsubscribe (Decision 32).
         if (p_news && !s.news) Object.assign(s, { news: true, newsAt: state.now });
         if (p_news) delete s.unsubscribed;
+        // First touch wins (#93): tags are stored only while the signup has none and isn't a marker.
+        const tags = Object.fromEntries(Object.entries(args).filter(([k]) => k.startsWith('p_utm_')).map(([k, v]) => [k.slice(2), v as string | null]));
+        for (const v of Object.values(tags)) if (v !== null && v.length > 150) return { data: null, error: { message: 'check constraint' } };
+        if (!s.unsubscribed && !utm.has(s.id) && Object.values(tags).some((v) => v !== null)) utm.set(s.id, tags);
         tokens.set(p_token_hash, { signupId: s.id, expiresAt: state.now + 7 * DAY });
         return { data: null, error: null };
       }
@@ -64,6 +70,7 @@ function fakeSupabase(releases: Release[] = [{ id: 1, version: '1.2.0', filename
         const s = signups.find((x) => x.id === id);
         // Only the address stays marked (Decision 32): the opt-in and the language go with it (Decision 34).
         if (s) Object.assign(s, { unsubscribed: true, news: false, newsAt: null, lang: 'en' });
+        if (s) utm.delete(s.id);
         return { data: !!s, error: null };
       }
       throw new Error(`unexpected rpc ${fn}`);
@@ -653,5 +660,60 @@ describe('unsubscribe', () => {
     expect((await handleSignup(post({ email: 'ada@example.com' }), deps)).status).toBe(200);
     expect(sent).toHaveLength(2);
     expect(state.signups[0]).toMatchObject({ unsubscribed: true, news: false, newsAt: null });
+  });
+});
+
+describe('campaign tags (#93)', () => {
+  const ad = { utm_source: 'meta', utm_medium: 'paid', utm_campaign: 'producers-nov', utm_content: 'ad 3 · plug-ins', utm_term: 'uninstall vst' };
+  const args = (o: Record<string, string>) => Object.fromEntries(Object.entries(o).map(([k, v]) => [`p_${k}`, v]));
+  const none = { p_utm_source: null, p_utm_medium: null, p_utm_campaign: null, p_utm_content: null, p_utm_term: null };
+
+  it('keeps the five tags, trimmed', () => {
+    expect(utmArgs({ ...ad, utm_source: '  meta ' })).toEqual(args(ad));
+  });
+
+  it.each([
+    ['no tags', undefined],
+    ['not an object', 'utm_source=meta'],
+    ['empty values', { utm_source: '', utm_medium: '   ' }],
+    ['non-strings', { utm_source: 42, utm_medium: ['paid'] }],
+    ['a value over the limit', { utm_source: 'x'.repeat(UTM_MAX + 1) }],
+    ['a value that looks like a download token', { utm_content: 'a'.repeat(43) }],
+  ])('drops %s', (_, utm) => {
+    expect(utmArgs(utm)).toEqual(none);
+  });
+
+  it('keeps a value at the limit and ignores other keys', () => {
+    const long = 'Producers Nov 2026 '.repeat(8).slice(0, UTM_MAX);
+    expect(utmArgs({ utm_content: long, utm_id: '9', email: 'a@b.c' })).toEqual({ ...none, p_utm_content: long });
+  });
+
+  // The download-token filter is the analytics one (Base.astro): any run of 43 letters, digits, - or _
+  // looks like a token. A campaign named without spaces that long is dropped, so name campaigns with spaces.
+  it('drops an unbroken 43-character name as a possible token', () => {
+    expect(utmArgs({ utm_campaign: 'producers-november-2026-plugins-uninstall-ad3' })).toEqual(none);
+  });
+
+  it('stores the tags with the signup, and a re-sent link keeps the first ones', async () => {
+    const { deps, sent, state } = setup();
+    expect((await handleSignup(post({ email: 'ada@example.com', utm: ad }), deps)).status).toBe(200);
+    expect((await handleSignup(post({ email: 'ada@example.com', utm: { utm_source: 'google' } }), deps)).status).toBe(200);
+    expect(sent).toHaveLength(2);
+    expect(state.utm.get(1)).toEqual(ad);
+  });
+
+  it('a signup with no tags takes the first ones it gets', async () => {
+    const { deps, state } = setup();
+    await handleSignup(post({ email: 'ada@example.com' }), deps);
+    await handleSignup(post({ email: 'ada@example.com', utm: { utm_source: 'google' } }), deps);
+    expect(state.utm.get(1)).toEqual({ ...ad, utm_source: 'google', utm_medium: null, utm_campaign: null, utm_content: null, utm_term: null });
+  });
+
+  it('a bad tag never fails the signup', async () => {
+    const { deps, sent, state } = setup();
+    const res = await handleSignup(post({ email: 'ada@example.com', utm: { utm_source: 'x'.repeat(500), utm_campaign: 'nov' } }), deps);
+    expect(res.status).toBe(200);
+    expect(sent).toHaveLength(1);
+    expect(state.utm.get(1)).toMatchObject({ utm_source: null, utm_campaign: 'nov' });
   });
 });

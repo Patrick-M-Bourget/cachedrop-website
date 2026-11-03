@@ -70,6 +70,32 @@ const alternates = [
 <!-- bot-check.js first: site.js and the /download/ form use it (Decision 12). It loads Cloudflare's script only on demand. -->
 <script is:inline src="/assets/bot-check.js" defer></script>
 <script is:inline src="/assets/site.js" defer></script>
+<!-- Campaign tags (#93): the first utm_* set seen in this tab is kept in sessionStorage, so it survives
+     the click from a guide to /download/, whose form sends it with the signup. No cookie; values that
+     look like a download token are dropped, as in the analytics redaction below. -->
+<script is:inline>
+(function () {
+  'use strict';
+  var KEY = 'cachedrop.utm';
+  var NAMES = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+  var HAS_TOKEN = /[A-Za-z0-9_-]{43}/;
+  try {
+    if (!sessionStorage.getItem(KEY)) {
+      var params = new URLSearchParams(location.search);
+      var found = {};
+      var any = false;
+      NAMES.forEach(function (name) {
+        var value = (params.get(name) || '').trim();
+        if (value && !HAS_TOKEN.test(value)) { found[name] = value; any = true; }
+      });
+      if (any) sessionStorage.setItem(KEY, JSON.stringify(found));
+    }
+  } catch (e) { /* storage blocked: the signup goes without tags */ }
+  window.cacheDropUtm = function () {
+    try { return JSON.parse(sessionStorage.getItem(KEY) || 'null') || undefined; } catch (e) { return undefined; }
+  };
+})();
+</script>
 <!-- Vercel Web Analytics (Decision 16), cookieless. This script must run before <Analytics />:
      it redacts download tokens from the referrer and defines the beforeSend the package reads. -->
 <script is:inline>

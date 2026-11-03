@@ -107,7 +107,7 @@ describe.skipIf(!run)('signup language on the dev database (Decision 5)', () => 
     expect(error).not.toBeNull();
   });
 
-  it('has only the five-argument call: the older three- and four-argument ones are gone', async () => {
+  it('the older three- and four-argument calls are gone', async () => {
     const email = newEmail('langold');
     const three = await db.rpc('request_download', { p_email: email, p_filling: null, p_token_hash: newHash() });
     expect(three.error).not.toBeNull();
@@ -236,5 +236,60 @@ describe.skipIf(!run)('unsubscribe and re-consent on the dev database', () => {
     expect(r.unsubscribed_at).not.toBeNull();
     expect(r).toMatchObject({ news_opt_in: false, news_opt_in_at: null });
     expect(await subscribed(email)).toBe(false);
+  });
+});
+
+const AD = { p_utm_source: 'meta', p_utm_medium: 'paid', p_utm_campaign: 'producers nov', p_utm_content: 'ad 3', p_utm_term: null };
+
+async function requestWith(email: string, utm: Record<string, string | null>, news = false) {
+  const { error } = await db.rpc('request_download', { p_email: email, p_filling: null, p_news: news, p_lang: 'en', p_token_hash: newHash(), ...utm });
+  return error;
+}
+
+async function tagsOf(email: string) {
+  const { data, error } = await db.from('signups').select('utm_source, utm_medium, utm_campaign, utm_content, utm_term').eq('email', email).single();
+  expect(error).toBeNull();
+  return data!;
+}
+
+const NONE = { utm_source: null, utm_medium: null, utm_campaign: null, utm_content: null, utm_term: null };
+const STORED = { utm_source: 'meta', utm_medium: 'paid', utm_campaign: 'producers nov', utm_content: 'ad 3', utm_term: null };
+
+describe.skipIf(!run)('campaign tags on the dev database (#93)', () => {
+  it('stores the tags with a new signup, and a later request keeps the first ones', async () => {
+    const email = newEmail('utm');
+    expect(await requestWith(email, AD)).toBeNull();
+    expect(await requestWith(email, { p_utm_source: 'google', p_utm_campaign: 'other' })).toBeNull();
+    expect(await tagsOf(email)).toEqual(STORED);
+  });
+
+  it('a signup with no tags takes the first ones it gets', async () => {
+    const email = newEmail('utmlate');
+    await request(email, false);
+    expect(await tagsOf(email)).toEqual(NONE);
+    expect(await requestWith(email, AD)).toBeNull();
+    expect(await tagsOf(email)).toEqual(STORED);
+  });
+
+  it('the five-argument call still works and stores no tags', async () => {
+    const email = newEmail('utmnone');
+    await request(email, false);
+    expect(await tagsOf(email)).toEqual(NONE);
+  });
+
+  it('refuses a tag over 150 characters, and an empty one', async () => {
+    expect(await requestWith(newEmail('utmlong'), { p_utm_source: 'x'.repeat(151) })).not.toBeNull();
+    expect(await requestWith(newEmail('utmempty'), { p_utm_source: '' })).not.toBeNull();
+  });
+
+  it('an unsubscribe wipes the tags; a request without the tick stores none, a fresh tick stores them again', async () => {
+    const email = newEmail('utmunsub');
+    await requestWith(email, AD, true);
+    await unsubscribe(email);
+    expect(await tagsOf(email)).toEqual(NONE);
+    await requestWith(email, AD, false);
+    expect(await tagsOf(email)).toEqual(NONE);
+    await requestWith(email, { p_utm_source: 'newsletter' }, true);
+    expect(await tagsOf(email)).toEqual({ ...NONE, utm_source: 'newsletter' });
   });
 });

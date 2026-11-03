@@ -171,7 +171,7 @@ const label = 'font-size: 13px; line-height: 18px; font-weight: 500';
     var address = email.value.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) return fail(BAD_EMAIL, true);
     var choice = form.querySelector('[name=filling]:checked');
-    last = { email: address, filling: choice ? choice.value : null, news: form.news.checked, lang: msg.lang };
+    last = { email: address, filling: choice ? choice.value : null, news: form.news.checked, lang: msg.lang, utm: window.cacheDropUtm ? window.cacheDropUtm() : undefined };
     submit.disabled = true;
     post(Object.assign({}, last), function () {
       document.querySelector('[data-gate-sent-to]').textContent = address;

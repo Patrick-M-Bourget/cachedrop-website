@@ -108,10 +108,10 @@ const policy = {
     collect: 'What we collect and why',
     retention: 'How long we keep it',
     token: ['Anyone with the link can use it for 7 days, so don’t share it.'],
-    collected: ['Your language', 'A code in each email’s unsubscribe link', 'Stripe takes the payment; we never see your card.'],
+    collected: ['Your language', 'Campaign tags', 'A code in each email’s unsubscribe link', 'Stripe takes the payment; we never see your card.'],
     kept: [
       'Feedback: your rating, your message, the page, your email if you added one, and the system specs if you sent them. We keep it until you ask us to delete it.',
-      'your news choice and your language',
+      'your news choice, your language and the campaign tags that brought you',
       'Unsubscribe codes: we keep them as long as your signup, and delete them with it.',
       // Decision 40: the license record, and why it is kept.
       'We keep them as long as your license can be used, so we can send your key again, refund it or revoke it.',
@@ -122,10 +122,10 @@ const policy = {
     collect: 'Ce que nous recueillons et pourquoi',
     retention: 'Combien de temps nous les gardons',
     token: ['Toute personne qui a le lien peut s’en servir pendant 7 jours. Ne le partagez donc pas.'],
-    collected: ['Votre langue', 'Un code dans le lien de désabonnement de chaque courriel', 'Stripe traite le paiement; nous ne voyons jamais votre carte.'],
+    collected: ['Votre langue', 'Les étiquettes de campagne', 'Un code dans le lien de désabonnement de chaque courriel', 'Stripe traite le paiement; nous ne voyons jamais votre carte.'],
     kept: [
       'Les avis : votre note, votre message, la page, votre adresse courriel si vous l’avez ajoutée, et les caractéristiques du système si vous les avez envoyées. Nous les gardons jusqu’à ce que vous nous demandiez de les supprimer.',
-      'votre choix pour les courriels de nouvelles et votre langue',
+      'votre choix pour les courriels de nouvelles, votre langue et les étiquettes de campagne qui vous ont amené',
       'Les codes de désabonnement : nous les gardons aussi longtemps que votre inscription, et les supprimons avec elle.',
       'Nous les gardons tant que votre licence peut servir, pour pouvoir vous renvoyer votre clé, la rembourser ou la révoquer.',
     ],
