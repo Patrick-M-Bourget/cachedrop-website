@@ -7,6 +7,7 @@
 // The platform claim is the handoff's own again (Decision 46): CacheDrop 1.0.1 is universal, macOS 14 or later.
 import { readFileSync } from 'node:fs';
 import { price, pricingCopy } from '../src/components/pricing';
+import { lastModified } from '../src/components/structured-data';
 
 export type CopyFix = { from: string; to: string; why: string };
 
@@ -99,6 +100,11 @@ export const copyFixes: Record<string, CopyFix[]> = {
       to: `"price": "${price.offer}", "priceCurrency": "USD", "priceSpecification": { "@type": "UnitPriceSpecification", "priceType": "https://schema.org/StrikethroughPrice", "price": "${price.regular}", "priceCurrency": "USD" } }`,
       why: 'Decision 47: the SoftwareApplication offer is what a buyer pays today, with the regular price struck through.',
     },
+    {
+      from: '"applicationCategory": "UtilitiesApplication",',
+      to: `"applicationCategory": "UtilitiesApplication", "dateModified": "${lastModified('https://cachedrop.io/')}",`,
+      why: '#94: every page’s JSON-LD carries dateModified, the page’s sitemap lastmod.',
+    },
     { from: '<section id="faq"', to: `${pricingSection}<section id="faq"`, why: 'Decision 44: the pricing section sits between “Careful by default” and the FAQ.' },
   ],
   'clear-mac-developer-caches/index.html': [
@@ -174,8 +180,8 @@ export const copyFixes: Record<string, CopyFix[]> = {
   'download/index.html': [
     {
       from: 'Download the free CacheDrop beta for Mac: a universal app',
-      to: 'Download CacheDrop for Mac, free to try: a universal app',
-      why: 'Decision 44: the description drops “beta”.',
+      to: 'Download CacheDrop for Mac: a universal app',
+      why: 'Decisions 44 and 51: the description drops “beta” and “free to try”.',
     },
     { from: 'Thanks for trying the CacheDrop beta.', to: 'Thanks for trying CacheDrop.', why: 'Decision 52.' },
     { from: 'CacheDrop is free while in beta.', to: 'CacheDrop is free to try.', why: 'Decision 44.' },

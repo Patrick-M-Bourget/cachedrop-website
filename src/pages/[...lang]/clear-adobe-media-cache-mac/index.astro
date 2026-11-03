@@ -5,6 +5,7 @@ import Guide from '../../../layouts/Guide.astro';
 import Toc from '../../../components/Toc.astro';
 import CodeBlock from '../../../components/CodeBlock.astro';
 import { guideH2, guideP, arrowLink } from '../../../components/guide-styles';
+import { guides } from '../../../components/guides';
 import { langOf, langPaths, localize } from '../../../i18n';
 
 export const getStaticPaths = langPaths;
@@ -24,8 +25,7 @@ const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" strok
 const copy = {
   en: {
     guide: {
-      title: 'Clear Adobe Media Cache on Mac (Premiere Pro & Final Cut Pro)',
-      description: 'How to clear Adobe Premiere Pro media cache and Final Cut Pro render files on a Mac, step by step, plus a free tool that clears every version at once.',
+      ...guides.creator.en,
       crumb: 'Creator Storage Guide',
       headline: 'Stop buying external drives.',
       lede: 'Video editing software generates massive, invisible cache files to keep playback smooth. When the project is over, those files stay on your Mac forever. CacheDrop finds them.',
@@ -72,8 +72,7 @@ const copy = {
   },
   fr: {
     guide: {
-      title: 'Vider le cache Adobe sur Mac (Premiere Pro et Final Cut Pro)',
-      description: 'Comment vider le cache de média de Premiere Pro et les fichiers de rendu de Final Cut Pro sur Mac, étape par étape, plus un outil gratuit qui vide toutes les versions d’un coup.',
+      ...guides.creator.fr,
       crumb: 'Guide de stockage pour créateurs',
       headline: 'Arrêtez d’acheter des disques externes.',
       lede: 'Les logiciels de montage vidéo créent d’énormes fichiers cache invisibles pour que la lecture reste fluide. Une fois le projet terminé, ces fichiers restent sur votre Mac pour toujours. CacheDrop les retrouve.',

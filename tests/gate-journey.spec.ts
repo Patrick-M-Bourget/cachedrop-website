@@ -67,7 +67,7 @@ async function requestLink(page: Page, inbox: Awaited<ReturnType<typeof authoris
   const before = inbox.length;
   await page.getByLabel('Email', { exact: true }).fill(email);
   if (news) await page.getByRole('checkbox', { name: /^Email me news about CacheDrop/ }).check();
-  await page.getByRole('button', { name: 'Send Download Link' }).click();
+  await page.getByRole('button', { name: 'Email Me the Link' }).click();
   await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
   expect(inbox.slice(before).map((m) => m.status)).toEqual([200]);
   const captured = inbox[inbox.length - 1].body.captured!;
@@ -89,13 +89,13 @@ test('form → captured email → token page → download, and the retry link do
   const email = `gate-journey+${Date.now()}@example.com`;
   await page.getByLabel('Email', { exact: true }).fill(email);
   await page.getByLabel('Development').check();
-  await page.getByRole('button', { name: 'Send Download Link' }).click();
+  await page.getByRole('button', { name: 'Email Me the Link' }).click();
 
   await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
   expect(inbox.map((m) => m.status)).toEqual([200]);
   const captured = inbox[0].body.captured!;
   expect(captured.to).toBe(email);
-  expect(captured.subject).toBe('Your CacheDrop download link');
+  expect(captured.subject).toBe('Your CacheDrop download');
 
   const matchedLink = captured.text.match(/https:\/\/\S+\/download\/[A-Za-z0-9_-]{43}\//);
   if (!matchedLink) throw new Error('Captured email has no download link');

@@ -9,6 +9,7 @@ import ClosingCta from '../../components/ClosingCta.astro';
 import PricingSection from '../../components/PricingSection.astro';
 import { discounted, price, pricingCopy } from '../../components/pricing';
 import { card, eyebrow, faqItem, faqQuestion, primaryLg, secondaryLg, sectionH2, titleMd } from '../../components/guide-styles';
+import { lastModified } from '../../components/structured-data';
 import { langOf, langPaths, localize } from '../../i18n';
 
 export const getStaticPaths = langPaths;
@@ -134,6 +135,7 @@ const jsonLd = {
       name: 'CacheDrop',
       url: `${site}${localize(lang, '/')}`,
       applicationCategory: 'UtilitiesApplication',
+      dateModified: lastModified(`${site}${localize(lang, '/')}`),
       operatingSystem: t.operatingSystem,
       description: t.description,
       publisher: { '@id': `${site}/#org` },

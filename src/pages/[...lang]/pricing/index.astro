@@ -9,14 +9,15 @@ import { langOf, langPaths } from '../../../i18n';
 
 export const getStaticPaths = langPaths;
 
+// Outcomes first, then the price (#113); the title names the regular price (Decision 47).
 const copy = {
   en: {
-    title: `CacheDrop Pricing – ${pricingCopy.en.was} One-Time Mac Cleaner License`,
-    description: `CacheDrop is free to try: scanning is always free and you can clean up to 2\u00a0GB. A license is ${pricingCopy.en.license}, for up to 3 Macs and every 1.x release, with 30-day refunds.`,
+    title: `CacheDrop Pricing – ${pricingCopy.en.was} Once for Up to 3 Macs`,
+    description: `CacheDrop finds what’s filling your Mac and clears it safely. A license is ${pricingCopy.en.license}, for up to 3 Macs, with every update through version 1 and 30-day refunds. Nothing to cancel.`,
   },
   fr: {
-    title: `Tarifs de CacheDrop – Licence à ${pricingCopy.fr.was} payée une seule fois`,
-    description: `CacheDrop s’essaie gratuitement\u00a0: l’analyse est toujours gratuite et vous pouvez nettoyer jusqu’à 2\u00a0Go. La licence coûte ${pricingCopy.fr.license}, pour un maximum de 3 Mac et toutes les versions 1.x, remboursable dans les 30 jours.`,
+    title: `Tarifs de CacheDrop – ${pricingCopy.fr.was} une seule fois, jusqu’à 3 Mac`,
+    description: `CacheDrop trouve ce qui remplit votre Mac et le nettoie en toute sécurité. La licence coûte ${pricingCopy.fr.license}, pour un maximum de 3 Mac, avec toutes les mises à jour de la version 1 et le remboursement dans les 30 jours. Rien à annuler.`,
   },
 };
 const lang = langOf(Astro.url);

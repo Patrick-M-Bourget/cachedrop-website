@@ -14,6 +14,7 @@ import Toc from '../../../components/Toc.astro';
 import CodeBlock from '../../../components/CodeBlock.astro';
 import Kicker from '../../../components/Kicker.astro';
 import { guideH2, guideP } from '../../../components/guide-styles';
+import { guides } from '../../../components/guides';
 import { langOf, langPaths } from '../../../i18n';
 
 export const getStaticPaths = langPaths;
@@ -38,8 +39,7 @@ const deleteSnapshot = 'sudo tmutil deletelocalsnapshots 2026-11-03-101112';
 const copy = {
   en: {
     guide: {
-      title: 'How to Clear System Data on Mac (and Why It’s So Big)',
-      description: 'What System Data on Mac is, why it grows so big, and what’s safe to remove: caches, logs, developer files and Time Machine local snapshots, with the Terminal commands and the risks.',
+      ...guides.systemData.en,
       crumb: 'System Data Guide',
       headline: 'How to clear System Data on Mac',
       lede: 'System Data is the grey bar in Storage settings that macOS won’t explain. Here is what’s in it, what you can safely remove, and what to leave alone.',
@@ -150,8 +150,7 @@ const copy = {
   },
   fr: {
     guide: {
-      title: 'Vider les Données système sur Mac (et pourquoi elles grossissent)',
-      description: 'Ce que sont les Données système sur Mac, pourquoi elles grossissent autant et ce que vous pouvez supprimer sans risque : caches, journaux, fichiers de développement et instantanés locaux Time Machine, avec les commandes Terminal et leurs risques.',
+      ...guides.systemData.fr,
       crumb: 'Guide des Données système',
       headline: 'Comment vider les Données système sur Mac',
       lede: 'Les Données système, c’est la barre grise des réglages de stockage que macOS n’explique pas. Voici ce qu’elle contient, ce que vous pouvez retirer sans risque et ce qu’il faut laisser en place.',

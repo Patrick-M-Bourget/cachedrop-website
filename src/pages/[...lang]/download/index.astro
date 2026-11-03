@@ -17,19 +17,21 @@ export const getStaticPaths = langPaths;
 const copy = {
   en: {
     title: 'Download CacheDrop for Mac.',
-    lede: 'Enter your email and we’ll send you a download link. The link works for 7 days, on any Mac. CacheDrop itself doesn’t expire.',
+    lede: 'We’ll email your download link and let you know when updates are ready.',
     expiredTitle: 'This link has expired.',
     expiredLede: 'Download links work for 7 days. Enter your email and we’ll send you a new one. CacheDrop itself doesn’t expire.',
     wait: 'While you wait:',
+    producer: 'Uninstall Audio Plug-ins guide',
     tried: 'Already tried it?',
     buy: 'Buy a license',
   },
   fr: {
     title: 'Téléchargez CacheDrop pour Mac.',
-    lede: 'Entrez votre adresse courriel et nous vous enverrons un lien de téléchargement. Le lien fonctionne pendant 7 jours, sur n’importe quel Mac. CacheDrop lui-même n’expire pas.',
+    lede: 'Nous vous enverrons votre lien de téléchargement par courriel et vous dirons quand des mises à jour seront prêtes.',
     expiredTitle: 'Ce lien a expiré.',
     expiredLede: 'Les liens de téléchargement fonctionnent pendant 7 jours. Entrez votre adresse courriel et nous vous en enverrons un nouveau. CacheDrop lui-même n’expire pas.',
     wait: 'En attendant :',
+    producer: 'Guide pour désinstaller des plug-ins audio',
     tried: 'Vous l’avez déjà essayé?',
     buy: 'Achetez une licence',
   },
@@ -61,8 +63,6 @@ if (new URLSearchParams(location.search).get('link') === 'expired') {
 <span>{meta[0]}</span>
 <span aria-hidden="true">·</span>
 <span>{meta[1]}</span>
-<span aria-hidden="true">·</span>
-<span>{meta[2]}</span>
 </p>
 
 <SignupForm lang={lang} style="margin-top: var(--space-12)" />
@@ -73,6 +73,7 @@ if (new URLSearchParams(location.search).get('link') === 'expired') {
 <span style="color: var(--ink-secondary)">{t.wait}</span>
 <a class="textlink" href={localize(lang, '/clear-mac-developer-caches/')} style={guideLink}>{guideLinks[lang][0]}</a>
 <a class="textlink" href={localize(lang, '/clear-adobe-media-cache-mac/')} style={guideLink}>{guideLinks[lang][1]}</a>
+<a class="textlink" href={localize(lang, '/uninstall-audio-plugins-mac/')} style={guideLink}>{t.producer}</a>
 <a class="textlink" href={localize(lang, '/clear-system-data-mac/')} style={guideLink}>{guideLinks[lang][2]}</a>
 </div>
 </div>
