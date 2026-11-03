@@ -62,7 +62,8 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | Pricing (nav link, section) | Tarifs | Owner, 2026-11-02. |
 | Try it before you buy. Pay once. | Essayez-le avant d’acheter. Payez une seule fois. | The pricing section's title. |
 | Already tried it? Buy a license | Vous l’avez déjà essayé? Achetez une licence | The download page's line. |
-| Was $29.99, now $19.99 (spoken) | Prix régulier 29,99 $, maintenant 19,99 $ | What screen readers hear for the struck-through price. |
+| Was $29.99, now $19.99 for a limited time (spoken) | Prix régulier 29,99 $, maintenant 19,99 $ pour un temps limité | What screen readers hear for the struck-through price. |
+| Limited-time price (pill) | Prix pour un temps limité | Decision 47. |
 | the same number in each (currency) | le même montant dans chaque devise | |
 | What’s included | Ce qui est inclus | |
 | email (address) | courriel, adresse courriel | OQLF. |

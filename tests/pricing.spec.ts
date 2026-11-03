@@ -24,7 +24,7 @@ const copy = {
     pricing: ['Tarifs', '/fr/pricing/'],
     download: 'Télécharger pour Mac',
     title: 'Essayez-le avant d’acheter. Payez une seule fois.',
-    spoken: 'Prix régulier 29,99 $, maintenant 19,99 $, une seule fois.',
+    spoken: 'Prix régulier 29,99 $, maintenant 19,99 $ pour un temps limité, une seule fois.',
     shown: ['29,99 $', '19,99 $', 'une seule fois'],
     currencies: 'Payez en USD, CAD, EUR, GBP ou AUD : le même montant dans chaque devise.',
     items: ['Nettoyage gratuit jusqu’à 2 Go, et l’analyse est toujours gratuite', 'Sur un maximum de 3 de vos Mac', 'Toutes les versions 1.x', 'Remboursement dans les 30 jours, sans avoir à vous justifier'],

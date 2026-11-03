@@ -23,6 +23,20 @@ describe('the price', () => {
     expect(pricingCopy.en.license).toBe('$29.99 once, now $19.99 for a limited time');
   });
 
+  // #114: French lacked `limited`, so its pill rendered empty, and wrote its prices out by hand.
+  it('gives both languages the same keys', () => {
+    expect(Object.keys(pricingCopy.fr).sort()).toEqual(Object.keys(pricingCopy.en).sort());
+  });
+
+  it('states the French prices and the limited-time wording (Decision 47)', () => {
+    expect(pricingCopy.fr).toMatchObject({
+      was: '29,99 $',
+      now: '19,99 $',
+      spoken: 'Prix régulier 29,99 $, maintenant 19,99 $ pour un temps limité, une seule fois.',
+      limited: 'Prix pour un temps limité',
+    });
+  });
+
   it('never calls the offer a launch price in any copy', () => {
     const copy = JSON.stringify(pricingCopy);
     expect(copy).not.toMatch(/launch|lancement/i);
