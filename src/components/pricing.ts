@@ -18,7 +18,7 @@ export const price: { readonly regular: string; readonly offer: string } = { reg
  * that page is built and indexed in the language, so the link never leads to a 404 or a draft;
  * tests/pricing.spec.ts fails if this disagrees with the build either way.
  */
-export const compareLive: Readonly<Record<Lang, boolean>> = { en: false, fr: false };
+export const compareLive: Readonly<Record<Lang, boolean>> = { en: true, fr: true };
 
 /** Whether the limited-time offer is running. */
 export const discounted = price.offer !== price.regular;

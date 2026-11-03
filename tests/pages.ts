@@ -22,6 +22,7 @@ export const pages: PageUnderTest[] = [
   { path: '/uninstall-audio-plugins-mac/' }, // the producer page (Decision 48): no handoff original
   { path: '/clear-system-data-mac/' }, // the System Data guide (#110): no handoff original
   { path: '/uninstall-apps-mac/' }, // the app uninstall guide (#111): no handoff original
+  { path: '/cleanmymac-alternative/' }, // the compare page (Decision 54): no handoff original
   { path: '/privacy/' }, // no handoff original: token and modal tests only
   { path: '/unsubscribe/' }, // new (Decision 4); vercel.json serves it at /unsubscribe/<token>/
   // The email form (Decision 1) is new; it keeps the handoff download page's head.
@@ -40,6 +41,7 @@ export const pages: PageUnderTest[] = [
   { path: '/fr/uninstall-audio-plugins-mac/', lang: 'fr' },
   { path: '/fr/clear-system-data-mac/', lang: 'fr' },
   { path: '/fr/uninstall-apps-mac/', lang: 'fr' },
+  { path: '/fr/cleanmymac-alternative/', lang: 'fr' },
   { path: '/fr/privacy/', lang: 'fr' },
   { path: '/fr/unsubscribe/', lang: 'fr' },
   { path: '/fr/download/', lang: 'fr' },
@@ -67,6 +69,7 @@ export const pairs: Pair[] = [
   pair('/uninstall-audio-plugins-mac/', true),
   pair('/clear-system-data-mac/', true),
   pair('/uninstall-apps-mac/', true),
+  pair('/cleanmymac-alternative/', true),
   pair('/privacy/', true),
   pair('/download/', false),
   pair('/download/link/', false, '/download/'),

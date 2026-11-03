@@ -59,7 +59,9 @@ test.describe('/llms.txt', () => {
     const text = await (await request.get('/llms.txt')).text();
     expect(text).toContain(`A license is ${pricingCopy.en.license}, for up to 3 Macs.`);
     const amounts = new Set(text.match(/\$\s?\d+(?:[.,]\d+)?|\d+[.,]\d{2}\s?\$/g));
-    expect([...amounts].sort()).toEqual([...new Set([pricingCopy.en.was, pricingCopy.en.now])].sort());
+    // The French lines (the compare page's description) write the same two numbers the French way.
+    const fr = [pricingCopy.fr.was, pricingCopy.fr.now].map((a) => a.replace('\u00a0', ' '));
+    expect([...amounts].map((a) => a.replace('\u00a0', ' ')).sort()).toEqual([...new Set([pricingCopy.en.was, pricingCopy.en.now, ...fr])].sort());
     // The Mac count is the pricing section's ("Use it on up to 3 of your Macs").
     const macs = /up to (\d+) of your Macs/.exec(pricingCopy.en.items.join('\n'))![1];
     for (const [, n] of text.matchAll(/(\d+) (?:of your )?Macs\b/g)) expect(n).toBe(macs);
