@@ -1,18 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 
-// The producer page (#52, Decision 48): a guide with the signup form in its hero, "Music & audio"
-// pre-selected, a HowTo in its JSON-LD and a nav link. The signup endpoint is mocked as in download.spec.ts.
-
-const turnstile = 'XXXX.DUMMY.TOKEN.XXXX';
-
-async function mockSignup(page: Page) {
-  const requests: unknown[] = [];
-  await page.route('**/api/signup', async (route) => {
-    requests.push(route.request().postDataJSON());
-    await route.fulfill({ status: 200, json: { ok: true } });
-  });
-  return requests;
-}
+// The producer page (#52, Decisions 48 to 50): a guide in the other guides' format, with a HowTo in its
+// JSON-LD and a nav link.
 
 async function jsonLd(page: Page) {
   const raw = await page.locator('script[type="application/ld+json"]').first().textContent();
@@ -20,22 +9,17 @@ async function jsonLd(page: Page) {
 }
 
 const langs = [
-  { path: '/uninstall-audio-plugins-mac/', lang: 'en', music: 'Music & audio', email: 'Email', send: 'Send Download Link', done: 'Check your inbox', nav: 'For Producers' },
-  { path: '/fr/uninstall-audio-plugins-mac/', lang: 'fr', music: 'Musique et audio', email: 'Courriel', send: 'Envoyer le lien de téléchargement', done: 'Vérifiez vos courriels', nav: 'Pour les producteurs' },
+  { path: '/uninstall-audio-plugins-mac/', lang: 'en', cta: 'Get CacheDrop free', download: '/download/', nav: 'For Producers' },
+  { path: '/fr/uninstall-audio-plugins-mac/', lang: 'fr', cta: 'Obtenir CacheDrop gratuitement', download: '/fr/download/', nav: 'Pour les producteurs' },
 ] as const;
 
 for (const l of langs) {
   test.describe(l.path, () => {
-    test('signs up on the page with Music & audio pre-selected and the news box unticked', async ({ page }) => {
-      const requests = await mockSignup(page);
+    test('leads to the download form like the other guides, with no form of its own', async ({ page }) => {
       await page.goto(l.path);
-      await expect(page.getByLabel(l.music)).toBeChecked();
-      await expect(page.getByRole('radio', { checked: true })).toHaveCount(1);
-      await expect(page.getByRole('checkbox')).not.toBeChecked();
-      await page.getByLabel(l.email, { exact: true }).fill('ada@example.com');
-      await page.getByRole('button', { name: l.send }).click();
-      await expect(page.getByRole('heading', { name: l.done })).toBeFocused();
-      expect(requests).toEqual([{ email: 'ada@example.com', filling: 'music-audio', news: false, lang: l.lang, turnstile }]);
+      await expect(page.locator('[data-gate-form]')).toHaveCount(0);
+      const hero = page.locator('main section').first().getByRole('link', { name: l.cta });
+      await expect(hero).toHaveAttribute('href', l.download);
     });
 
     test('marks its nav link as the current page', async ({ page }) => {
