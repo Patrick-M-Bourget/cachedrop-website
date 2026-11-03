@@ -1,6 +1,6 @@
 ---
 // The music producers page (#52, Decision 48): the music ad's landing page and a search page, led by
-// plug-in uninstalls. Built on the Guide layout with the signup form in the hero, at
+// plug-in uninstalls. Built on the Guide layout like the other guides (Decision 50), at
 // /uninstall-audio-plugins-mac/ and under /fr/ (Decision 5, English slug per the French glossary).
 // Every claim follows the shipping build (Decision 48), checked against mac-cleaner 1.0.1 (022d2aee):
 // PlugInInventory.swift (formats, folders), PlugInUninstall.swift (receipts, hosts, vendor content),
@@ -46,7 +46,7 @@ const copy = {
       headline: 'Uninstall audio plug-ins on Mac, every file they left.',
       lede: 'Plug-ins you stopped using, caches your DAW rebuilds, files from apps you already deleted. CacheDrop lists every format of every plug-in in one place and moves what you pick to the Trash.',
       cta: 'Get CacheDrop free',
-      ctaNote: 'AU · VST · VST3 · AAX · CLAP · macOS 14+ · Free while in beta.',
+      ctaNote: 'AU · VST · VST3 · AAX · CLAP · macOS 14+',
       updated: 'November 2026',
       readTime: '7 min read',
       faqTitle: 'Plug-in and music storage FAQ',
@@ -113,7 +113,7 @@ const copy = {
       headline: 'Désinstallez vos plug-ins audio sur Mac, avec tout ce qu’ils ont laissé.',
       lede: 'Des plug-ins que vous n’utilisez plus, des caches que votre STAN reconstruit, des fichiers d’applications déjà supprimées. CacheDrop liste chaque format de chaque plug-in au même endroit et met ce que vous choisissez à la Corbeille.',
       cta: 'Obtenir CacheDrop gratuitement',
-      ctaNote: 'AU · VST · VST3 · AAX · CLAP · macOS 14+ · Gratuit pendant la bêta.',
+      ctaNote: 'AU · VST · VST3 · AAX · CLAP · macOS 14+',
       updated: 'novembre 2026',
       readTime: '7 min de lecture',
       faqTitle: 'FAQ sur les plug-ins et le stockage musical',
@@ -173,27 +173,25 @@ const copy = {
     howTo: 'Comment désinstaller un plug-in audio sur Mac',
   },
 };
-// Decision 44 and 48: with pricing live, the trial terms replace "free while in beta". Uninstalls count
-// toward the 2 GB (Trial.swift), so no line says uninstalling is free.
+// Decision 44 and 48: with pricing live, the FAQ's last answer gives the trial terms instead of "free
+// while in beta". Uninstalls count toward the 2 GB (Trial.swift), so no line says uninstalling is free.
 const launch = {
   en: {
-    ctaNote: 'AU · VST · VST3 · AAX · CLAP · macOS 14+',
     trial: 'Scanning and the plug-in list are always free. Cleanup and uninstalls are free until they’ve freed 2 GB.',
   },
   fr: {
-    ctaNote: 'AU · VST · VST3 · AAX · CLAP · macOS 14+',
     trial: 'L’analyse et la liste des plug-ins sont toujours gratuites. Le nettoyage et les désinstallations sont gratuits jusqu’à 2 Go libérés.',
   },
 };
 const lang = langOf(Astro.url);
 const base = copy[lang];
-const live = withLaunch({ ctaNote: base.guide.ctaNote, trial: '' }, launch[lang]);
+const live = withLaunch({ trial: '' }, launch[lang]);
 const faq = live.trial ? base.guide.faq.map(([q, a], i, all) => [q, i === all.length - 1 ? live.trial : a] as [string, string]) : base.guide.faq;
-const t = { ...base, guide: { ...base.guide, ctaNote: live.trial ? `${live.ctaNote} · ${live.trial}` : live.ctaNote, faq } };
+const t = { ...base, guide: { ...base.guide, faq } };
 const ids = ['uninstall', 'where', 'receipts', 'licences', 'ableton', 'libraries', 'deleted-apps'];
 const howTo = { name: t.howTo, steps: t.uninstall.manual };
 ---
-<Guide {...t.guide} path="/uninstall-audio-plugins-mac/" dateModified="2026-11-02" signup="music-audio" howTo={howTo}>
+<Guide {...t.guide} path="/uninstall-audio-plugins-mac/" dateModified="2026-11-02" howTo={howTo}>
 <Toc items={[...ids.map((id, i) => [`#${id}`, t.toc[i]] as [string, string]), ['#faq', t.guide.faqTitle]]} />
 
 <section id="uninstall" style="padding-top: var(--space-16); display: flex; flex-direction: column; gap: var(--space-5)">
