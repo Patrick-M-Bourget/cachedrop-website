@@ -5,6 +5,8 @@
 // The news checkbox always starts unticked and the download never depends on it (Decision 3).
 // Built from the design system's TextField, Checkbox, Button and done-state parts
 // (handoff/design-system/components/bundle.css). One per page: its ids are fixed.
+// `filling` pre-selects an answer to "What's filling your Mac?" (the producer page: music-audio);
+// the visitor can still change it, and "Use a Different Email" keeps it.
 // The bot check (Decision 12) starts on load, so its token is ready by the time the email is typed.
 import BotCheck from './BotCheck.astro';
 import { withLaunch } from './pricing';
@@ -12,13 +14,16 @@ import { titleMd } from './guide-styles';
 import { localize, type Lang } from '../i18n';
 import '../styles/gate.css';
 
+export type Filling = 'development' | 'video-photo' | 'music-audio' | 'other';
+
 interface Props {
   lang: Lang;
+  filling?: Filling;
   /** Extra inline style for the card, such as its margin on the page. */
   style?: string;
 }
 
-const { lang, style = '' } = Astro.props;
+const { lang, filling: preselect, style = '' } = Astro.props;
 
 const copy = {
   en: {
@@ -64,7 +69,8 @@ const launch = {
   fr: { news: 'Envoyez-moi des nouvelles de CacheDrop par courriel : nouvelles fonctionnalités et sondages.' },
 };
 const t = withLaunch(copy[lang], launch[lang]);
-const filling = ['development', 'video-photo', 'music-audio', 'other'].map((value, i) => [value, t.filling[i]]);
+const values: Filling[] = ['development', 'video-photo', 'music-audio', 'other'];
+const filling = values.map((value, i) => [value, t.filling[i]] as const);
 const msg = { lang, badEmail: t.badEmail, failed: t.failed };
 const label = 'font-size: 13px; line-height: 18px; font-weight: 500';
 ---
@@ -79,7 +85,7 @@ const label = 'font-size: 13px; line-height: 18px; font-weight: 500';
 <legend style={`padding: 0; margin-bottom: var(--space-2-5); ${label}`}>{t.filled} <span style="font-weight: 400; color: var(--ink-secondary)">{t.optional}</span></legend>
 <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2-5) var(--space-4)">
 {filling.map(([value, text]) => (
-<label class="gate-check"><input type="radio" name="filling" value={value}><span>{text}</span></label>
+<label class="gate-check"><input type="radio" name="filling" value={value} checked={value === preselect}><span>{text}</span></label>
 ))}
 </div>
 </fieldset>

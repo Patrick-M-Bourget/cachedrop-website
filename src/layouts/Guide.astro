@@ -1,13 +1,16 @@
 ---
 // A cleaning guide: hero with breadcrumb, the guide body (default slot), the FAQ,
 // a link to the other guide and the closing call to action. It builds the
-// Article, BreadcrumbList and FAQPage JSON-LD in the handoff's key order. The page passes its
+// Article, BreadcrumbList and FAQPage JSON-LD in the handoff's key order, plus HowTo when given.
+// A landing page (Decision 48) passes `signup`: the hero then holds the signup form instead of the
+// download button; the closing button still goes to /download/ (Decision 1). The page passes its
 // strings in its own language; the layout's own few words are in `copy`.
 import Base from './Base.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { guideH2, primaryLg, arrowLink, faqItem, faqQuestion } from '../components/guide-styles';
 import ClosingCta from '../components/ClosingCta.astro';
+import SignupForm, { type Filling } from '../components/SignupForm.astro';
 import { withLaunch } from '../components/pricing';
 import { langOf, localize } from '../i18n';
 
@@ -38,6 +41,10 @@ interface Props {
   /** The closing title and line; the layout adds the price sentence after the line. */
   closing: { title: string; body: string };
   trademarks: string;
+  /** Put the signup form in the hero, with this answer pre-selected (Decision 48). */
+  signup?: Filling;
+  /** A HowTo for the page's main task: its name and plain-text steps. */
+  howTo?: { name: string; steps: string[] };
 }
 
 const p = Astro.props;
@@ -53,7 +60,7 @@ const site = Astro.site!.origin;
 const url = new URL(localize(lang, p.path), site).href;
 const home = `${site}${localize(lang, '/')}`;
 const downloadHref = localize(lang, '/download/');
-const plain = (html: string) => html.replace(/<[^>]+>/g, '');
+const plain = (html: string) => html.replace(/<[^>]+>/g, '').replaceAll('&amp;', '&');
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -78,6 +85,9 @@ const jsonLd = {
       '@type': 'FAQPage',
       mainEntity: p.faq.map(([name, a]) => ({ '@type': 'Question', name, acceptedAnswer: { '@type': 'Answer', text: plain(a) } })),
     },
+    ...(p.howTo
+      ? [{ '@type': 'HowTo', name: p.howTo.name, step: p.howTo.steps.map((text, i) => ({ '@type': 'HowToStep', position: i + 1, text })) }]
+      : []),
   ],
 };
 
@@ -99,6 +109,12 @@ const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" strok
 </nav>
 <h1 style="margin: var(--space-10) 0 0; font-size: clamp(38px, 5.4vw, 64px); line-height: 1.06; font-weight: 600; letter-spacing: -0.04em; text-wrap: balance">{p.headline}</h1>
 <h2 style="margin: var(--space-6) 0 0; font-size: 19px; line-height: 29px; font-weight: 400; letter-spacing: -0.012em; color: var(--ink-secondary); text-wrap: pretty">{p.lede}</h2>
+{p.signup ? (
+<div id="signup" style="margin-top: 36px; scroll-margin-top: calc(var(--nav-height) + var(--space-6))">
+<SignupForm lang={lang} filling={p.signup} />
+<p style="margin: var(--space-4) 0 0; font-size: 13px; color: var(--ink-secondary)">{p.ctaNote}</p>
+</div>
+) : (
 <div style="margin-top: 36px; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-5)">
 <a class="btn-primary" href={downloadHref} style={primaryLg}>
 <Fragment set:html={download} />
@@ -106,6 +122,7 @@ const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" strok
 </a>
 <span style="font-size: 13px; color: var(--ink-secondary)">{p.ctaNote}</span>
 </div>
+)}
 <p style="margin: var(--space-10) 0 0; font-size: 13px; color: var(--ink-secondary)">{t.updated} {p.updated} · {p.readTime}</p>
 </div>
 </section>
