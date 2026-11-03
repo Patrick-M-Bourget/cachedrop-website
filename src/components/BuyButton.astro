@@ -1,0 +1,17 @@
+---
+// The Buy button (Decision 51): "Buy · $29.99 once". While the limited-time offer runs (Decision 47)
+// the regular price is struck through before the offer, and screen readers hear
+// "Buy · was $29.99 now $19.99 once". The pricing card shows it as the primary button, the homepage
+// hero as the secondary one beside "Download for Mac".
+import { primaryLg, secondaryLg } from './guide-styles';
+import { buyHref, discounted, pricingCopy } from './pricing';
+import { langOf } from '../i18n';
+
+interface Props {
+  variant: 'primary' | 'ghost';
+}
+const { variant } = Astro.props;
+const lang = langOf(Astro.url);
+const t = pricingCopy[lang];
+---
+<a class={`btn-${variant}`} href={buyHref(lang)} style={variant === 'primary' ? primaryLg : secondaryLg}><span>{t.buy} ·{discounted && <> <span class="sr-only">{t.wasWord}</span>{' '}<s>{t.was}</s> <span class="sr-only">{t.nowWord}</span></>} {t.now}{t.buyOnce && ` ${t.buyOnce}`}</span></a>

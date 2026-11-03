@@ -2,7 +2,7 @@
 // guides with these same strings, and tests/answer-engines.spec.ts holds it to them (#94).
 export const footerCopy = {
   en: {
-    tagline: 'A careful Mac storage cleaner for developer caches and creative render files.',
+    tagline: 'Get your Mac’s space back: a cleaner, app uninstaller and plug-in manager you pay for once.',
     guides: 'Cleaning Guides',
     developer: 'Clear Developer Caches',
     creator: 'Clear Adobe Media Cache',
@@ -25,7 +25,7 @@ export const footerCopy = {
     switchTo: 'Français',
   },
   fr: {
-    tagline: 'Un nettoyeur de stockage prudent pour Mac, fait pour les caches de développement et les fichiers de rendu.',
+    tagline: 'Récupérez l’espace de votre Mac : un nettoyeur, un désinstalleur d’applications et un gestionnaire de plug-ins, payés une seule fois.',
     guides: 'Guides de nettoyage',
     developer: 'Vider les caches de développement',
     creator: 'Vider le cache de média Adobe',

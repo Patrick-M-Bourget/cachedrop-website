@@ -52,6 +52,8 @@ export const pricingCopy = {
       'Scanning is always free, and you can clean up to 2 GB before you buy.',
     ],
     // Shown only while the compare page (#87) is built and indexed in this language (`compareLive`).
+    // The homepage's "Pay once" line (Decision 51): the regular price against CleanMyMac's yearly one.
+    versus: `${en(price.regular)} once for up to 3 Macs. CleanMyMac is $39.95 every year, for one.`,
     compare: 'Compare CacheDrop with other Mac cleaners',
     // The Buy button (Decision 51): "Buy · $29.99 once", with the offer shown as on the card (Decision 47).
     buy: 'Buy',
@@ -84,6 +86,7 @@ export const pricingCopy = {
       'Remboursement dans les 30 jours, sans avoir à vous justifier.',
       'L’analyse est toujours gratuite, et vous pouvez nettoyer jusqu’à 2 Go avant d’acheter.',
     ],
+    versus: `${fr(price.regular)} une seule fois pour un maximum de 3 Mac. CleanMyMac coûte 39,95\u00a0$ chaque année, pour un seul.`,
     compare: 'Comparer CacheDrop aux autres nettoyeurs pour Mac',
     buy: 'Acheter',
     // No « une seule fois » on the button: it wraps at 390 px, and the price above already says it (owner, #107).

@@ -1,14 +1,18 @@
 ---
-// The homepage, built at / and at /fr/ (Decision 5). The markup is shared; `copy` holds each
-// language's strings. Strings rendered with set:html carry inline markup (a line break, a code span).
+// The homepage, built at / and at /fr/ (Decision 5), in the order Decision 51 sets (#109): the hero,
+// three value props, "Made for your work", "Safe by design", "Pay once" (the pricing section), the FAQ
+// and the closing call to action. "Kept up to date" waits for the update feed (#122). The markup is
+// shared; `copy` holds each language's strings. Strings rendered with set:html carry inline markup.
 import Base from '../../layouts/Base.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import AppWindow from '../../components/AppWindow.astro';
+import BuyButton from '../../components/BuyButton.astro';
 import ClosingCta from '../../components/ClosingCta.astro';
 import PricingSection from '../../components/PricingSection.astro';
 import { discounted, price, pricingCopy } from '../../components/pricing';
-import { card, eyebrow, faqItem, faqQuestion, primaryLg, secondaryLg, sectionH2, titleMd } from '../../components/guide-styles';
+import { card, eyebrow, faqItem, faqQuestion, primaryLg, sectionH2, titleMd } from '../../components/guide-styles';
+import { guides } from '../../components/guides';
 import { lastModified } from '../../components/structured-data';
 import { langOf, langPaths, localize } from '../../i18n';
 
@@ -16,109 +20,128 @@ export const getStaticPaths = langPaths;
 
 const copy = {
   en: {
-    title: 'Mac Storage Cleaner – Free Up Space on Your Mac | CacheDrop',
-    description: 'Free up space on your Mac. CacheDrop finds hidden caches, Xcode DerivedData, node_modules and video caches, and clears them safely. Free to try.',
+    title: 'Mac Cleaner – Get Your Mac’s Space Back, Pay Once | CacheDrop',
+    description: 'CacheDrop finds the caches, leftovers and old files filling your Mac, and clears them safely. Made for music producers, developers and video editors.',
     operatingSystem: 'macOS 14 or later',
-    badge: 'Mac storage cleaner · Free to try',
-    h1: 'Store less junk.<br>Keep what matters.',
-    lede: 'Your Mac is full of invisible caches, derived data, and abandoned project files. CacheDrop safely finds them and drops them. Free up space on your Mac in seconds.',
+    // Decision 51's proof: the 18 GB of plug-ins on the owner's Mac, until the Smart clean figure (#105).
+    proof: 'CacheDrop found 18 GB of plug-ins on a music producer’s Mac',
+    h1: 'Get your Mac’s space back.',
+    lede: 'CacheDrop finds the caches, leftovers and old files filling your Mac, and clears them safely. Made for music producers, developers and video editors.',
     download: 'Download for Mac',
-    feedback: 'Give Fast Feedback',
-    meta: pricingCopy.en.trial,
-    featuresEyebrow: 'Built for workstations',
-    featuresTitle: 'Built for the heavy lifters.',
-    featuresBody: 'CacheDrop is a Mac storage cleaner made for developers and video editors. Generic cleaners clear browser cookies and miss the real weight. CacheDrop goes after compiler caches, media caches and stale container images: the files that grow quietly with every project.',
+    valueEyebrow: 'One app instead of three',
+    valueTitle: 'A cleaner, an app uninstaller and a plug-in manager.',
+    values: [
+      ['See what’s filling your Mac', 'One scan shows caches, old project files, leftovers and big downloads, with their sizes.'],
+      ['Remove apps and plug-ins completely', 'Every file they installed goes in one step, and your licenses stay safe.'],
+      ['Nothing lost by mistake', 'You check everything first. Your files go to the Trash, and History puts them back.'],
+    ],
+    workEyebrow: 'Made for your work',
+    workTitle: 'Music, code and video fill a Mac fastest.',
+    workBody: 'CacheDrop knows where your tools keep their files, so it finds the gigabytes a general cleaner misses.',
+    producers: {
+      title: 'For music producers',
+      body: 'Uninstall VST, AU, AAX and CLAP plug-ins with every file they installed, and clear Ableton Live’s cache. Your licenses stay put.',
+      chips: ['VST3 / AU', 'AAX / CLAP', 'Ableton cache'],
+      link: 'How to uninstall audio plug-ins',
+    },
     developers: {
-      title: 'Clear Developer Junk',
-      body: 'Drop gigabytes of forgotten <span class="mono" style="font-size: 13px">node_modules</span>, Xcode DerivedData, and Docker caches safely.',
+      title: 'For developers',
+      body: 'Clear forgotten <span class="mono" style="font-size: 13px">node_modules</span> folders, Xcode DerivedData and Docker caches safely.',
       chips: ['node_modules', 'DerivedData', 'Docker images'],
       link: 'How to clear developer caches',
     },
-    creators: {
-      title: 'Clear Creator Caches',
+    editors: {
+      title: 'For video editors',
       body: 'Clear hidden Adobe media caches and size up Final Cut Pro libraries full of render files, without losing your timelines.',
       chips: ['.cfa / .pek', 'Media Cache', 'FCPX Libraries'],
       link: 'How to clear Adobe media cache',
     },
-    disk: {
-      title: 'Reclaim Mac Disk Space',
-      body: 'Safely purge massive application logs, app caches, and leftover update downloads clogging your hard drive.',
-      chips: ['~/Library/Caches', '~/Library/Logs', 'Update downloads'],
-    },
-    carefulEyebrow: 'Careful by default',
-    carefulTitle: 'Nothing leaves your Mac without a look.',
-    carefulBody: 'Old-school cleaners run blunt scripts across standard folders. CacheDrop shows you what it found, why it’s safe to drop, and how much you’ll get back. Then it waits for you.',
+    safeEyebrow: 'Safe by design',
+    safeTitle: 'You decide what goes.',
+    safeBody: 'CacheDrop shows what it found, where it lives and how much you’ll get back. Then it waits for you.',
     steps: [
-      ['Only what tools rebuild', 'Package caches, build files and render data that your apps regenerate on their own. Your code, projects and timelines stay put.'],
-      ['You review first', 'Every recommendation shows its size and where it lives before anything moves.'],
-      ['Your files go to the Trash', 'Caches that apps rebuild are deleted. Your files go to the Trash, so changing your mind is one drag away.'],
+      ['You review first', 'Every item shows its size and where it lives before anything moves.'],
+      ['Only files apps make again are deleted', 'Caches and build files are deleted, because your apps make them again. Your own files go to the Trash.'],
+      ['Put back', 'History lists every cleanup and puts your files back where they were.'],
+      ['Your licenses stay safe', 'CacheDrop never touches the license data of your apps and plug-ins.'],
+      ['Signed and notarized by Apple', 'Every release is signed and checked by Apple, so macOS opens it without a warning.'],
     ],
     faqTitle: 'Mac storage, answered.',
     faqAsk: 'Still have a question? <a class="textlink" href="#feedback" data-feedback style="color: var(--accent-text)">Ask us directly</a>.',
     // One list feeds both the visible FAQ and the FAQPage JSON-LD, so they can't drift apart.
     faq: [
-      ['What is CacheDrop?', 'CacheDrop is a native Mac storage cleaner for developers and video editors. It finds hidden caches, Xcode DerivedData, old node_modules folders and video editing caches, shows how much space each one takes, and clears what you approve.'],
-      ['How do I free up space on my Mac?', 'Start with the files you can’t see. Caches, build files and render data can take tens of gigabytes, and macOS hides them inside “System Data”. CacheDrop scans for them, lets you review what it found, and clears it when you confirm.'],
-      ['What is System Data on a Mac, and can I delete it?', 'System Data is where macOS counts files that don’t fit its other categories, including app caches, logs and developer build files. Much of it is safe to remove because apps rebuild it. CacheDrop only targets those rebuildable parts.'],
-      ['Is it safe to delete caches on a Mac?', 'Yes, for caches that apps regenerate: the app simply rebuilds them the next time it needs them. CacheDrop recommends caches that rebuild themselves and shows you each one before anything is cleared.'],
-      ['How do I clear my Mac’s disk without losing files?', 'Clear caches and build output, not documents. CacheDrop leaves your code, projects and timelines alone. It deletes only files apps make again, like caches, and sends your own files to the Trash.'],
-      ['How much does CacheDrop cost, and which Macs does it support?', `It’s free to try: scanning is always free, and you can clean up to 2\u00a0GB before you buy. A license is ${pricingCopy.en.license}, for up to 3 Macs. It’s a universal app for Apple Silicon and Intel Macs running macOS 14 Sonoma or later.`],
+      ['What is CacheDrop?', 'CacheDrop is a Mac app that finds the caches, leftovers and old files filling your Mac and clears them safely. It also removes apps and audio plug-ins with every file they installed. It’s made for music producers, developers and video editors.'],
+      ['How do I free up space on my Mac?', 'Start with the files you can’t see. Caches, build files and app leftovers can take tens of gigabytes, and macOS hides them inside “System Data”. CacheDrop scans for them, shows you what it found and how big each one is, and clears what you approve.'],
+      ['What is System Data on a Mac, and can I delete it?', 'System Data is where macOS counts files that don’t fit its other categories, including app caches, logs and developer files. Much of it is safe to remove because apps make those files again. CacheDrop goes after only those parts.'],
+      ['Is it safe to delete caches on a Mac?', 'Yes, for caches that apps make again: the app simply creates them the next time it needs them. CacheDrop shows you each one before anything is cleared.'],
+      ['How do I completely uninstall an app or plug-in on a Mac?', 'Dragging an app to the Trash leaves its settings, caches and support files behind, and plug-ins install files in several folders. CacheDrop finds every file an app or plug-in installed and removes them in one step, without touching your licenses.'],
+      ['How do I clean up my Mac without losing files?', 'Clear caches and build files, not documents. CacheDrop deletes only files apps make again. Your own files go to the Trash, and History puts them back.'],
+      ['Is CacheDrop a subscription?', `No. You pay once: a license is ${pricingCopy.en.license}, for up to 3 Macs, with every update through version 1. CleanMyMac is $39.95 every year, for one Mac.`],
+      ['How much does CacheDrop cost, and which Macs does it support?', `A license is ${pricingCopy.en.license}, for up to 3 Macs, with 30-day refunds. You can try it before you buy: scanning is always free, and you can clean up to 2 GB first. It’s a universal app for Apple Silicon and Intel Macs on macOS 14 or later.`],
     ],
-    closingTitle: 'Get your space back.',
-    closingBody: 'Free to try. One universal app for Apple Silicon and Intel Macs on macOS 14 or later.',
-    closingLink: 'Using it already? Tell us what to fix next →',
+    closingTitle: 'Try it on your Mac.',
+    closingBody: 'One app for Apple Silicon and Intel Macs on macOS 14 or later.',
   },
   fr: {
-    title: 'Nettoyer son Mac – Libérez de l’espace de stockage | CacheDrop',
-    description: 'Libérez de l’espace sur votre Mac. CacheDrop repère les caches invisibles, les DerivedData de Xcode, les dossiers node_modules et les caches vidéo, puis les vide en toute sécurité. Essai gratuit.',
+    title: 'Nettoyer son Mac – Récupérez votre espace, payez une fois | CacheDrop',
+    description: 'CacheDrop repère les caches, les restes et les vieux fichiers qui remplissent votre Mac, et les vide en toute sécurité. Fait pour les producteurs de musique, les développeurs et les monteurs vidéo.',
     operatingSystem: 'macOS 14 ou version ultérieure',
-    badge: 'Nettoyeur de stockage pour Mac · Essai gratuit',
-    h1: 'Moins de superflu.<br>Gardez l’essentiel.',
-    lede: 'Votre Mac est rempli de caches invisibles, de données dérivées et de fichiers de projets abandonnés. CacheDrop les repère et les supprime en toute sécurité. Libérez de l’espace sur votre Mac en quelques secondes.',
+    proof: 'CacheDrop a trouvé 18 Go de plug-ins sur le Mac d’un producteur de musique',
+    h1: 'Récupérez l’espace de votre Mac.',
+    lede: 'CacheDrop repère les caches, les restes et les vieux fichiers qui remplissent votre Mac, et les vide en toute sécurité. Fait pour les producteurs de musique, les développeurs et les monteurs vidéo.',
     download: 'Télécharger pour Mac',
-    feedback: 'Donner votre avis',
-    meta: pricingCopy.fr.trial,
-    featuresEyebrow: 'Conçu pour les postes de travail',
-    featuresTitle: 'Fait pour les gros travaux.',
-    featuresBody: 'CacheDrop est un nettoyeur de stockage pour Mac conçu pour les développeurs et les monteurs vidéo. Les nettoyeurs génériques effacent les témoins du navigateur et passent à côté de ce qui pèse vraiment. CacheDrop s’attaque aux caches de compilation, aux caches de média et aux vieilles images de conteneurs : les fichiers qui grossissent en silence à chaque projet.',
+    valueEyebrow: 'Une application au lieu de trois',
+    valueTitle: 'Un nettoyeur, un désinstalleur d’applications et un gestionnaire de plug-ins.',
+    values: [
+      ['Voyez ce qui remplit votre Mac', 'Une seule analyse montre les caches, les vieux fichiers de projets, les restes et les gros téléchargements, avec leur taille.'],
+      ['Désinstallez complètement applications et plug-ins', 'Tous les fichiers qu’ils ont installés partent en une seule étape, et vos licences restent intactes.'],
+      ['Rien n’est perdu par erreur', 'Vous vérifiez tout avant. Vos fichiers vont dans la Corbeille, et l’historique les remet en place.'],
+    ],
+    workEyebrow: 'Fait pour votre travail',
+    workTitle: 'La musique, le code et la vidéo remplissent un Mac plus vite que tout.',
+    workBody: 'CacheDrop sait où vos outils rangent leurs fichiers, et il trouve les gigaoctets qu’un nettoyeur ordinaire laisse passer.',
+    producers: {
+      title: 'Pour les producteurs de musique',
+      body: 'Désinstallez les plug-ins VST, AU, AAX et CLAP avec tous les fichiers qu’ils ont installés, et videz le cache d’Ableton Live. Vos licences restent en place.',
+      chips: ['VST3 / AU', 'AAX / CLAP', 'Cache Ableton'],
+      link: 'Comment désinstaller des plug-ins audio',
+    },
     developers: {
-      title: 'Vider les fichiers de développement',
-      body: 'Supprimez en toute sécurité des gigaoctets de dossiers <span class="mono" style="font-size: 13px">node_modules</span> oubliés, de DerivedData de Xcode et de caches Docker.',
+      title: 'Pour les développeurs',
+      body: 'Videz en toute sécurité les dossiers <span class="mono" style="font-size: 13px">node_modules</span> oubliés, les DerivedData de Xcode et les caches Docker.',
       chips: ['node_modules', 'DerivedData', 'Images Docker'],
       link: 'Comment vider les caches de développement',
     },
-    creators: {
-      title: 'Vider les caches de création',
+    editors: {
+      title: 'Pour les monteurs vidéo',
       body: 'Videz les caches de média Adobe invisibles et mesurez les bibliothèques Final Cut Pro remplies de fichiers de rendu, sans perdre vos montages.',
       chips: ['.cfa / .pek', 'Cache de média', 'Bibliothèques FCPX'],
       link: 'Comment vider le cache de média Adobe',
     },
-    disk: {
-      title: 'Récupérer de l’espace disque',
-      body: 'Purgez en toute sécurité les énormes journaux d’applications, les caches d’applications et les téléchargements de mises à jour restants qui encombrent votre disque.',
-      chips: ['~/Library/Caches', '~/Library/Logs', 'Mises à jour téléchargées'],
-    },
-    carefulEyebrow: 'Prudent par défaut',
-    carefulTitle: 'Rien ne quitte votre Mac sans que vous l’ayez vu.',
-    carefulBody: 'Les nettoyeurs d’ancienne génération lancent des scripts sans nuance sur des dossiers standards. CacheDrop vous montre ce qu’il a trouvé, pourquoi on peut le supprimer sans risque et combien d’espace vous récupérerez. Puis il attend votre feu vert.',
+    safeEyebrow: 'Sûr dès la conception',
+    safeTitle: 'Vous décidez de ce qui part.',
+    safeBody: 'CacheDrop vous montre ce qu’il a trouvé, où c’est rangé et combien d’espace vous récupérerez. Puis il attend votre feu vert.',
     steps: [
-      ['Seulement ce que vos outils recréent', 'Les caches de paquets, les fichiers de compilation et les données de rendu que vos applications régénèrent d’elles-mêmes. Votre code, vos projets et vos montages restent en place.'],
-      ['Vous vérifiez d’abord', 'Chaque recommandation indique sa taille et son emplacement avant que quoi que ce soit ne bouge.'],
-      ['Vos fichiers vont à la Corbeille', 'Les caches que les applications recréent sont supprimés. Vos fichiers vont à la Corbeille, d’où vous pouvez les récupérer d’un simple glisser.'],
+      ['Vous vérifiez d’abord', 'Chaque élément indique sa taille et son emplacement avant que quoi que ce soit ne bouge.'],
+      ['Seuls les fichiers que les applications recréent sont supprimés', 'Les caches et les fichiers de compilation sont supprimés, car vos applications les recréent. Vos propres fichiers vont dans la Corbeille.'],
+      ['Remettre en place', 'L’historique liste chaque nettoyage et remet vos fichiers là où ils étaient.'],
+      ['Vos licences restent intactes', 'CacheDrop ne touche jamais aux données de licence de vos applications et de vos plug-ins.'],
+      ['Signé et notarié par Apple', 'Chaque version est signée et vérifiée par Apple, et macOS l’ouvre sans avertissement.'],
     ],
     faqTitle: 'Le stockage du Mac, expliqué.',
     faqAsk: 'Une autre question? <a class="textlink" href="#feedback" data-feedback style="color: var(--accent-text)">Écrivez-nous directement</a>.',
     faq: [
-      ['Qu’est-ce que CacheDrop?', 'CacheDrop est un nettoyeur de stockage natif pour Mac, conçu pour les développeurs et les monteurs vidéo. Il repère les caches invisibles, les DerivedData de Xcode, les vieux dossiers node_modules et les caches de montage vidéo, montre l’espace qu’occupe chacun et vide ce que vous approuvez.'],
-      ['Comment libérer de l’espace sur mon Mac?', 'Commencez par les fichiers que vous ne voyez pas. Les caches, les fichiers de compilation et les données de rendu peuvent occuper des dizaines de gigaoctets, et macOS les dissimule dans « Données système ». CacheDrop les repère, vous laisse vérifier ce qu’il a trouvé et les vide quand vous confirmez.'],
-      ['Que sont les Données système d’un Mac, et puis-je les supprimer?', 'Les Données système regroupent les fichiers que macOS ne classe dans aucune autre catégorie, dont les caches d’applications, les journaux et les fichiers de compilation des développeurs. Une bonne partie peut être supprimée sans risque, car les applications la recréent. CacheDrop ne cible que ces parties recréables.'],
-      ['Peut-on supprimer les caches d’un Mac sans risque?', 'Oui, pour les caches que les applications régénèrent : l’application les recrée simplement la prochaine fois qu’elle en a besoin. CacheDrop recommande les caches qui se recréent d’eux-mêmes et vous montre chacun d’eux avant de vider quoi que ce soit.'],
-      ['Comment faire de la place sur le disque de mon Mac sans perdre de fichiers?', 'Videz les caches et les produits de compilation, pas vos documents. CacheDrop ne touche pas à votre code, à vos projets ni à vos montages. Il supprime seulement les fichiers que les applications recréent, comme les caches, et envoie vos propres fichiers à la Corbeille.'],
-      ['Combien coûte CacheDrop, et sur quels Mac fonctionne-t-il?', `Vous pouvez l’essayer gratuitement\u00a0: l’analyse est toujours gratuite, et vous pouvez nettoyer jusqu’à 2\u00a0Go avant d’acheter. La licence coûte ${pricingCopy.fr.license}, pour un maximum de 3 Mac. C’est une application universelle pour les Mac Apple Silicon et Intel sous macOS 14 Sonoma ou version ultérieure.`],
+      ['Qu’est-ce que CacheDrop?', 'CacheDrop est une application pour Mac qui repère les caches, les restes et les vieux fichiers qui remplissent votre Mac, et les vide en toute sécurité. Il désinstalle aussi les applications et les plug-ins audio avec tous les fichiers qu’ils ont installés. Il est fait pour les producteurs de musique, les développeurs et les monteurs vidéo.'],
+      ['Comment libérer de l’espace sur mon Mac?', 'Commencez par les fichiers que vous ne voyez pas. Les caches, les fichiers de compilation et les restes d’applications peuvent occuper des dizaines de gigaoctets, et macOS les dissimule dans « Données système ». CacheDrop les repère, vous montre ce qu’il a trouvé et la taille de chaque élément, et vide ce que vous approuvez.'],
+      ['Que sont les Données système d’un Mac, et puis-je les supprimer?', 'Les Données système regroupent les fichiers que macOS ne classe dans aucune autre catégorie, dont les caches d’applications, les journaux et les fichiers de développement. Une bonne partie peut être supprimée sans risque, car les applications recréent ces fichiers. CacheDrop ne s’attaque qu’à ces parties.'],
+      ['Peut-on supprimer les caches d’un Mac sans risque?', 'Oui, pour les caches que les applications recréent : l’application les crée de nouveau la prochaine fois qu’elle en a besoin. CacheDrop vous montre chacun d’eux avant de vider quoi que ce soit.'],
+      ['Comment désinstaller complètement une application ou un plug-in sur Mac?', 'Glisser une application dans la Corbeille laisse ses réglages, ses caches et ses fichiers de soutien, et les plug-ins installent des fichiers dans plusieurs dossiers. CacheDrop trouve tous les fichiers qu’une application ou un plug-in a installés et les supprime en une seule étape, sans toucher à vos licences.'],
+      ['Comment faire le ménage sur mon Mac sans perdre de fichiers?', 'Videz les caches et les fichiers de compilation, pas vos documents. CacheDrop supprime seulement les fichiers que les applications recréent. Vos propres fichiers vont dans la Corbeille, et l’historique les remet en place.'],
+      ['CacheDrop est-il un abonnement?', `Non. Vous payez une seule fois : la licence coûte ${pricingCopy.fr.license}, pour un maximum de 3 Mac, avec toutes les mises à jour de la version 1. CleanMyMac coûte 39,95 $ chaque année, pour un seul Mac.`],
+      ['Combien coûte CacheDrop, et sur quels Mac fonctionne-t-il?', `La licence coûte ${pricingCopy.fr.license}, pour un maximum de 3 Mac, avec remboursement dans les 30 jours. Vous pouvez l’essayer avant d’acheter : l’analyse est toujours gratuite, et vous pouvez d’abord nettoyer jusqu’à 2 Go. C’est une application universelle pour les Mac Apple Silicon et Intel sous macOS 14 ou version ultérieure.`],
     ],
-    closingTitle: 'Récupérez votre espace.',
-    closingBody: 'Essai gratuit. Une seule application universelle pour les Mac Apple Silicon et Intel sous macOS 14 ou version ultérieure.',
-    closingLink: 'Vous l’utilisez déjà? Dites-nous quoi corriger en premier →',
+    closingTitle: 'Essayez-le sur votre Mac.',
+    closingBody: 'Une seule application pour les Mac Apple Silicon et Intel sous macOS 14 ou version ultérieure.',
   },
 };
 const lang = langOf(Astro.url);
@@ -137,7 +160,10 @@ const jsonLd = {
       applicationCategory: 'UtilitiesApplication',
       dateModified: lastModified(`${site}${localize(lang, '/')}`),
       operatingSystem: t.operatingSystem,
+      processorRequirements: 'Apple Silicon, Intel',
       description: t.description,
+      // Decision 51's fact sheet, in the words of the pricing card.
+      featureList: pricingCopy[lang].items,
       publisher: { '@id': `${site}/#org` },
       // Decision 47: the price a buyer pays today, with the regular price as the struck-through one
       // while the limited-time offer runs (schema.org StrikethroughPrice).
@@ -162,92 +188,102 @@ const chip = 'font-size: 12px; color: var(--ink-body); background: var(--surface
 const chips = 'display: flex; flex-wrap: wrap; gap: var(--space-1-5); padding-top: var(--space-5); border-top: 1px solid var(--line)';
 const cardBody = 'margin: var(--space-2) 0 0; font-size: 15px; line-height: 23px; color: var(--ink-soft)';
 const cardLink = 'display: inline-flex; align-items: center; gap: var(--space-1-5); font-size: 14px; font-weight: 500; color: var(--accent-text)';
+const lede = 'margin: var(--space-4) 0 0; font-size: 17px; line-height: 27px; color: var(--ink-secondary); text-wrap: pretty';
+const grid = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-6)';
+const twoColumns = 'max-width: var(--container-max); margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: var(--space-16); align-items: start';
 const steps = t.steps.map(([title, body], i) => [`0${i + 1}`, title, body]);
+
+// The value props' icons: a disk with its fill, an app box with an arrow out, a tick in a shield.
+const valueIcons = [
+  '<rect x="3" y="7" width="18" height="10" rx="3"></rect><path d="M11 12h6"></path><path d="M7 12h.01"></path>',
+  '<rect x="4" y="4" width="16" height="16" rx="4"></rect><path d="M12 8v8"></path><path d="M8.5 12.5L12 16l3.5-3.5"></path>',
+  '<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path><path d="M9 12l2 2 4-4"></path>',
+];
+// The work cards: a waveform, a terminal, a play button.
+const work = [
+  { id: 'producers', ...t.producers, href: guides.producer.path, icon: '<path d="M4 12h2"></path><path d="M8 8v8"></path><path d="M12 5v14"></path><path d="M16 9v6"></path><path d="M20 11v2"></path>' },
+  { id: 'developers', ...t.developers, href: guides.developer.path, icon: '<rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M7 10l3 2-3 2"></path><path d="M13 15h4"></path>' },
+  { id: 'editors', ...t.editors, href: guides.creator.path, icon: '<rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M10 9.5v5l4.5-2.5z"></path>' },
+];
 ---
 <Base title={t.title} description={t.description} path="/" jsonLd={jsonLd}>
 <Nav homeHref="#top" />
 
 <section id="top" style="max-width: var(--container-max); margin: 0 auto; padding: var(--space-28) var(--space-6) var(--space-32); display: flex; flex-direction: column; align-items: center; text-align: center">
-<p style="margin: 0 0 var(--space-8); display: inline-flex; align-items: center; gap: var(--space-2); font-size: 12px; font-weight: 500; color: var(--ink-secondary); padding: var(--space-1-5) var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-full); background: var(--surface-elevated)">
+<p data-proof style="margin: 0 0 var(--space-8); display: inline-flex; align-items: center; gap: var(--space-2); font-size: 12px; font-weight: 500; color: var(--ink-secondary); padding: var(--space-1-5) var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-full); background: var(--surface-elevated)">
 <span aria-hidden="true" style="width: var(--dot); height: var(--dot); border-radius: var(--radius-full); background: var(--success)"></span>
-<span>{t.badge}</span>
+<span>{t.proof}</span>
 </p>
-<h1 style="margin: 0; font-size: clamp(40px, 6vw, 76px); line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; text-wrap: balance" set:html={t.h1} />
-<h2 style="margin: var(--space-7) 0 0; max-width: var(--lede-max); font-size: 19px; line-height: 29px; font-weight: 400; letter-spacing: -0.012em; color: var(--ink-secondary); text-wrap: pretty">{t.lede}</h2>
+<h1 style="margin: 0; font-size: clamp(40px, 6vw, 76px); line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; text-wrap: balance">{t.h1}</h1>
+<p style="margin: var(--space-7) 0 0; max-width: var(--lede-max); font-size: 19px; line-height: 29px; font-weight: 400; letter-spacing: -0.012em; color: var(--ink-secondary); text-wrap: pretty">{t.lede}</p>
 <div id="download" style="margin-top: var(--space-10); display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--space-3)">
 <a class="btn-primary" href={download} style={primaryLg}>
 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg>
 <span>{t.download}</span>
 </a>
-<a class="btn-ghost" href="#feedback" data-feedback style={secondaryLg}>{t.feedback}</a>
+<BuyButton variant="ghost" />
 </div>
-<p style="margin: 18px 0 0; font-size: 13px; color: var(--ink-secondary)">{t.meta}</p>
+<p style="margin: 18px 0 0; font-size: 13px; color: var(--ink-secondary)">{pricingCopy[lang].trial}</p>
 
 <AppWindow />
 </section>
 
-<section id="features" style="background: var(--surface-subtle); padding: var(--space-30) var(--space-6)">
+<section id="value" style="padding: 0 var(--space-6) var(--space-30)">
 <div style="max-width: var(--container-max); margin: 0 auto">
 <div style="max-width: var(--lede-max); margin-bottom: var(--space-14)">
-<p style={eyebrow}>{t.featuresEyebrow}</p>
-<h2 style={sectionH2}>{t.featuresTitle}</h2>
-<p style="margin: var(--space-4) 0 0; font-size: 17px; line-height: 27px; color: var(--ink-secondary); text-wrap: pretty">{t.featuresBody}</p>
+<p style={eyebrow}>{t.valueEyebrow}</p>
+<h2 style={`${sectionH2}; text-wrap: balance`}>{t.valueTitle}</h2>
 </div>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-6)">
-
-<article id="developers" style={card}>
+<div style={grid}>
+{t.values.map(([title, body], i) => (
+<div style="display: flex; flex-direction: column; gap: var(--space-5)">
 <div style={tile}>
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M7 10l3 2-3 2"></path><path d="M13 15h4"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={valueIcons[i]} />
 </div>
-<div style="flex: 1">
-<h3 style={titleMd}>{t.developers.title}</h3>
-<p style={cardBody} set:html={t.developers.body} />
+<div>
+<h3 style={titleMd}>{title}</h3>
+<p style={cardBody}>{body}</p>
 </div>
-<div style={chips}>
-{t.developers.chips.map((c) => <span class="mono" style={chip}>{c}</span>)}
 </div>
-<a class="textlink" href={localize(lang, '/clear-mac-developer-caches/')} style={cardLink}>{t.developers.link}
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></a>
-</article>
-
-<article id="creators" style={card}>
-<div style={tile}>
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="M10 9.5v5l4.5-2.5z"></path></svg>
-</div>
-<div style="flex: 1">
-<h3 style={titleMd}>{t.creators.title}</h3>
-<p style={cardBody}>{t.creators.body}</p>
-</div>
-<div style={chips}>
-{t.creators.chips.map((c) => <span class="mono" style={chip}>{c}</span>)}
-</div>
-<a class="textlink" href={localize(lang, '/clear-adobe-media-cache-mac/')} style={cardLink}>{t.creators.link}
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></a>
-</article>
-
-<article style={card}>
-<div style={tile}>
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="3"></rect><path d="M11 12h6"></path><path d="M7 12h.01"></path></svg>
-</div>
-<div style="flex: 1">
-<h3 style={titleMd}>{t.disk.title}</h3>
-<p style={cardBody}>{t.disk.body}</p>
-</div>
-<div style={chips}>
-{t.disk.chips.map((c) => <span class="mono" style={chip}>{c}</span>)}
-</div>
-</article>
-
+))}
 </div>
 </div>
 </section>
 
-<section style="padding: var(--space-32) var(--space-6)">
-<div style="max-width: var(--container-max); margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: var(--space-16); align-items: start">
+<section id="work" style="background: var(--surface-subtle); padding: var(--space-30) var(--space-6)">
+<div style="max-width: var(--container-max); margin: 0 auto">
+<div style="max-width: var(--lede-max); margin-bottom: var(--space-14)">
+<p style={eyebrow}>{t.workEyebrow}</p>
+<h2 style={`${sectionH2}; text-wrap: balance`}>{t.workTitle}</h2>
+<p style={lede}>{t.workBody}</p>
+</div>
+<div style={grid}>
+{work.map((w) => (
+<article id={w.id} style={card}>
+<div style={tile}>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={w.icon} />
+</div>
+<div style="flex: 1">
+<h3 style={titleMd}>{w.title}</h3>
+<p style={cardBody} set:html={w.body} />
+</div>
+<div style={chips}>
+{w.chips.map((c) => <span class="mono" style={chip}>{c}</span>)}
+</div>
+<a class="textlink" href={localize(lang, w.href)} style={cardLink}>{w.link}
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></a>
+</article>
+))}
+</div>
+</div>
+</section>
+
+<section id="safe" style="padding: var(--space-32) var(--space-6)">
+<div style={twoColumns}>
 <div>
-<p style={eyebrow}>{t.carefulEyebrow}</p>
-<h2 style={`${sectionH2}; text-wrap: balance`}>{t.carefulTitle}</h2>
-<p style="margin: var(--space-4) 0 0; max-width: 440px; font-size: 17px; line-height: 27px; color: var(--ink-secondary); text-wrap: pretty">{t.carefulBody}</p>
+<p style={eyebrow}>{t.safeEyebrow}</p>
+<h2 style={`${sectionH2}; text-wrap: balance`}>{t.safeTitle}</h2>
+<p style={`${lede}; max-width: 440px`}>{t.safeBody}</p>
 </div>
 <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column">
 {steps.map(([n, title, body], i) => (
@@ -263,10 +299,10 @@ const steps = t.steps.map(([title, body], i) => [`0${i + 1}`, title, body]);
 </div>
 </section>
 
-<PricingSection />
+<PricingSection versus />
 
 <section id="faq" style="padding: 0 var(--space-6) var(--space-32)">
-<div style="max-width: var(--container-max); margin: 0 auto; padding-top: var(--space-28); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: var(--space-16); align-items: start">
+<div style={`${twoColumns}; padding-top: var(--space-28); border-top: 1px solid var(--line)`}>
 <div>
 <p style={eyebrow}>FAQ</p>
 <h2 style={`${sectionH2}; text-wrap: balance`}>{t.faqTitle}</h2>
@@ -283,9 +319,7 @@ const steps = t.steps.map(([title, body], i) => [`0${i + 1}`, title, body]);
 </div>
 </section>
 
-<ClosingCta size="home" title={t.closingTitle} body={t.closingBody} href={download} cta={t.download}>
-<a class="textlink" href="#feedback" data-feedback style="margin-top: var(--space-5); font-size: 14px; color: var(--ink-body)">{t.closingLink}</a>
-</ClosingCta>
+<ClosingCta size="home" title={t.closingTitle} body={t.closingBody} href={download} cta={t.download} />
 
 <Footer path="/" />
 </Base>

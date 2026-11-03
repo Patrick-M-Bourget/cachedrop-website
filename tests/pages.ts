@@ -15,7 +15,8 @@ export type PageUnderTest = {
 };
 
 export const pages: PageUnderTest[] = [
-  { path: '/', handoff: 'index.html', screenshots: 'home' },
+  // The homepage (#109, Decision 51) is a new layout: its own reference renders, no handoff original.
+  { path: '/', screenshots: 'home' },
   { path: '/clear-mac-developer-caches/', handoff: 'clear-mac-developer-caches/index.html', screenshots: 'developer-guide' },
   { path: '/clear-adobe-media-cache-mac/', handoff: 'clear-adobe-media-cache-mac/index.html', screenshots: 'creator-guide' },
   { path: '/uninstall-audio-plugins-mac/' }, // the producer page (Decision 48): no handoff original
