@@ -82,6 +82,12 @@ export const handoffChanges: HandoffChange[] = [
     replace: '<a class="flink" href="/uninstall-audio-plugins-mac/">Uninstall Audio Plug-ins</a><a class="flink" href="/clear-system-data-mac/">Clear System Data</a>',
   },
   {
+    decision: 51,
+    why: 'The footer\'s tagline says what the homepage says (#109).',
+    find: '>A careful Mac storage cleaner for developer caches and creative render files.</p>',
+    replace: '>Get your Mac’s space back: a cleaner, app uninstaller and plug-in manager you pay for once.</p>',
+  },
+  {
     decision: 52,
     why: 'The footer\'s "Public beta" label goes with the badge. Applied last: the Decision 19 and 5 changes anchor on it.',
     find: '<span>Public beta</span>',
