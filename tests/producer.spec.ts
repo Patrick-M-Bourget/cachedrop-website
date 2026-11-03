@@ -9,8 +9,8 @@ async function jsonLd(page: Page) {
 }
 
 const langs = [
-  { path: '/uninstall-audio-plugins-mac/', lang: 'en', cta: 'Get CacheDrop free', download: '/download/', nav: 'For Producers' },
-  { path: '/fr/uninstall-audio-plugins-mac/', lang: 'fr', cta: 'Obtenir CacheDrop gratuitement', download: '/fr/download/', nav: 'Pour les producteurs' },
+  { path: '/uninstall-audio-plugins-mac/', lang: 'en', cta: 'Get CacheDrop free', download: '/download/', nav: 'For Music Producers' },
+  { path: '/fr/uninstall-audio-plugins-mac/', lang: 'fr', cta: 'Obtenir CacheDrop gratuitement', download: '/fr/download/', nav: 'Pour les producteurs de musique' },
 ] as const;
 
 for (const l of langs) {

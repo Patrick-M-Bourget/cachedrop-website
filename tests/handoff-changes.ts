@@ -37,7 +37,7 @@ export const handoffChanges: HandoffChange[] = [
     decision: 48,
     why: 'The nav links to the producer page after For Creators.',
     find: 'For Creators</a>',
-    replace: 'For Creators</a><a class="navlink" href="/uninstall-audio-plugins-mac/">For Producers</a>',
+    replace: 'For Creators</a><a class="navlink" href="/uninstall-audio-plugins-mac/">For Music Producers</a>',
   },
   {
     decision: 48,
