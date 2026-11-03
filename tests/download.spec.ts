@@ -250,3 +250,29 @@ test.describe('the token page', () => {
     expect(calls).toBe(0);
   });
 });
+
+// Campaign tags (#93): the first utm_* set seen in the tab rides along to the /download/ form.
+test.describe('campaign tags', () => {
+  test('a landing page\'s tags go with the signup, and a later page\'s tags don\'t replace them', async ({ page }) => {
+    const requests = await mockSignup(page);
+    await page.goto('/uninstall-audio-plugins-mac/?utm_source=meta&utm_medium=paid&utm_campaign=producers%20nov&utm_content=ad%203&fbclid=abc');
+    await page.goto('/?utm_source=google');
+    await page.goto('/download/');
+    await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
+    await page.getByRole('button', { name: 'Email Me the Link' }).click();
+    await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
+    expect(requests).toEqual([
+      { email: 'ada@example.com', filling: null, news: false, lang: 'en', utm: { utm_source: 'meta', utm_medium: 'paid', utm_campaign: 'producers nov', utm_content: 'ad 3' }, turnstile },
+    ]);
+  });
+
+  test('a tag that looks like a download token is dropped, and a visit with none sends none', async ({ page, context }) => {
+    const requests = await mockSignup(page);
+    await page.goto(`/download/?utm_content=${'a'.repeat(43)}`);
+    await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
+    await page.getByRole('button', { name: 'Email Me the Link' }).click();
+    await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
+    expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false, lang: 'en', turnstile }]);
+    expect(await context.cookies()).toEqual([]);
+  });
+});
