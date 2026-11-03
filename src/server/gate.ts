@@ -13,11 +13,34 @@ export const BUCKET = 'releases';
 export const SIGNED_URL_SECONDS = 60;
 /** The "What's filling your Mac?" answers, as the form posts them. */
 export const FILLING = ['development', 'video-photo', 'music-audio', 'other'] as const;
+/** The campaign tags a signup may carry (#93). */
+export const UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
+/** The longest tag value stored; a longer one is dropped, not cut. */
+export const UTM_MAX = 150;
+const HAS_TOKEN = /[A-Za-z0-9_-]{43}/;
+type UtmArgs = { [K in (typeof UTM)[number] as `p_${K}`]: string | null };
+
+/**
+ * The tags from the request body's `utm` object, as request_download takes them. Each is kept only
+ * when it is a non-empty string of at most UTM_MAX characters that doesn't look like a download token;
+ * anything else is null, and never fails the signup.
+ */
+export function utmArgs(utm: unknown): UtmArgs {
+  const source = (typeof utm === 'object' && utm !== null ? utm : {}) as Record<string, unknown>;
+  return Object.fromEntries(
+    UTM.map((name) => {
+      const value = typeof source[name] === 'string' ? source[name].trim() : '';
+      const ok = value.length > 0 && value.length <= UTM_MAX && !HAS_TOKEN.test(value);
+      return [`p_${name}`, ok ? value : null];
+    }),
+  ) as UtmArgs;
+}
+
 export type TokenLookup = { status: 'ok' | 'unknown' | 'expired' | 'no_release'; version: string | null; filename: string | null };
 
 /** The slice of the supabase-js client the gate uses. */
 export interface GateDb {
-  rpc(fn: 'request_download', args: { p_email: string; p_filling: string | null; p_news: boolean; p_lang: Lang; p_token_hash: string }): Result<unknown>;
+  rpc(fn: 'request_download', args: { p_email: string; p_filling: string | null; p_news: boolean; p_lang: Lang; p_token_hash: string } & UtmArgs): Result<unknown>;
   rpc(fn: 'download_for_token', args: { p_token_hash: string; p_count: boolean }): Result<TokenLookup[]>;
   rpc(fn: 'issue_unsubscribe_token', args: { p_email: string; p_token_hash: string }): Result<unknown>;
   /** true when the token was known (and its address is now unsubscribed). */
@@ -51,15 +74,16 @@ export interface GateDeps {
 export type SignupDeps = GateDeps & Guard;
 
 /**
- * POST /api/signup with JSON `{ email, filling?, news?, lang?, turnstile }`: saves the signup (or
+ * POST /api/signup with JSON `{ email, filling?, news?, lang?, utm?, turnstile }`: saves the signup (or
  * finds the one for this email) and emails a new download link. Only `news: true` counts as the
  * news opt-in, and a later request without it never turns an existing yes off (Decision 3). `lang`
  * is the page's language, "en" unless it is exactly "fr"; the email goes out in it, and it is
  * stored unless the signup is unsubscribed and this request has no tick (Decisions 5, 32). The
- * Turnstile token and the rate limit are checked first (Decision 12).
+ * Turnstile token and the rate limit are checked first (Decision 12). `utm` holds the landing page's
+ * campaign tags (#93, see utmArgs); the first ones stored for an address are kept.
  */
 export async function handleSignup(request: Request, deps: SignupDeps): Promise<Response> {
-  let body: { email?: unknown; filling?: unknown; news?: unknown; lang?: unknown; turnstile?: unknown };
+  let body: { email?: unknown; filling?: unknown; news?: unknown; lang?: unknown; utm?: unknown; turnstile?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -79,6 +103,7 @@ export async function handleSignup(request: Request, deps: SignupDeps): Promise<
     p_news: body.news === true,
     p_lang: lang,
     p_token_hash: hashToken(token),
+    ...utmArgs(body.utm),
   });
   if (saved.error) return json({ error: 'unavailable' }, 503);
   const unsubscribe = newToken();
