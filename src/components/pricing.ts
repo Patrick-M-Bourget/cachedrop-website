@@ -1,14 +1,6 @@
-// The launch setting (Decision 44): PUBLIC_PRICING_LIVE=1 at build time shows pricing, the Buy
-// links and the "Download free" copy; anything else, or unset, builds the site as it was. Vercel
-// reads it at build time, so flipping it takes a redeploy. The download email's server code reads
-// the same variable at run time (src/server/vercel.ts).
+// The price and the pricing section's copy (Decisions 44 and 47). Pricing is always on: the
+// launch setting that once hid it retired with Decision 52.
 import type { Lang } from '../i18n';
-
-/** Whether `value` (the variable as read from the environment) turns pricing on. */
-export const isPricingLive = (value: string | undefined) => value === '1';
-
-/** This build's setting. */
-export const pricingLive = isPricingLive(import.meta.env.PUBLIC_PRICING_LIVE);
 
 /** Where a page in `lang` sends its Buy links (Decision 41). */
 export const buyHref = (lang: Lang) => (lang === 'fr' ? '/buy?lang=fr' : '/buy');
@@ -27,15 +19,12 @@ export const discounted = price.offer !== price.regular;
 const en = (n: string) => `$${n}`;
 const fr = (n: string) => `${n.replace('.', ',')}\u00a0$`;
 
-/** Picks a page's copy: the base strings, with the launch strings over them when pricing is live. */
-export const withLaunch = <T extends object>(base: T, launch: Partial<T>, live = pricingLive): T => (live ? { ...base, ...launch } : base);
-
 //   is a non-breaking space: before the French colon and currency symbol, and between a
 // number and its unit (docs/french-glossary.md).
 export const pricingCopy = {
   en: {
     eyebrow: 'Pricing',
-    title: 'Try it free. Pay once.',
+    title: 'Try it before you buy. Pay once.',
     body: 'Scanning is always free, and you can clean up to 2 GB before you buy. One license covers every 1.x release.',
     name: 'CacheDrop license',
     was: en(price.regular),
@@ -51,8 +40,12 @@ export const pricingCopy = {
       'Every 1.x release',
       '30-day refunds, no questions asked',
     ],
-    buy: 'Buy a License',
-    download: 'Download Free',
+    // The Buy button (Decision 51): "Buy · $29.99 once", with the offer shown as on the card (Decision 47).
+    buy: 'Buy',
+    buyOnce: 'once',
+    wasWord: 'was',
+    nowWord: 'now',
+    download: 'Download for Mac',
     // Odd entries are the links to the terms of sale, refund policy and license agreement, in order.
     // Prose for meta descriptions and answers: the regular price, then the discount while it runs.
     license: discounted ? `${en(price.regular)} once, now ${en(price.offer)} for a limited time` : `${en(price.regular)} once`,
@@ -60,7 +53,7 @@ export const pricingCopy = {
   },
   fr: {
     eyebrow: 'Tarifs',
-    title: 'Essayez-le gratuitement. Payez une seule fois.',
+    title: 'Essayez-le avant d’acheter. Payez une seule fois.',
     body: 'L’analyse est toujours gratuite, et vous pouvez nettoyer jusqu’à 2 Go avant d’acheter. Une licence vous donne toutes les versions 1.x.',
     name: 'Licence CacheDrop',
     was: '29,99 $',
@@ -75,8 +68,12 @@ export const pricingCopy = {
       'Toutes les versions 1.x',
       'Remboursement dans les 30 jours, sans avoir à vous justifier',
     ],
-    buy: 'Acheter une licence',
-    download: 'Télécharger gratuitement',
+    buy: 'Acheter',
+    // No « une seule fois » on the button: it wraps at 390 px, and the price above already says it (owner, #107).
+    buyOnce: '',
+    wasWord: 'prix régulier',
+    nowWord: 'maintenant',
+    download: 'Télécharger pour Mac',
     license: discounted ? `${fr(price.regular)} une seule fois, maintenant ${fr(price.offer)} pour un temps limité` : `${fr(price.regular)} une seule fois`,
     legal: ['Consultez les ', 'conditions de vente', ', la ', 'politique de remboursement', ' et le ', 'contrat de licence', '.'],
   },

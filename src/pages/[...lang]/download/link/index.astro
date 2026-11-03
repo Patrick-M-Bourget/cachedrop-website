@@ -11,7 +11,6 @@
 import Base from '../../../../layouts/Base.astro';
 import Nav from '../../../../components/Nav.astro';
 import Footer from '../../../../components/Footer.astro';
-import { withLaunch } from '../../../../components/pricing';
 import { downloadHead, downloadMeta, guideLinks } from '../_head.ts';
 import { titleMd } from '../../../../components/guide-styles';
 import { langOf, langPaths, localize } from '../../../../i18n';
@@ -21,7 +20,7 @@ export const getStaticPaths = langPaths;
 const copy = {
   en: {
     title: 'Your download has started.',
-    lede: 'Thanks for trying the CacheDrop beta. It takes about a minute to set up.',
+    lede: 'Thanks for trying CacheDrop. It takes about a minute to set up.',
     retry: 'Download didn’t start? Try again',
     steps: [
       ['Open the disk image', 'Double-click <span class="mono" style="font-size: 13px" data-filename>CacheDrop.dmg</span> in your Downloads folder.'],
@@ -29,13 +28,13 @@ const copy = {
       ['Choose what to scan', 'Open CacheDrop, pick the folders it can look in under Locations &amp; access, and run your first scan.'],
     ],
     help: 'Help us build it',
-    helpBody: 'CacheDrop is free while in beta. If a scan misses something or a result surprises you, tell us. It takes thirty seconds.',
+    helpBody: 'CacheDrop is free to try. If a scan misses something or a result surprises you, tell us. It takes thirty seconds.',
     feedback: 'Give Fast Feedback',
     installing: 'While it installs:',
   },
   fr: {
     title: 'Votre téléchargement a commencé.',
-    lede: 'Merci d’essayer la bêta de CacheDrop. L’installation prend environ une minute.',
+    lede: 'Merci d’essayer CacheDrop. L’installation prend environ une minute.',
     retry: 'Le téléchargement n’a pas commencé? Réessayez',
     steps: [
       ['Ouvrez l’image disque', 'Double-cliquez sur <span class="mono" style="font-size: 13px" data-filename>CacheDrop.dmg</span> dans votre dossier Téléchargements.'],
@@ -43,24 +42,13 @@ const copy = {
       ['Choisissez quoi analyser', 'Ouvrez CacheDrop, choisissez les dossiers où il peut chercher, sous Locations &amp; access, et lancez votre première analyse.'],
     ],
     help: 'Aidez-nous à le bâtir',
-    helpBody: 'CacheDrop est gratuit pendant la bêta. Si une analyse oublie quelque chose ou qu’un résultat vous surprend, dites-le-nous. Ça prend trente secondes.',
+    helpBody: 'Vous pouvez essayer CacheDrop gratuitement. Si une analyse oublie quelque chose ou qu’un résultat vous surprend, dites-le-nous. Ça prend trente secondes.',
     feedback: 'Donner votre avis',
     installing: 'Pendant l’installation :',
   },
 };
-// Decision 44: with pricing live, "beta" gives way to "free to try".
-const launch = {
-  en: {
-    lede: 'Thanks for trying CacheDrop. It takes about a minute to set up.',
-    helpBody: 'CacheDrop is free to try. If a scan misses something or a result surprises you, tell us. It takes thirty seconds.',
-  },
-  fr: {
-    lede: 'Merci d’essayer CacheDrop. L’installation prend environ une minute.',
-    helpBody: 'Vous pouvez essayer CacheDrop gratuitement. Si une analyse oublie quelque chose ou qu’un résultat vous surprend, dites-le-nous. Ça prend trente secondes.',
-  },
-};
 const lang = langOf(Astro.url);
-const t = withLaunch(copy[lang], launch[lang]);
+const t = copy[lang];
 const meta = downloadMeta[lang];
 const expiredForm = `${localize(lang, '/download/')}?link=expired`;
 

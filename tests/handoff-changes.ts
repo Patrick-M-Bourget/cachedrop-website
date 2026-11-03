@@ -45,6 +45,36 @@ export const handoffChanges: HandoffChange[] = [
     find: '<a class="flink" href="/clear-adobe-media-cache-mac/">Clear Adobe Media Cache</a>',
     replace: '<a class="flink" href="/clear-adobe-media-cache-mac/">Clear Adobe Media Cache</a><a class="flink" href="/uninstall-audio-plugins-mac/">Uninstall Audio Plug-ins</a>',
   },
+  {
+    decision: 44,
+    why: 'The nav links to /pricing/ after For Music Producers. Applied after the Decision 48 change.',
+    find: 'For Music Producers</a>',
+    replace: 'For Music Producers</a><a class="navlink" href="/pricing/">Pricing</a>',
+  },
+  {
+    decision: 52,
+    why: 'The beta is over: the nav loses its BETA badge.',
+    find: '<span style="font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: #6E6E73; background: #F5F5F7; border-radius: 9999px; padding: 2px 7px">BETA</span>',
+    replace: '',
+  },
+  {
+    decision: 51,
+    why: 'The nav button has the one label for buttons to /download/.',
+    find: 'Get Free Beta</a>',
+    replace: 'Download for Mac</a>',
+  },
+  {
+    decision: 51,
+    why: 'So does the footer\'s download link.',
+    find: '<a class="flink" href="/download/">Download Free Beta</a>',
+    replace: '<a class="flink" href="/download/">Download for Mac</a>',
+  },
+  {
+    decision: 52,
+    why: 'The footer\'s "Public beta" label goes with the badge. Applied last: the Decision 19 and 5 changes anchor on it.',
+    find: '<span>Public beta</span>',
+    replace: '',
+  },
 ];
 
 /** Returns the handoff page's HTML with every decided change applied. */

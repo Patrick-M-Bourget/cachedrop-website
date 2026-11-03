@@ -1,8 +1,8 @@
 // The download email (Decisions 2, 3). Transactional: the link, what CacheDrop is, who sent it and
-// the privacy policy. Nothing promotional. No mailing address for the beta (Decision 33).
+// the privacy policy. Nothing promotional. No mailing address (Decision 33).
 // Like every email, it carries the unsubscribe link and one-click headers (Decision 4). It goes out
 // in the language the person signed up in (Decision 5); the French ships as Claude drafted it
-// (Decision 34). With pricing live (Decision 44) it says "free to try" instead of "free while in beta".
+// (Decision 34).
 import type { Email } from './gate.ts';
 import type { Lang } from '../i18n.ts';
 
@@ -14,8 +14,7 @@ const COPY = {
     button: 'Download CacheDrop',
     validity: 'The link works for 7 days, on any Mac. CacheDrop itself doesn’t expire.',
     fallback: 'If the button doesn’t work, paste this link into your browser:',
-    about: 'CacheDrop is a Mac storage cleaner made for developers and video editors. It is free while in beta.',
-    aboutLive: 'CacheDrop is a Mac storage cleaner made for developers and video editors. It is free to try.',
+    about: 'CacheDrop is a Mac storage cleaner made for developers and video editors. It is free to try.',
     notYou: 'You asked for this link on cachedrop.io. If that wasn’t you, ignore this email.',
     privacy: 'Privacy policy',
     unsubscribe: 'Unsubscribe',
@@ -30,8 +29,6 @@ const COPY = {
     validity: 'Le lien fonctionne pendant 7 jours, sur n’importe quel Mac. CacheDrop lui-même n’expire pas.',
     fallback: 'Si le bouton ne fonctionne pas, collez ce lien dans votre navigateur :',
     about:
-      'CacheDrop est un nettoyeur de stockage pour Mac conçu pour les développeurs et les monteurs vidéo. Il est gratuit pendant la bêta.',
-    aboutLive:
       'CacheDrop est un nettoyeur de stockage pour Mac conçu pour les développeurs et les monteurs vidéo. Vous pouvez l’essayer gratuitement.',
     notYou: 'Vous avez demandé ce lien sur cachedrop.io. Si ce n’était pas vous, ignorez ce courriel.',
     privacy: 'Politique de confidentialité',
@@ -49,10 +46,8 @@ export function downloadEmail(
   link: string,
   siteUrl: string,
   unsubscribe: { link: string; headers: Record<string, string> },
-  pricingLive = false,
 ): Email {
-  const { aboutLive, ...base } = COPY[lang];
-  const c = pricingLive ? { ...base, about: aboutLive } : base;
+  const c = COPY[lang];
   const privacy = `${pagesFor(siteUrl, lang)}/privacy/`;
   const text = [
     c.intro,

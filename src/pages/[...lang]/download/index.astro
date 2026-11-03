@@ -8,7 +8,7 @@ import Base from '../../../layouts/Base.astro';
 import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
 import SignupForm from '../../../components/SignupForm.astro';
-import { buyHref, pricingLive, withLaunch } from '../../../components/pricing';
+import { buyHref } from '../../../components/pricing';
 import { downloadHead, downloadMeta, guideLinks } from './_head.ts';
 import { langOf, langPaths, localize } from '../../../i18n';
 
@@ -16,27 +16,26 @@ export const getStaticPaths = langPaths;
 
 const copy = {
   en: {
-    title: 'Get the CacheDrop beta.',
+    title: 'Download CacheDrop for Mac.',
     lede: 'Enter your email and we’ll send you a download link. The link works for 7 days, on any Mac. CacheDrop itself doesn’t expire.',
     expiredTitle: 'This link has expired.',
     expiredLede: 'Download links work for 7 days. Enter your email and we’ll send you a new one. CacheDrop itself doesn’t expire.',
     wait: 'While you wait:',
+    tried: 'Already tried it?',
+    buy: 'Buy a license',
   },
   fr: {
-    title: 'Obtenez la bêta de CacheDrop.',
+    title: 'Téléchargez CacheDrop pour Mac.',
     lede: 'Entrez votre adresse courriel et nous vous enverrons un lien de téléchargement. Le lien fonctionne pendant 7 jours, sur n’importe quel Mac. CacheDrop lui-même n’expire pas.',
     expiredTitle: 'Ce lien a expiré.',
     expiredLede: 'Les liens de téléchargement fonctionnent pendant 7 jours. Entrez votre adresse courriel et nous vous en enverrons un nouveau. CacheDrop lui-même n’expire pas.',
     wait: 'En attendant :',
+    tried: 'Vous l’avez déjà essayé?',
+    buy: 'Achetez une licence',
   },
 };
-// Decision 44: with pricing live, the title drops "beta" and a Buy link sits under the card.
-const launch = {
-  en: { title: 'Try CacheDrop free.', tried: 'Already tried it?', buy: 'Buy a license' },
-  fr: { title: 'Essayez CacheDrop gratuitement.', tried: 'Vous l’avez déjà essayé?', buy: 'Achetez une licence' },
-};
 const lang = langOf(Astro.url);
-const t = withLaunch({ ...copy[lang], tried: '', buy: '' }, launch[lang]);
+const t = copy[lang];
 const meta = downloadMeta[lang];
 const expired = { title: t.expiredTitle, lede: t.expiredLede };
 const guideLink = 'color: var(--accent-text); font-weight: 500';
@@ -68,7 +67,7 @@ if (new URLSearchParams(location.search).get('link') === 'expired') {
 
 <SignupForm lang={lang} style="margin-top: var(--space-12)" />
 
-{pricingLive && <p data-buy style="margin: var(--space-8) 0 0; font-size: 14px; color: var(--ink-secondary)">{t.tried} <a class="textlink" href={buyHref(lang)} style={guideLink}>{t.buy}</a></p>}
+<p data-buy style="margin: var(--space-8) 0 0; font-size: 14px; color: var(--ink-secondary)">{t.tried} <a class="textlink" href={buyHref(lang)} style={guideLink}>{t.buy}</a></p>
 
 <div style="margin-top: var(--space-18); display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3) var(--space-8); font-size: 14px">
 <span style="color: var(--ink-secondary)">{t.wait}</span>

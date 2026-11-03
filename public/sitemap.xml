@@ -81,4 +81,14 @@
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/license-agreement/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/license-agreement/"/>
   </url>
+  <url><loc>https://cachedrop.io/pricing/</loc><lastmod>2026-11-01</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/pricing/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/pricing/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/pricing/"/>
+  </url>
+  <url><loc>https://cachedrop.io/fr/pricing/</loc><lastmod>2026-11-01</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/pricing/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/pricing/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/pricing/"/>
+  </url>
 </urlset>

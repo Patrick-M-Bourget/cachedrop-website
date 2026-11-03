@@ -1,35 +1,35 @@
 import { test, expect, type Page } from '@playwright/test';
 import { pages, ui } from './pages';
 
-// Decision 44: the build with the launch setting on (PUBLIC_PRICING_LIVE=1), served by the
-// `pricing-live` project in playwright.config.ts.
-const live = [...pages, { path: '/pricing/' }, { path: '/fr/pricing/', lang: 'fr' as const }];
+// Pricing (Decisions 44 and 47) on every build: the launch setting retired with Decision 52.
+const withPricing = [...pages, { path: '/pricing/' }, { path: '/fr/pricing/', lang: 'fr' as const }];
 const langOf = (p: { lang?: 'fr' }) => p.lang ?? 'en';
 
 const copy = {
   en: {
     pricing: ['Pricing', '/pricing/'],
-    download: 'Download Free',
-    title: 'Try it free. Pay once.',
+    download: 'Download for Mac',
+    title: 'Try it before you buy. Pay once.',
     spoken: 'Was $29.99, now $19.99 for a limited time, one-time.',
     shown: ['$29.99', '$19.99', 'one-time'],
     currencies: 'Pay in USD, CAD, EUR, GBP or AUD: the same number in each.',
     items: ['Free cleanup up to 2 GB, and scanning is always free', 'Use it on up to 3 of your Macs', 'Every 1.x release', '30-day refunds, no questions asked'],
-    buy: ['Buy a License', '/buy'],
+    // Decision 51: "Buy · $29.99 once", the regular price struck through before the offer.
+    buy: ['Buy · was $29.99 now $19.99 once', '/buy'],
     legal: [['terms of sale', '/terms-of-sale/'], ['refund policy', '/refund-policy/'], ['license agreement', '/license-agreement/']],
     tried: ['Already tried it?', 'Buy a license'],
     news: 'Email me news about CacheDrop, like new features and surveys.',
   },
   fr: {
     pricing: ['Tarifs', '/fr/pricing/'],
-    download: 'Télécharger gratuitement',
-    title: 'Essayez-le gratuitement. Payez une seule fois.',
+    download: 'Télécharger pour Mac',
+    title: 'Essayez-le avant d’acheter. Payez une seule fois.',
     spoken: 'Prix régulier 29,99 $, maintenant 19,99 $, une seule fois.',
     shown: ['29,99 $', '19,99 $', 'une seule fois'],
     currencies: 'Payez en USD, CAD, EUR, GBP ou AUD : le même montant dans chaque devise.',
     items: ['Nettoyage gratuit jusqu’à 2 Go, et l’analyse est toujours gratuite', 'Sur un maximum de 3 de vos Mac', 'Toutes les versions 1.x', 'Remboursement dans les 30 jours, sans avoir à vous justifier'],
     news: 'Envoyez-moi des nouvelles de CacheDrop par courriel : nouvelles fonctionnalités et sondages.',
-    buy: ['Acheter une licence', '/buy?lang=fr'],
+    buy: ['Acheter · prix régulier 29,99\u00a0$ maintenant 19,99\u00a0$', '/buy?lang=fr'],
     legal: [['conditions de vente', '/fr/terms-of-sale/'], ['politique de remboursement', '/fr/refund-policy/'], ['contrat de licence', '/fr/license-agreement/']],
     tried: ['Vous l’avez déjà essayé?', 'Achetez une licence'],
   },
@@ -48,7 +48,12 @@ async function expectPricing(page: Page, lang: 'en' | 'fr', level: 1 | 2) {
   for (const text of c.shown) await expect(price.getByText(text, { exact: true })).toBeVisible();
   await expect(section.getByText(c.currencies)).toBeVisible();
   await expect(section.getByRole('listitem')).toHaveText([...c.items]);
-  await expect(section.getByRole('link', { name: c.buy[0] })).toHaveAttribute('href', c.buy[1]);
+  const buy = section.getByRole('link', { name: c.buy[0], exact: true });
+  await expect(buy).toHaveAttribute('href', c.buy[1]);
+  await expect(buy).toHaveText(c.buy[0]);
+  // The words "was" and "now" are for screen readers only.
+  await expect(buy.locator('.sr-only')).toHaveCount(2);
+  await expect(buy.locator('s')).toHaveText(c.shown[0]);
   await expect(section.getByRole('link', { name: c.download })).toHaveAttribute('href', ui[lang].download);
   for (const [name, href] of c.legal) await expect(section.getByRole('link', { name, exact: true })).toHaveAttribute('href', href);
 }
@@ -117,7 +122,7 @@ test('the sitemap lists /pricing/ and /fr/pricing/', async ({ request }) => {
   for (const loc of ['https://cachedrop.io/pricing/', 'https://cachedrop.io/fr/pricing/']) expect(xml).toContain(`<loc>${loc}</loc>`);
 });
 
-for (const p of live) {
+for (const p of withPricing) {
   const lang = langOf(p);
   const c = copy[lang];
   test(`${p.path}: nav has no BETA badge, a Pricing link and "${c.download}"; no beta copy anywhere`, async ({ page }) => {
@@ -146,10 +151,10 @@ for (const path of ['/clear-mac-developer-caches/', '/clear-adobe-media-cache-ma
 }
 
 // The email gate stays required (#60, mac-cleaner #581): every download link still goes to the form.
-for (const p of live.filter((p) => !/^(\/fr)?\/download\//.test(p.path))) {
+for (const p of withPricing.filter((p) => !/^(\/fr)?\/download\//.test(p.path))) {
   test(`${p.path}: every Download link goes to the email form`, async ({ page }) => {
     await page.goto(p.path);
-    const hrefs = await page.locator('a', { hasText: /download|get your space back|télécharg|obtenir/i }).evaluateAll((as) => as.map((a) => a.getAttribute('href')));
+    const hrefs = await page.locator('a', { hasText: /download|télécharg|try cachedrop|essayer cachedrop/i }).evaluateAll((as) => as.map((a) => a.getAttribute('href')));
     expect(hrefs.length).toBeGreaterThan(0);
     for (const href of hrefs) expect(href).toBe(ui[langOf(p)].download);
   });

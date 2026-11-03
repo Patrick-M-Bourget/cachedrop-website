@@ -7,7 +7,7 @@ import Footer from '../../components/Footer.astro';
 import AppWindow from '../../components/AppWindow.astro';
 import ClosingCta from '../../components/ClosingCta.astro';
 import PricingSection from '../../components/PricingSection.astro';
-import { discounted, price, pricingCopy, pricingLive, withLaunch } from '../../components/pricing';
+import { discounted, price, pricingCopy } from '../../components/pricing';
 import { card, eyebrow, faqItem, faqQuestion, primaryLg, secondaryLg, sectionH2, titleMd } from '../../components/guide-styles';
 import { langOf, langPaths, localize } from '../../i18n';
 
@@ -16,14 +16,14 @@ export const getStaticPaths = langPaths;
 const copy = {
   en: {
     title: 'Mac Storage Cleaner – Free Up Space on Your Mac | CacheDrop',
-    description: 'Free up space on your Mac. CacheDrop finds hidden caches, Xcode DerivedData, node_modules and video caches, and clears them safely. Free beta.',
+    description: 'Free up space on your Mac. CacheDrop finds hidden caches, Xcode DerivedData, node_modules and video caches, and clears them safely. Free to try.',
     operatingSystem: 'macOS 14 or later',
-    badge: 'Free Mac storage cleaner · Public beta',
+    badge: 'Mac storage cleaner · Free to try',
     h1: 'Store less junk.<br>Keep what matters.',
     lede: 'Your Mac is full of invisible caches, derived data, and abandoned project files. CacheDrop safely finds them and drops them. Free up space on your Mac in seconds.',
-    download: 'Download Free Beta',
+    download: 'Download for Mac',
     feedback: 'Give Fast Feedback',
-    meta: 'Free for a limited time · Help us build it · macOS 14+ on Apple Silicon & Intel',
+    meta: 'Try it before you buy · No card needed · macOS 14 or later',
     featuresEyebrow: 'Built for workstations',
     featuresTitle: 'Built for the heavy lifters.',
     featuresBody: 'CacheDrop is a Mac storage cleaner made for developers and video editors. Generic cleaners clear browser cookies and miss the real weight. CacheDrop goes after compiler caches, media caches and stale container images: the files that grow quietly with every project.',
@@ -61,22 +61,22 @@ const copy = {
       ['What is System Data on a Mac, and can I delete it?', 'System Data is where macOS counts files that don’t fit its other categories, including app caches, logs and developer build files. Much of it is safe to remove because apps rebuild it. CacheDrop only targets those rebuildable parts.'],
       ['Is it safe to delete caches on a Mac?', 'Yes, for caches that apps regenerate: the app simply rebuilds them the next time it needs them. CacheDrop recommends caches that rebuild themselves and shows you each one before anything is cleared.'],
       ['How do I clear my Mac’s disk without losing files?', 'Clear caches and build output, not documents. CacheDrop leaves your code, projects and timelines alone. It deletes only files apps make again, like caches, and sends your own files to the Trash.'],
-      ['Is CacheDrop free, and which Macs does it support?', 'It’s free for a limited time during the public beta. It’s a universal app for Apple Silicon and Intel Macs running macOS 14 Sonoma or later.'],
+      ['How much does CacheDrop cost, and which Macs does it support?', `It’s free to try: scanning is always free, and you can clean up to 2\u00a0GB before you buy. A license is ${pricingCopy.en.license}, for up to 3 Macs. It’s a universal app for Apple Silicon and Intel Macs running macOS 14 Sonoma or later.`],
     ],
     closingTitle: 'Get your space back.',
-    closingBody: 'Free while in beta. One universal app for Apple Silicon and Intel Macs on macOS 14 or later.',
+    closingBody: 'Free to try. One universal app for Apple Silicon and Intel Macs on macOS 14 or later.',
     closingLink: 'Using it already? Tell us what to fix next →',
   },
   fr: {
     title: 'Nettoyer son Mac – Libérez de l’espace de stockage | CacheDrop',
-    description: 'Libérez de l’espace sur votre Mac. CacheDrop repère les caches invisibles, les DerivedData de Xcode, les dossiers node_modules et les caches vidéo, puis les vide en toute sécurité. Bêta gratuite.',
+    description: 'Libérez de l’espace sur votre Mac. CacheDrop repère les caches invisibles, les DerivedData de Xcode, les dossiers node_modules et les caches vidéo, puis les vide en toute sécurité. Essai gratuit.',
     operatingSystem: 'macOS 14 ou version ultérieure',
-    badge: 'Nettoyeur gratuit pour Mac · Bêta publique',
+    badge: 'Nettoyeur de stockage pour Mac · Essai gratuit',
     h1: 'Moins de superflu.<br>Gardez l’essentiel.',
     lede: 'Votre Mac est rempli de caches invisibles, de données dérivées et de fichiers de projets abandonnés. CacheDrop les repère et les supprime en toute sécurité. Libérez de l’espace sur votre Mac en quelques secondes.',
-    download: 'Télécharger la bêta gratuite',
+    download: 'Télécharger pour Mac',
     feedback: 'Donner votre avis',
-    meta: 'Gratuit pour une durée limitée · Aidez-nous à le bâtir · macOS 14+ sur Apple Silicon et Intel',
+    meta: 'Essayez-le avant d’acheter · Aucune carte requise · macOS 14 ou version ultérieure',
     featuresEyebrow: 'Conçu pour les postes de travail',
     featuresTitle: 'Fait pour les gros travaux.',
     featuresBody: 'CacheDrop est un nettoyeur de stockage pour Mac conçu pour les développeurs et les monteurs vidéo. Les nettoyeurs génériques effacent les témoins du navigateur et passent à côté de ce qui pèse vraiment. CacheDrop s’attaque aux caches de compilation, aux caches de média et aux vieilles images de conteneurs : les fichiers qui grossissent en silence à chaque projet.',
@@ -113,35 +113,15 @@ const copy = {
       ['Que sont les Données système d’un Mac, et puis-je les supprimer?', 'Les Données système regroupent les fichiers que macOS ne classe dans aucune autre catégorie, dont les caches d’applications, les journaux et les fichiers de compilation des développeurs. Une bonne partie peut être supprimée sans risque, car les applications la recréent. CacheDrop ne cible que ces parties recréables.'],
       ['Peut-on supprimer les caches d’un Mac sans risque?', 'Oui, pour les caches que les applications régénèrent : l’application les recrée simplement la prochaine fois qu’elle en a besoin. CacheDrop recommande les caches qui se recréent d’eux-mêmes et vous montre chacun d’eux avant de vider quoi que ce soit.'],
       ['Comment faire de la place sur le disque de mon Mac sans perdre de fichiers?', 'Videz les caches et les produits de compilation, pas vos documents. CacheDrop ne touche pas à votre code, à vos projets ni à vos montages. Il supprime seulement les fichiers que les applications recréent, comme les caches, et envoie vos propres fichiers à la Corbeille.'],
-      ['CacheDrop est-il gratuit, et sur quels Mac fonctionne-t-il?', 'Il est gratuit pour une durée limitée pendant la bêta publique. C’est une application universelle pour les Mac Apple Silicon et Intel sous macOS 14 Sonoma ou version ultérieure.'],
+      ['Combien coûte CacheDrop, et sur quels Mac fonctionne-t-il?', `Vous pouvez l’essayer gratuitement\u00a0: l’analyse est toujours gratuite, et vous pouvez nettoyer jusqu’à 2\u00a0Go avant d’acheter. La licence coûte ${pricingCopy.fr.license}, pour un maximum de 3 Mac. C’est une application universelle pour les Mac Apple Silicon et Intel sous macOS 14 Sonoma ou version ultérieure.`],
     ],
     closingTitle: 'Récupérez votre espace.',
-    closingBody: 'Gratuit pendant la bêta. Une seule application universelle pour les Mac Apple Silicon et Intel sous macOS 14 ou version ultérieure.',
+    closingBody: 'Essai gratuit. Une seule application universelle pour les Mac Apple Silicon et Intel sous macOS 14 ou version ultérieure.',
     closingLink: 'Vous l’utilisez déjà? Dites-nous quoi corriger en premier →',
   },
 };
-// Decision 44: with pricing live, the beta copy gives way to "free to try" and the FAQ's price answer.
-const launch = {
-  en: {
-    description: 'Free up space on your Mac. CacheDrop finds hidden caches, Xcode DerivedData, node_modules and video caches, and clears them safely. Free to try.',
-    badge: 'Mac storage cleaner · Free to try',
-    download: 'Download Free',
-    meta: 'Free to try · Pay once · macOS 14+ on Apple Silicon & Intel',
-    priceAnswer: ['Is CacheDrop free, and which Macs does it support?', `It’s free to try: scanning is always free, and you can clean up to 2\u00a0GB before you buy. A license is ${pricingCopy.en.license}, for up to 3 Macs. It’s a universal app for Apple Silicon and Intel Macs running macOS 14 Sonoma or later.`],
-    closingBody: 'Free to try. One universal app for Apple Silicon and Intel Macs on macOS 14 or later.',
-  },
-  fr: {
-    description: 'Libérez de l’espace sur votre Mac. CacheDrop repère les caches invisibles, les DerivedData de Xcode, les dossiers node_modules et les caches vidéo, puis les vide en toute sécurité. Essai gratuit.',
-    badge: 'Nettoyeur de stockage pour Mac · Essai gratuit',
-    download: 'Télécharger gratuitement',
-    meta: 'Essai gratuit · Payez une seule fois · macOS 14+ sur Apple Silicon et Intel',
-    priceAnswer: ['CacheDrop est-il gratuit, et sur quels Mac fonctionne-t-il?', `Vous pouvez l’essayer gratuitement\u00a0: l’analyse est toujours gratuite, et vous pouvez nettoyer jusqu’à 2\u00a0Go avant d’acheter. La licence coûte ${pricingCopy.fr.license}, pour un maximum de 3 Mac. C’est une application universelle pour les Mac Apple Silicon et Intel sous macOS 14 Sonoma ou version ultérieure.`],
-    closingBody: 'Essai gratuit. Une seule application universelle pour les Mac Apple Silicon et Intel sous macOS 14 ou version ultérieure.',
-  },
-};
 const lang = langOf(Astro.url);
-const { priceAnswer, ...launchCopy } = launch[lang];
-const t = withLaunch(copy[lang], { ...launchCopy, faq: [...copy[lang].faq.slice(0, -1), priceAnswer] });
+const t = copy[lang];
 const download = localize(lang, '/download/');
 
 const site = Astro.site!.origin;
@@ -159,16 +139,14 @@ const jsonLd = {
       publisher: { '@id': `${site}/#org` },
       // Decision 47: the price a buyer pays today, with the regular price as the struck-through one
       // while the limited-time offer runs (schema.org StrikethroughPrice).
-      offers: pricingLive
-        ? {
-            '@type': 'Offer',
-            price: price.offer,
-            priceCurrency: 'USD',
-            ...(discounted && {
-              priceSpecification: { '@type': 'UnitPriceSpecification', priceType: 'https://schema.org/StrikethroughPrice', price: price.regular, priceCurrency: 'USD' },
-            }),
-          }
-        : { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      offers: {
+        '@type': 'Offer',
+        price: price.offer,
+        priceCurrency: 'USD',
+        ...(discounted && {
+          priceSpecification: { '@type': 'UnitPriceSpecification', priceType: 'https://schema.org/StrikethroughPrice', price: price.regular, priceCurrency: 'USD' },
+        }),
+      },
     },
     {
       '@type': 'FAQPage',
@@ -283,7 +261,7 @@ const steps = t.steps.map(([title, body], i) => [`0${i + 1}`, title, body]);
 </div>
 </section>
 
-{pricingLive && <PricingSection />}
+<PricingSection />
 
 <section id="faq" style="padding: 0 var(--space-6) var(--space-32)">
 <div style="max-width: var(--container-max); margin: 0 auto; padding-top: var(--space-28); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: var(--space-16); align-items: start">

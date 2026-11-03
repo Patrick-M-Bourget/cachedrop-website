@@ -7,6 +7,9 @@ const PORT = 5799;
 
 // Pages the site links to that later tickets build. Add one per line; remove it when its page lands.
 const PENDING = /** @type {string[]} */ ([]);
+// Routes vercel.json rewrites to a Vercel function, which a static crawl of dist/ can't reach:
+// /buy redirects to Stripe (Decision 41). It is linked from every build now that pricing is always on (Decision 52).
+const FUNCTIONS = ['/buy', '/buy/'];
 
 const checker = new LinkChecker();
 checker.on('link', (link) => {
@@ -22,7 +25,7 @@ const result = await checker.check({
   urlRewriteExpressions: [{ pattern: /^https:\/\/cachedrop\.io/, replacement: `http://localhost:${PORT}` }],
   linksToSkip: async (url) => {
     const path = new URL(url, `http://localhost:${PORT}`).pathname;
-    return PENDING.includes(path);
+    return PENDING.includes(path) || FUNCTIONS.includes(path);
   },
 });
 

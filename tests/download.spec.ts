@@ -5,7 +5,7 @@ import { pages, uiOf } from './pages';
 // mocked. tests/gate-journey.spec.ts runs the real thing against a preview.
 
 const TOKEN = 'T'.repeat(43);
-const NEWS = 'Email me news about CacheDrop, like new features, surveys and the paid launch.';
+const NEWS = 'Email me news about CacheDrop, like new features and surveys.';
 // The token Cloudflare's always-pass test site key gives (the build's key outside Production; Decision 12).
 const turnstile = 'XXXX.DUMMY.TOKEN.XXXX';
 
@@ -13,7 +13,7 @@ test.describe('every Download button leads to the form', () => {
   for (const p of pages.filter((p) => !/^(\/fr)?\/download\//.test(p.path))) {
     test(`on ${p.path}`, async ({ page }) => {
       await page.goto(p.path);
-      const links = page.locator('a', { hasText: /download|get free beta|get your space back|télécharg|obtenir/i });
+      const links = page.locator('a', { hasText: /download|télécharg|try cachedrop|essayer cachedrop/i });
       const hrefs = await links.evaluateAll((as) => as.map((a) => a.getAttribute('href')));
       expect(hrefs.length).toBeGreaterThan(0);
       for (const href of hrefs) expect(href).toBe(uiOf(p).download);
@@ -22,7 +22,7 @@ test.describe('every Download button leads to the form', () => {
 
   test('and the form asks for an email', async ({ page }) => {
     await page.goto('/download/');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Get the CacheDrop beta.');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Download CacheDrop for Mac.');
     await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
     await expect(page.getByRole('radio')).toHaveCount(4);
     await expect(page.getByRole('radio', { checked: true })).toHaveCount(0);

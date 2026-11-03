@@ -4,7 +4,9 @@
 // (eyebrow, headline-lg), a feature card, the large primary and secondary buttons and the
 // step list's ruled rows. The struck-through price is hidden from screen readers, which hear
 // `spoken` ("Was $29.99, now $19.99 for a limited time, one-time.") instead. While the offer runs,
-// a "Limited-time price" pill sits above the price (Decision 47).
+// a "Limited-time price" pill sits above the price (Decision 47). The Buy button reads
+// "Buy · $29.99 once" (Decision 51); during the offer the regular price is struck through before the
+// offer, and screen readers hear "Buy · was $29.99 now $19.99 once".
 import { card, eyebrow, primaryLg, secondaryLg, sectionH2 } from './guide-styles';
 import { buyHref, discounted, pricingCopy } from './pricing';
 import { langOf, localize } from '../i18n';
@@ -40,7 +42,7 @@ const textLink = 'color: var(--accent-text); font-weight: 500';
 <p style="margin: var(--space-3) 0 0; font-size: 13px; line-height: 19px; color: var(--ink-secondary)">{t.currencies}</p>
 </div>
 <div style="display: flex; flex-wrap: wrap; gap: var(--space-3)">
-<a class="btn-primary" href={buyHref(lang)} style={primaryLg}>{t.buy}</a>
+<a class="btn-primary" href={buyHref(lang)} style={primaryLg}><span>{t.buy} ·{discounted && <> <span class="sr-only">{t.wasWord}</span>{' '}<s>{t.was}</s> <span class="sr-only">{t.nowWord}</span></>} {t.now}{t.buyOnce && ` ${t.buyOnce}`}</span></a>
 <a class="btn-ghost" href={localize(lang, '/download/')} style={secondaryLg}>{t.download}</a>
 </div>
 <ul aria-label={t.included} style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column">
