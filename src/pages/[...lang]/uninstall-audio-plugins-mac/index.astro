@@ -11,7 +11,7 @@ import Guide from '../../../layouts/Guide.astro';
 import Toc from '../../../components/Toc.astro';
 import CodeBlock from '../../../components/CodeBlock.astro';
 import { guideH2, guideP } from '../../../components/guide-styles';
-import { langOf, langPaths } from '../../../i18n';
+import { langOf, langPaths, localize } from '../../../i18n';
 
 export const getStaticPaths = langPaths;
 
@@ -101,6 +101,8 @@ const copy = {
     deleted: {
       p1: 'Deleting an app from the Applications folder leaves its settings, caches and data in your Library. CacheDrop lists them under Files from deleted apps, each tied to its app by its bundle ID or installer receipt, and moves what you pick to the Trash.',
       p2: 'A folder that only shares a name with a deleted app is shown as possibly related, with the reason, and Smart clean never picks it.',
+      apps: 'Removing whole apps too? Read',
+      appsLink: 'how to completely uninstall apps on Mac',
     },
     howTo: 'How to uninstall an audio plug-in on Mac',
   },
@@ -168,6 +170,8 @@ const copy = {
     deleted: {
       p1: 'Supprimer une application du dossier Applications laisse ses réglages, ses caches et ses données dans votre Bibliothèque. CacheDrop les liste sous Files from deleted apps, chacun lié à son application par son identifiant ou le reçu de son installateur, et met ce que vous choisissez à la Corbeille.',
       p2: 'Un dossier qui partage seulement un nom avec une application supprimée est montré comme possiblement lié, avec la raison, et le Smart clean ne le choisit jamais.',
+      apps: 'Vous retirez aussi des applications entières? Lisez',
+      appsLink: 'comment désinstaller complètement une application sur Mac',
     },
     howTo: 'Comment désinstaller un plug-in audio sur Mac',
   },
@@ -244,5 +248,6 @@ const howTo = { name: t.howTo, steps: t.uninstall.manual };
 <h2 style={guideH2}>{t.toc[6]}</h2>
 <p style={`${guideP}; text-wrap: pretty`}>{t.deleted.p1}</p>
 <p style={`${guideP}; text-wrap: pretty`}>{t.deleted.p2}</p>
+<p style={`${guideP}; text-wrap: pretty`}>{t.deleted.apps} <a class="textlink" href={localize(lang, '/uninstall-apps-mac/')} style="color: var(--accent-text); font-weight: 500">{t.deleted.appsLink}</a>.</p>
 </section>
 </Guide>

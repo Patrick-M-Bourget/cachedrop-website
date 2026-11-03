@@ -46,6 +46,12 @@ export const handoffChanges: HandoffChange[] = [
     replace: '<a class="flink" href="/clear-adobe-media-cache-mac/">Clear Adobe Media Cache</a><a class="flink" href="/uninstall-audio-plugins-mac/">Uninstall Audio Plug-ins</a>',
   },
   {
+    decision: 51,
+    why: 'The footer\'s Cleaning Guides column links to the app uninstall guide (#111) after the producer page. Applied after the Decision 48 change.',
+    find: '<a class="flink" href="/uninstall-audio-plugins-mac/">Uninstall Audio Plug-ins</a>',
+    replace: '<a class="flink" href="/uninstall-audio-plugins-mac/">Uninstall Audio Plug-ins</a><a class="flink" href="/uninstall-apps-mac/">Uninstall Apps</a>',
+  },
+  {
     decision: 44,
     why: 'The nav links to /pricing/ after For Music Producers. Applied after the Decision 48 change.',
     find: 'For Music Producers</a>',

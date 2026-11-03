@@ -1,0 +1,270 @@
+---
+// The app uninstall guide (#111, slice 5 of #103, Decision 51), in the guide format (Decision 50) at
+// /uninstall-apps-mac/ and under /fr/ (Decision 5, English slug per the French glossary). It leads with
+// leftovers, since Apple's own page owns the basic query.
+// Every claim about CacheDrop is checked against mac-cleaner 1.0.1 (022d2aee), the build on the update feed
+// (Decision 48): ApplicationsInventory.swift (which apps are listed, own uninstallers), AppUninstall.swift (bundle ID or
+// receipt ties, Possibly related, password check), RemovedAppLeftovers.swift (the ~/Library folders, makers' shared
+// folders, license files), ApplicationsView.swift ("Has its own uninstaller", "Needs your password to remove"),
+// PutBackLink.swift and CleanupWording.swift (Put back, "Uninstalled <App> · N items"), Trial.swift (2 GB, uninstalls count).
+// Strings with <span class="ic"> are HTML.
+import Guide from '../../../layouts/Guide.astro';
+import Toc from '../../../components/Toc.astro';
+import CodeBlock from '../../../components/CodeBlock.astro';
+import { guideH2, guideP } from '../../../components/guide-styles';
+import { langOf, langPaths, localize } from '../../../i18n';
+
+export const getStaticPaths = langPaths;
+
+const section = 'padding-top: var(--space-22); display: flex; flex-direction: column; gap: var(--space-5)';
+const card = 'padding: var(--space-7); border-radius: var(--radius-2xl); display: flex; flex-direction: column; gap: 14px';
+const manual = `${card}; border: 1px solid var(--line)`;
+const ours = `${card}; background: var(--surface-subtle)`;
+const h3 = 'margin: 0; font-size: 20px; line-height: 26px; font-weight: 600; letter-spacing: -0.015em';
+const list = 'margin: 0; padding: 0 0 0 var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); font-size: 16px; line-height: 25px; color: var(--ink-body)';
+const cell = 'padding: var(--space-3) var(--space-4) var(--space-3) 0; border-top: 1px solid var(--line); text-align: left; vertical-align: top';
+const head = `${cell}; font-size: 13px; font-weight: 600; color: var(--ink-secondary); border-top: 0`;
+const link = 'color: var(--accent-text); font-weight: 500';
+
+// The folders RemovedAppLeftovers.places looks in, in its order.
+const folders = ['Application Support', 'Caches', 'Containers', 'Group Containers', 'Preferences', 'Saved Application State', 'LaunchAgents', 'HTTPStorages', 'WebKit', 'Logs'];
+
+const copy = {
+  en: {
+    guide: {
+      title: 'How to Completely Uninstall Apps on Mac and Remove Leftovers',
+      description: 'Dragging an app to the Trash leaves its settings, caches and data behind. Find where app leftovers live on a Mac, remove them by hand, or uninstall apps with every file they left.',
+      crumb: 'App Uninstall Guide',
+      headline: 'How to completely uninstall apps on Mac',
+      lede: 'Dragging an app to the Trash removes the app, not the settings, caches and data it left in your Library. Here’s where those leftovers live, how to remove them by hand, and how CacheDrop finds them for you.',
+      cta: 'Download for Mac',
+      ctaNote: 'Apps · Files from deleted apps · macOS 14+',
+      updated: 'November 2026',
+      readTime: '6 min read',
+      faqTitle: 'App uninstall FAQ',
+      faq: [
+        ['How do I completely uninstall an app on Mac?', 'Quit the app, use its own uninstaller if it has one, then drag it to the Trash and remove the files it left in <span class="ic">~/Library</span>: its folders in Application Support, Caches and Containers, and its preferences. CacheDrop’s Applications page does it in one step, with every file tied to the app.'],
+        ['Does deleting an app on Mac delete its data?', 'No. Moving an app to the Trash removes only the app. Its settings, caches and data stay in your Library until you remove them.'],
+        ['Where do app leftovers live on Mac?', 'Mostly in your own Library folder, <span class="ic">~/Library</span>, in folders such as Application Support, Caches, Containers, Group Containers, Preferences and Logs. Apps installed for every user can also leave files in <span class="ic">/Library</span>.'],
+        ['Is it safe to delete files in ~/Library?', 'Files that belong to an app you deleted, yes. Be careful with folders named only after a maker, and with group containers: other apps from the same maker may still use them. Never remove license or activation files you still need.'],
+        ['How do I remove leftovers from apps I already deleted?', 'Search <span class="ic">~/Library</span> for the app’s name and its bundle ID, as below. CacheDrop lists them under Files from deleted apps, each tied to its app by its bundle ID or installer receipt.'],
+        ['Can I undo an uninstall?', 'Yes, until you empty the Trash. CacheDrop moves the app and its files to the Trash, and Put back in History returns each item to where it was.'],
+        ['Why does CacheDrop say an app needs my password to remove?', 'macOS won’t let you move that app to the Trash without an administrator password, for example because another account installed it. CacheDrop never asks for that password: it lists the app with Reveal in Finder, so you can remove it there.'],
+        ['Can I try the app uninstaller before I buy?', 'Looking for a free app uninstaller for Mac? Scanning and the list of apps are always free. Cleanup and uninstalls are free until they’ve freed 2 GB.'],
+      ] as Array<[string, string]>,
+      other: { eyebrow: 'Make music?', title: 'How to uninstall audio plug-ins on Mac', href: '/uninstall-audio-plugins-mac/', link: 'Read the producer guide' },
+      closing: { title: 'Uninstall the whole app, not just its icon.', body: 'CacheDrop finds every app’s files and the leftovers of apps you already deleted in one scan.' },
+      trademarks: 'Apple, Mac, macOS and Finder are trademarks of Apple Inc. Other names are trademarks of their owners.',
+    },
+    toc: ['Why the Trash leaves files behind', 'Where app leftovers live on Mac', 'How to uninstall an app on Mac by hand', 'Uninstall apps with CacheDrop', 'Files from deleted apps', 'Changed your mind? Put back'],
+    why: {
+      p1: 'A Mac app is one bundle in your Applications folder, but it doesn’t keep its data there. While you use it, it writes settings, caches, saved windows and sometimes gigabytes of downloads and data to your Library folder. Moving the app to the Trash takes only the bundle. macOS leaves the rest where it is.',
+      p2: 'Most leftovers are small, but caches and app data add up over the years, and a helper the app installed can keep starting when you log in.',
+    },
+    where: {
+      intro: 'Almost everything an app leaves is in your own Library, <span class="ic">~/Library</span>. Finder hides it: choose Go › Go to Folder, type <span class="ic">~/Library</span> and press Return. Items are named for the app or for its bundle ID, such as <span class="ic">com.maker.AppName</span>.',
+      folder: 'Folder',
+      holds: 'What apps keep there',
+      rows: [
+        'The app’s data: databases, downloads, add-ons',
+        'Caches the app rebuilds',
+        'Everything a sandboxed app keeps, in a folder named for its bundle ID',
+        'Data shared by a maker’s apps',
+        'Settings, as .plist files named for the bundle ID',
+        'The windows macOS reopens',
+        'Helpers that start when you log in',
+        'Web data the app stored',
+        'Web data the app stored',
+        'Logs',
+      ],
+      system: 'Apps installed for every user can also leave files in <span class="ic">/Library</span>, such as Application Support, LaunchAgents, LaunchDaemons and PrivilegedHelperTools. Removing those takes an administrator password.',
+    },
+    manual: {
+      intro: 'Check each folder above for the app’s name and its bundle ID. Find the bundle ID while the app is still installed:',
+      label: 'Terminal',
+      title: 'The manual way',
+      steps: [
+        'Quit the app, including any icon it keeps in the menu bar.',
+        'If the app came with an uninstaller, or its maker’s manager removes it, use that first.',
+        'Note its bundle ID (below), then drag the app from Applications to the Trash.',
+        'In Finder, choose Go › Go to Folder, open ~/Library and look in each folder above for items named for the app or its bundle ID.',
+        'Move what belongs to the app to the Trash. Leave folders other apps from the same maker may share.',
+        'Empty the Trash once you’re sure nothing else needed them.',
+      ],
+      p2: 'Terminal may print “Operation not permitted” for folders macOS protects; the rest of the list is still complete. If the app came as an installer package, macOS keeps a receipt of what it wrote:',
+      p3: 'Matching by name is where most manual cleanups go wrong. A folder called after the maker can belong to its other apps, and a short name can match an unrelated one.',
+    },
+    ours: {
+      intro: 'CacheDrop’s Applications page lists every app in your Applications folders, on every volume, largest first. Apple’s apps and system apps aren’t listed. Each row shows the app’s maker and its total size with its files.',
+      steps: [
+        'Open Applications and tick an app. The files its bundle ID or installer receipt ties to it are ticked with it.',
+        'Folders that are only named like the app are listed as Possibly related, with the reason, and you tick each one yourself.',
+        'If the app is open, CacheDrop asks you to quit it first. If it has its own uninstaller, Open comes first.',
+        'Review shows every item before anything moves. The app and its files go to the Trash, and History records the run as “Uninstalled” with the app’s name.',
+      ],
+      never: 'CacheDrop never offers Apple’s folders or license and activation files, and checks every item again right before it moves it. An app macOS won’t let you move without a password reads “Needs your password to remove”, with Reveal in Finder: CacheDrop never asks for an administrator password.',
+      plugins: 'Uninstalling audio plug-ins? Each product goes with every format and its support files:',
+      pluginsLink: 'how to uninstall audio plug-ins on Mac',
+    },
+    deleted: {
+      p1: 'Apps you already dragged to the Trash still have their files in your Library. CacheDrop looks through the folders above for items whose app is no longer on this Mac, on any volume, and lists them under Files from deleted apps, grouped by app.',
+      p2: 'An item goes with an app only when its bundle ID or an installer receipt ties it there. A folder that only shares a name with a deleted app is listed as Possibly related, with the reason, and Smart clean never picks it. Folders of a maker that still has an app or plug-in on your Mac stay, since that app may use them.',
+    },
+    putBack: {
+      p1: 'An uninstall moves everything to the Trash; nothing is deleted outright. After the run, each item has a Put back link in the results and in History, which returns it to where it was.',
+      p2: 'The space comes back when the Trash is emptied. CacheDrop’s Empty from Trash deletes only what CacheDrop moved there, and leaves your own trashed files alone. Once an item is deleted from the Trash, it can’t be put back.',
+    },
+    howTo: 'How to completely uninstall an app on Mac',
+  },
+  fr: {
+    guide: {
+      title: 'Désinstaller une application sur Mac et supprimer ses restes',
+      description: 'Glisser une application dans la Corbeille laisse ses réglages, ses caches et ses données. Trouvez où se cachent les restes d’applications sur Mac, supprimez-les à la main, ou désinstallez vos applications avec tous leurs fichiers.',
+      crumb: 'Guide de désinstallation d’applications',
+      headline: 'Comment désinstaller complètement une application sur Mac',
+      lede: 'Glisser une application dans la Corbeille retire l’application, pas les réglages, les caches et les données qu’elle a laissés dans votre Bibliothèque. Voici où se trouvent ces restes, comment les supprimer à la main et comment CacheDrop les trouve pour vous.',
+      cta: 'Télécharger pour Mac',
+      ctaNote: 'Applications · Fichiers d’applications supprimées · macOS 14+',
+      updated: 'novembre 2026',
+      readTime: '6 min de lecture',
+      faqTitle: 'FAQ sur la désinstallation d’applications',
+      faq: [
+        ['Comment désinstaller complètement une application sur Mac?', 'Quittez l’application, utilisez son désinstallateur si elle en a un, puis glissez-la dans la Corbeille et retirez les fichiers qu’elle a laissés dans <span class="ic">~/Library</span> : ses dossiers dans Application Support, Caches et Containers, et ses préférences. La page Applications de CacheDrop le fait en une étape, avec chaque fichier lié à l’application.'],
+        ['Supprimer une application sur Mac supprime-t-il ses données?', 'Non. Mettre une application à la Corbeille ne retire que l’application. Ses réglages, ses caches et ses données restent dans votre Bibliothèque jusqu’à ce que vous les retiriez.'],
+        ['Où se trouvent les restes d’applications sur Mac?', 'Surtout dans votre propre dossier Bibliothèque, <span class="ic">~/Library</span>, dans des dossiers comme Application Support, Caches, Containers, Group Containers, Preferences et Logs. Les applications installées pour tous les utilisateurs peuvent aussi laisser des fichiers dans <span class="ic">/Library</span>.'],
+        ['Peut-on supprimer des fichiers dans ~/Library sans risque?', 'Ceux d’une application que vous avez supprimée, oui. Soyez prudent avec les dossiers qui portent seulement le nom d’un fabricant, et avec les conteneurs de groupe : d’autres applications du même fabricant peuvent encore s’en servir. Ne retirez jamais des fichiers de licence ou d’activation dont vous avez encore besoin.'],
+        ['Comment retirer les restes d’applications déjà supprimées?', 'Cherchez dans <span class="ic">~/Library</span> le nom de l’application et son identifiant de paquet, comme ci-dessous. CacheDrop les liste sous Files from deleted apps, chacun lié à son application par son identifiant ou le reçu de son installateur.'],
+        ['Peut-on annuler une désinstallation?', 'Oui, tant que vous n’avez pas vidé la Corbeille. CacheDrop met l’application et ses fichiers à la Corbeille, et Put back, dans History, remet chaque élément à sa place.'],
+        ['Pourquoi CacheDrop dit-il qu’une application demande mon mot de passe?', 'macOS ne vous laisse pas mettre cette application à la Corbeille sans un mot de passe d’administrateur, par exemple parce qu’un autre compte l’a installée. CacheDrop ne demande jamais ce mot de passe : il liste l’application avec Reveal in Finder, pour que vous la retiriez depuis le Finder.'],
+        ['Puis-je essayer le désinstallateur d’applications avant d’acheter?', 'Vous cherchez un désinstallateur d’applications gratuit pour Mac? L’analyse et la liste des applications sont toujours gratuites. Le nettoyage et les désinstallations sont gratuits jusqu’à 2 Go libérés.'],
+      ] as Array<[string, string]>,
+      other: { eyebrow: 'Vous faites de la musique?', title: 'Comment désinstaller des plug-ins audio sur Mac', href: '/uninstall-audio-plugins-mac/', link: 'Lire le guide pour producteurs' },
+      closing: { title: 'Désinstallez toute l’application, pas seulement son icône.', body: 'CacheDrop trouve les fichiers de chaque application et les restes des applications déjà supprimées en une seule analyse.' },
+      trademarks: 'Apple, Mac, macOS et Finder sont des marques de commerce d’Apple Inc. Les autres noms sont des marques de commerce de leurs propriétaires.',
+    },
+    toc: ['Pourquoi la Corbeille laisse des fichiers', 'Où se trouvent les restes d’applications sur Mac', 'Comment désinstaller une application à la main', 'Désinstaller des applications avec CacheDrop', 'Fichiers d’applications supprimées', 'Vous changez d’avis? Put back'],
+    why: {
+      p1: 'Une application Mac est un seul paquet dans votre dossier Applications, mais elle n’y garde pas ses données. Pendant que vous l’utilisez, elle écrit des réglages, des caches, l’état de ses fenêtres et parfois des gigaoctets de téléchargements et de données dans votre dossier Bibliothèque. Mettre l’application à la Corbeille ne retire que le paquet. macOS laisse le reste en place.',
+      p2: 'La plupart des restes sont petits, mais les caches et les données s’accumulent au fil des ans, et un assistant installé par l’application peut continuer de démarrer à l’ouverture de session.',
+    },
+    where: {
+      intro: 'Presque tout ce qu’une application laisse se trouve dans votre propre Bibliothèque, <span class="ic">~/Library</span>. Le Finder la cache : choisissez Aller › Aller au dossier, tapez <span class="ic">~/Library</span> et appuyez sur Retour. Les éléments portent le nom de l’application ou son identifiant de paquet (bundle ID), comme <span class="ic">com.maker.AppName</span>.',
+      folder: 'Dossier',
+      holds: 'Ce que les applications y gardent',
+      rows: [
+        'Les données de l’application : bases de données, téléchargements, extensions',
+        'Des caches que l’application reconstruit',
+        'Tout ce que garde une application isolée (sandbox), dans un dossier nommé d’après son identifiant',
+        'Des données partagées par les applications d’un même fabricant',
+        'Les réglages, en fichiers .plist nommés d’après l’identifiant',
+        'Les fenêtres que macOS rouvre',
+        'Des assistants qui démarrent à l’ouverture de session',
+        'Des données Web que l’application a gardées',
+        'Des données Web que l’application a gardées',
+        'Les journaux',
+      ],
+      system: 'Les applications installées pour tous les utilisateurs peuvent aussi laisser des fichiers dans <span class="ic">/Library</span>, par exemple dans Application Support, LaunchAgents, LaunchDaemons et PrivilegedHelperTools. Les retirer demande un mot de passe d’administrateur.',
+    },
+    manual: {
+      intro: 'Cherchez dans chaque dossier ci-dessus le nom de l’application et son identifiant. Trouvez l’identifiant pendant que l’application est encore installée :',
+      label: 'Terminal',
+      title: 'La méthode manuelle',
+      steps: [
+        'Quittez l’application, y compris l’icône qu’elle garde dans la barre des menus.',
+        'Si l’application est livrée avec un désinstallateur, ou si le gestionnaire de son fabricant la retire, utilisez-le d’abord.',
+        'Notez son identifiant (ci-dessous), puis glissez l’application du dossier Applications à la Corbeille.',
+        'Dans le Finder, choisissez Aller › Aller au dossier, ouvrez ~/Library et cherchez dans chaque dossier ci-dessus les éléments qui portent le nom de l’application ou son identifiant.',
+        'Mettez à la Corbeille ce qui appartient à l’application. Laissez les dossiers que d’autres applications du même fabricant peuvent partager.',
+        'Videz la Corbeille quand vous êtes sûr que rien d’autre n’en avait besoin.',
+      ],
+      p2: 'Terminal peut afficher « Operation not permitted » pour les dossiers que macOS protège; le reste de la liste est quand même complet. Si l’application vient d’un paquet d’installation, macOS garde un reçu de ce qu’il a écrit :',
+      p3: 'C’est en se fiant au nom que la plupart des nettoyages manuels tournent mal. Un dossier au nom du fabricant peut appartenir à ses autres applications, et un nom court peut correspondre à une application sans rapport.',
+    },
+    ours: {
+      intro: 'La page Applications de CacheDrop liste chaque application de vos dossiers Applications, sur chaque volume, de la plus grosse à la plus petite. Les applications d’Apple et du système n’y sont pas. Chaque ligne montre le fabricant de l’application et sa taille totale avec ses fichiers.',
+      steps: [
+        'Ouvrez Applications et cochez une application. Les fichiers que son identifiant ou le reçu de son installateur lui lient sont cochés avec elle.',
+        'Les dossiers qui portent seulement un nom semblable sont listés comme Possibly related, avec la raison, et vous les cochez vous-même un à un.',
+        'Si l’application est ouverte, CacheDrop vous demande d’abord de la quitter. Si elle a son propre désinstallateur, Open vient en premier.',
+        'L’écran de révision montre chaque élément avant que rien ne bouge. L’application et ses fichiers vont à la Corbeille, et History inscrit l’opération comme « Uninstalled » avec le nom de l’application.',
+      ],
+      never: 'CacheDrop ne propose jamais les dossiers d’Apple ni les fichiers de licence et d’activation, et revérifie chaque élément juste avant de le déplacer. Une application que macOS ne vous laisse pas déplacer sans mot de passe affiche « Needs your password to remove », avec Reveal in Finder : CacheDrop ne demande jamais de mot de passe d’administrateur.',
+      plugins: 'Vous désinstallez des plug-ins audio? Chaque produit part avec tous ses formats et ses fichiers de soutien :',
+      pluginsLink: 'comment désinstaller des plug-ins audio sur Mac',
+    },
+    deleted: {
+      p1: 'Les applications que vous avez déjà glissées dans la Corbeille ont encore leurs fichiers dans votre Bibliothèque. CacheDrop parcourt les dossiers ci-dessus à la recherche d’éléments dont l’application n’est plus sur ce Mac, sur aucun volume, et les liste sous Files from deleted apps, regroupés par application.',
+      p2: 'Un élément part avec une application seulement quand son identifiant ou le reçu d’un installateur l’y lie. Un dossier qui partage seulement un nom avec une application supprimée est listé comme Possibly related, avec la raison, et le Smart clean ne le choisit jamais. Les dossiers d’un fabricant qui a encore une application ou un plug-in sur votre Mac restent, puisque celle-ci peut s’en servir.',
+    },
+    putBack: {
+      p1: 'Une désinstallation met tout à la Corbeille; rien n’est supprimé d’emblée. Après l’opération, chaque élément a un lien Put back dans les résultats et dans History, qui le remet à sa place.',
+      p2: 'L’espace revient quand la Corbeille est vidée. Empty from Trash, dans CacheDrop, supprime seulement ce que CacheDrop y a mis, et laisse vos propres fichiers. Une fois un élément supprimé de la Corbeille, il ne peut plus être remis en place.',
+    },
+    howTo: 'Comment désinstaller complètement une application sur Mac',
+  },
+};
+// Uninstalls count toward the 2 GB (Trial.swift, mac-cleaner Decision 135), so the FAQ's last answer never says
+// uninstalling is free.
+const lang = langOf(Astro.url);
+const t = copy[lang];
+const ids = ['why', 'where', 'manual', 'cachedrop', 'deleted-apps', 'put-back'];
+const howTo = { name: t.howTo, steps: t.manual.steps };
+---
+<Guide {...t.guide} path="/uninstall-apps-mac/" dateModified="2026-11-03" howTo={howTo}>
+<Toc items={[...ids.map((id, i) => [`#${id}`, t.toc[i]] as [string, string]), ['#faq', t.guide.faqTitle]]} />
+
+<section id="why" style="padding-top: var(--space-16); display: flex; flex-direction: column; gap: var(--space-5)">
+<h2 style={guideH2}>{t.toc[0]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.why.p1}</p>
+<p style={`${guideP}; text-wrap: pretty`}>{t.why.p2}</p>
+</section>
+
+<section id="where" style={section}>
+<h2 style={guideH2}>{t.toc[1]}</h2>
+<p style={`${guideP}; text-wrap: pretty`} set:html={t.where.intro}></p>
+<table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 21px; color: var(--ink-body)">
+<thead><tr><th scope="col" style={head}>{t.where.folder}</th><th scope="col" style={head}>{t.where.holds}</th></tr></thead>
+<tbody>
+{folders.map((folder, i) => (
+<tr><th scope="row" style={`${cell}; font-weight: 400`}><span class="ic" style="overflow-wrap: anywhere">~/Library/{folder}</span></th><td style={cell}>{t.where.rows[i]}</td></tr>
+))}
+</tbody>
+</table>
+<p style={`${guideP}; text-wrap: pretty`} set:html={t.where.system}></p>
+</section>
+
+<section id="manual" style={section}>
+<h2 style={guideH2}>{t.toc[2]}</h2>
+<div style={manual}>
+<h3 style={h3}>{t.manual.title}</h3>
+<ol style={list}>{t.manual.steps.map((s) => <li>{s}</li>)}</ol>
+</div>
+<p style={`${guideP}; text-wrap: pretty`}>{t.manual.intro}</p>
+<CodeBlock label={t.manual.label} code={'osascript -e \'id of app "AppName"\'\nfind ~/Library -maxdepth 2 -iname \'*com.maker.appname*\''} />
+<p style={`${guideP}; text-wrap: pretty`}>{t.manual.p2}</p>
+<CodeBlock label={t.manual.label} code={'pkgutil --pkgs | grep -i maker\npkgutil --files com.maker.pkg.AppName'} />
+<p style={`${guideP}; text-wrap: pretty`}>{t.manual.p3}</p>
+</section>
+
+<section id="cachedrop" style={section}>
+<h2 style={guideH2}>{t.toc[3]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.ours.intro}</p>
+<div style={ours}>
+<ol style={list}>{t.ours.steps.map((s) => <li>{s}</li>)}</ol>
+</div>
+<p style={`${guideP}; text-wrap: pretty`}>{t.ours.never}</p>
+<p style={`${guideP}; text-wrap: pretty`}>{t.ours.plugins} <a class="textlink" href={localize(lang, '/uninstall-audio-plugins-mac/')} style={link}>{t.ours.pluginsLink}</a>.</p>
+</section>
+
+<section id="deleted-apps" style={section}>
+<h2 style={guideH2}>{t.toc[4]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.deleted.p1}</p>
+<p style={`${guideP}; text-wrap: pretty`}>{t.deleted.p2}</p>
+</section>
+
+<section id="put-back" style={section}>
+<h2 style={guideH2}>{t.toc[5]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.putBack.p1}</p>
+<p style={`${guideP}; text-wrap: pretty`}>{t.putBack.p2}</p>
+</section>
+</Guide>
