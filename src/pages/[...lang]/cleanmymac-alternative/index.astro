@@ -1,0 +1,284 @@
+---
+// The CleanMyMac alternative page (#87, Decision 54), at /cleanmymac-alternative/ and under /fr/
+// (English slug, per the French glossary). Price-led: the hero, then the price table from
+// compare.ts as the proof, "Left out on purpose" (categories, never a company), what CacheDrop
+// does, the FAQ and the closing call to action. Built from the homepage's parts and tokens.
+// Product names appear in text only: no logos, screenshots or brand colours.
+import Base from '../../../layouts/Base.astro';
+import Nav from '../../../components/Nav.astro';
+import Footer from '../../../components/Footer.astro';
+import BuyButton from '../../../components/BuyButton.astro';
+import ClosingCta from '../../../components/ClosingCta.astro';
+import { card, eyebrow, faqItem, faqQuestion, primaryLg, sectionH2, titleMd } from '../../../components/guide-styles';
+import { footerCopy } from '../../../components/footer';
+import { discounted, pricingCopy } from '../../../components/pricing';
+import { billingText, checkedOn, compareDescription, productName, macsText, priceText, rows, threeYearsText } from '../../../components/compare';
+import { breadcrumbPage } from '../../../components/structured-data';
+import { langOf, langPaths, localize } from '../../../i18n';
+
+export const getStaticPaths = langPaths;
+
+const lang = langOf(Astro.url);
+const p = pricingCopy[lang];
+const checked = checkedOn();
+const checkedLabel = new Date(`${checked}T12:00:00Z`).toLocaleDateString(lang === 'fr' ? 'fr-CA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+
+const copy = {
+  en: {
+    title: 'CleanMyMac alternative you pay for once | CacheDrop',
+    description: compareDescription.en,
+    crumb: 'CleanMyMac alternative',
+    badge: 'No subscription · Up to 3 Macs',
+    h1: 'A CleanMyMac alternative you pay for once.',
+    lede: `Looking for a CleanMyMac alternative without a subscription? CacheDrop cleans your Mac, removes apps and plug-ins completely, and clears developer and media caches. ${p.was} once, for up to 3 Macs.`,
+    priceEyebrow: 'Prices compared',
+    priceTitle: 'Pay once. Not every year.',
+    priceBody: 'Most Mac cleaners are subscriptions that renew on their own. Here is what each one costs, including the ones that cost less than CacheDrop.',
+    caption: 'Mac cleaner prices compared',
+    cols: { product: 'App', price: 'Price', billing: 'Billing', macs: 'Macs', three: '3 years, 1 Mac', goodFor: 'Good for' },
+    note: `List prices in US dollars for one license, before tax, from each maker’s own site, checked ${checkedLabel}. “3 years, 1 Mac” is the cheapest way to cover one Mac for three years.`,
+    offer: `Limited-time price: ${p.now} right now.`,
+    why: 'Some tools cost less and do one job. CacheDrop is one app for cleanup, complete uninstalls and plug-ins, on 3 Macs, ready for each new macOS when it ships.',
+    leaveEyebrow: 'Left out on purpose',
+    leaveTitle: 'No RAM booster. No antivirus. Just your disk.',
+    leaveBody: 'Many Mac cleaners grow into suites of tools macOS already handles. CacheDrop leaves them out. Every CacheDrop feature frees disk space or shows where it went.',
+    leave: [
+      ['RAM boosters', 'macOS manages memory on its own. Clearing it makes your apps reload what they just had, which is slower, not faster.'],
+      ['Antivirus', 'XProtect is built into macOS and updates itself in the background.'],
+      ['“Repair permissions”', 'macOS has protected its own system files since OS X El Capitan. There is nothing left to repair.'],
+      ['System monitors', 'Activity Monitor already shows your CPU, memory, battery and network.'],
+      ['Newsletters in the app', 'No announcements and no upsells inside the app. You hear from CacheDrop when an update is ready.'],
+    ],
+    doesEyebrow: 'What you get',
+    doesTitle: 'One app instead of three.',
+    does: [
+      ['Smart clean', 'One scan finds the caches, old project files, leftovers and big downloads filling your Mac. You check them, then clear them in one click.'],
+      ['Complete app uninstalls', 'Remove an app with every file it installed across your Library, not just the part you drag to the Trash.'],
+      ['Plug-in manager', 'Uninstall VST, AU, AAX and CLAP plug-ins with all their files, and keep your licenses safe.'],
+      ['Developer caches', 'Clear Xcode DerivedData, forgotten node_modules folders and Docker caches safely.'],
+      ['Media caches', 'Clear Adobe media cache and Final Cut Pro render files you no longer need.'],
+      ['System Data, explained', 'See what fills System Data in Storage settings, and clear the parts that are safe to clear.'],
+    ],
+    faqTitle: 'Switching, answered.',
+    faq: [
+      ['Is CacheDrop a good CleanMyMac alternative?', `Yes, if what you want is your disk space back. CacheDrop finds caches, leftovers and old files, removes apps and plug-ins completely, and costs ${p.license} instead of a yearly plan. It has no antivirus, RAM booster or system monitor.`],
+      ['Is CacheDrop a subscription?', `No. A license is ${p.license}, for up to 3 Macs, with every update through version 1. Nothing renews and there’s nothing to cancel.`],
+      ['Can I try it before I buy?', 'Yes. Scanning is always free, and you can clean up to 2 GB before you buy. No card needed. If you buy and change your mind, refunds are no questions asked for 30 days.'],
+      ['Do I need a RAM cleaner or antivirus on a Mac?', 'No. macOS manages memory itself and keeps recent data in memory on purpose, and XProtect checks apps for malware and updates itself.'],
+      ['What happens to my files?', 'You see everything before it goes. Caches that apps make again are cleared; your own files go to the Trash, and History puts them back.'],
+    ],
+    trademarks: `${footerCopy.en.trademarks} Product names are trademarks of their owners. CacheDrop isn’t affiliated with any of them.`,
+    closingTitle: 'See what it finds on your Mac.',
+    closingBody: 'One app for Apple Silicon and Intel Macs on macOS 14 or later.',
+  },
+  fr: {
+    title: 'Alternative à CleanMyMac payée une seule fois | CacheDrop',
+    description: compareDescription.fr,
+    crumb: 'Alternative à CleanMyMac',
+    badge: 'Aucun abonnement · Jusqu’à 3 Mac',
+    h1: 'Une alternative à CleanMyMac que vous payez une seule fois.',
+    lede: `Vous cherchez une alternative à CleanMyMac sans abonnement? CacheDrop nettoie votre Mac, désinstalle complètement applications et plug-ins, et vide les caches de développement et de média. ${p.was} une seule fois, pour un maximum de 3 Mac.`,
+    priceEyebrow: 'Prix comparés',
+    priceTitle: 'Payez une fois. Pas chaque année.',
+    priceBody: 'La plupart des nettoyeurs pour Mac sont des abonnements qui se renouvellent tout seuls. Voici ce que chacun coûte, y compris ceux qui coûtent moins cher que CacheDrop.',
+    caption: 'Prix des nettoyeurs pour Mac comparés',
+    cols: { product: 'Application', price: 'Prix', billing: 'Facturation', macs: 'Mac', three: '3 ans, 1 Mac', goodFor: 'Idéal pour' },
+    note: `Prix courants en dollars américains pour une licence, avant taxes, tirés du site de chaque éditeur, vérifiés le ${checkedLabel}. « 3 ans, 1 Mac » est la façon la moins chère de couvrir un Mac pendant trois ans.`,
+    offer: `Prix pour un temps limité : ${p.now} en ce moment.`,
+    why: 'Certains outils coûtent moins cher et font une seule chose. CacheDrop est une seule application pour le nettoyage, la désinstallation complète et les plug-ins, sur 3 Mac, prête pour chaque nouvelle version de macOS dès sa sortie.',
+    leaveEyebrow: 'Laissé de côté exprès',
+    leaveTitle: 'Pas d’accélérateur de mémoire. Pas d’antivirus. Juste votre disque.',
+    leaveBody: 'Beaucoup de nettoyeurs pour Mac deviennent des suites d’outils dont macOS s’occupe déjà. CacheDrop les laisse de côté. Chaque fonction de CacheDrop libère de l’espace disque ou montre où il est passé.',
+    leave: [
+      ['Accélérateurs de mémoire', 'macOS gère la mémoire tout seul. La vider oblige vos applications à recharger ce qu’elles venaient d’avoir, ce qui est plus lent, pas plus rapide.'],
+      ['Antivirus', 'XProtect est intégré à macOS et se met à jour tout seul en arrière-plan.'],
+      ['« Réparer les autorisations »', 'macOS protège ses propres fichiers système depuis OS X El Capitan. Il n’y a plus rien à réparer.'],
+      ['Moniteurs système', 'Le Moniteur d’activité montre déjà votre processeur, votre mémoire, votre batterie et votre réseau.'],
+      ['Infolettres dans l’application', 'Aucune annonce et aucune vente incitative dans l’application. CacheDrop vous écrit quand une mise à jour est prête.'],
+    ],
+    doesEyebrow: 'Ce que vous obtenez',
+    doesTitle: 'Une application au lieu de trois.',
+    does: [
+      ['Nettoyage intelligent', 'Une seule analyse trouve les caches, les vieux fichiers de projets, les restes et les gros téléchargements qui remplissent votre Mac. Vous les vérifiez, puis les videz en un clic.'],
+      ['Désinstallation complète', 'Supprimez une application avec tous les fichiers qu’elle a installés dans votre Bibliothèque, pas seulement ce que vous glissez dans la Corbeille.'],
+      ['Gestionnaire de plug-ins', 'Désinstallez les plug-ins VST, AU, AAX et CLAP avec tous leurs fichiers, et gardez vos licences intactes.'],
+      ['Caches de développement', 'Videz en toute sécurité les DerivedData de Xcode, les dossiers node_modules oubliés et les caches de Docker.'],
+      ['Caches de média', 'Videz le cache de média Adobe et les fichiers de rendu de Final Cut Pro dont vous n’avez plus besoin.'],
+      ['Les Données système, expliquées', 'Voyez ce qui remplit les Données système dans les réglages de stockage, et videz ce qui peut l’être sans risque.'],
+    ],
+    faqTitle: 'Changer d’outil, en réponses.',
+    faq: [
+      ['CacheDrop est-il une bonne alternative à CleanMyMac?', `Oui, si vous voulez récupérer l’espace de votre disque. CacheDrop trouve les caches, les restes et les vieux fichiers, désinstalle complètement applications et plug-ins, et coûte ${p.license} au lieu d’un forfait annuel. Il n’a ni antivirus, ni accélérateur de mémoire, ni moniteur système.`],
+      ['CacheDrop est-il un abonnement?', `Non. La licence coûte ${p.license}, pour un maximum de 3 Mac, avec toutes les mises à jour de la version 1. Rien ne se renouvelle et il n’y a rien à annuler.`],
+      ['Puis-je l’essayer avant d’acheter?', 'Oui. L’analyse est toujours gratuite, et vous pouvez nettoyer jusqu’à 2 Go avant d’acheter. Aucune carte requise. Si vous achetez et changez d’avis, le remboursement est accordé dans les 30 jours, sans avoir à vous justifier.'],
+      ['Ai-je besoin d’un nettoyeur de mémoire ou d’un antivirus sur Mac?', 'Non. macOS gère lui-même la mémoire et y garde exprès les données récentes, et XProtect vérifie les applications contre les logiciels malveillants et se met à jour tout seul.'],
+      ['Qu’arrive-t-il à mes fichiers?', 'Vous voyez tout avant que rien ne parte. Les caches que les applications recréent sont vidés; vos propres fichiers vont dans la Corbeille, et l’historique les remet en place.'],
+    ],
+    trademarks: `${footerCopy.fr.trademarks} Les noms de produits sont des marques de commerce de leurs propriétaires. CacheDrop n’est affilié à aucun d’eux.`,
+    closingTitle: 'Voyez ce qu’il trouve sur votre Mac.',
+    closingBody: 'Une seule application pour les Mac Apple Silicon et Intel sous macOS 14 ou version ultérieure.',
+  },
+};
+const t = copy[lang];
+const download = localize(lang, '/download/');
+const path = '/cleanmymac-alternative/';
+
+const site = Astro.site!.origin;
+const { '@context': context, ...webPage } = breadcrumbPage(site, lang, path, t.crumb);
+const jsonLd = {
+  '@context': context,
+  '@graph': [
+    webPage,
+    { '@type': 'FAQPage', mainEntity: t.faq.map(([name, text]) => ({ '@type': 'Question', name, acceptedAnswer: { '@type': 'Answer', text } })) },
+  ],
+};
+
+const lede = 'margin: var(--space-4) 0 0; font-size: 17px; line-height: 27px; color: var(--ink-secondary); text-wrap: pretty';
+const rowBody = 'margin: var(--space-1-5) 0 0; font-size: 15px; line-height: 23px; color: var(--ink-soft)';
+const small = 'margin: 0; font-size: 13px; line-height: 19px; color: var(--ink-secondary)';
+const twoColumns = 'max-width: var(--container-max); margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: var(--space-16); align-items: start';
+const check = '<svg style="flex: none; margin-top: var(--space-0-5); color: var(--success-ink)" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>';
+const dash = '<svg style="flex: none; margin-top: var(--space-0-5); color: var(--ink-secondary)" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"></path></svg>';
+const cells = (r: (typeof rows)[number]) => [
+  ['price', priceText(lang, r.plan)],
+  ['three', threeYearsText(lang, r.plan)],
+  ['billing', billingText(lang, r.plan)],
+  ['macs', macsText(lang, r.macs)],
+  ['goodFor', r.goodFor[lang]],
+] as const;
+---
+<Base title={t.title} description={t.description} path={path} jsonLd={jsonLd}>
+<style is:global>
+.cmp th, .cmp td { text-align: left; padding: var(--space-4); border-bottom: 1px solid var(--line); vertical-align: top; font-size: 15px; line-height: 23px; color: var(--ink-soft) }
+.cmp thead th { padding-top: var(--space-3); padding-bottom: var(--space-3); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-secondary); white-space: nowrap }
+.cmp tbody th { font-weight: 600; color: var(--ink) }
+.cmp tbody tr:last-child > * { border-bottom: 0 }
+.cmp .us > * { background: var(--accent-soft); color: var(--ink); font-weight: 500 }
+.cmp .k { display: none }
+.cmp .nw { white-space: nowrap }
+@media (max-width: 760px) {
+  .cmp thead { display: none }
+  .cmp, .cmp tbody, .cmp tr, .cmp th, .cmp td { display: block }
+  .cmp tr { padding: var(--space-4); border-bottom: 1px solid var(--line) }
+  .cmp tbody tr:last-child { border-bottom: 0 }
+  .cmp .us { background: var(--accent-soft); border-radius: var(--radius-lg) }
+  .cmp .us > * { background: none }
+  .cmp th, .cmp td { padding: 0; border: 0 }
+  .cmp .nw { white-space: normal }
+  .cmp td { display: flex; gap: var(--space-3); margin-top: var(--space-1-5) }
+  .cmp .k { display: block; flex: none; width: 112px; font-size: 13px; color: var(--ink-secondary); font-weight: 400 }
+}
+</style>
+<Nav />
+<main>
+
+<section style="max-width: var(--container-max); margin: 0 auto; padding: var(--space-28) var(--space-6) var(--space-30); display: flex; flex-direction: column; align-items: center; text-align: center">
+<p style="margin: 0 0 var(--space-8); display: inline-flex; align-items: center; gap: var(--space-2); font-size: 12px; font-weight: 500; color: var(--ink-secondary); padding: var(--space-1-5) var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-full); background: var(--surface-elevated)">
+<span aria-hidden="true" style="width: var(--dot); height: var(--dot); border-radius: var(--radius-full); background: var(--success)"></span>
+<span>{t.badge}</span>
+</p>
+<h1 style="margin: 0; max-width: 960px; font-size: clamp(40px, 6vw, 76px); line-height: 1.04; font-weight: 600; letter-spacing: -0.04em; text-wrap: balance">{t.h1}</h1>
+<h2 style="margin: var(--space-7) 0 0; max-width: var(--lede-max); font-size: 19px; line-height: 29px; font-weight: 400; letter-spacing: -0.012em; color: var(--ink-secondary); text-wrap: pretty">{t.lede}</h2>
+<div style="margin-top: var(--space-10); display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--space-3)">
+<a class="btn-primary" href={download} style={primaryLg}>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"></path><path d="M7 10l5 5 5-5"></path><path d="M5 20h14"></path></svg>
+<span>{p.download}</span>
+</a>
+<BuyButton variant="ghost" />
+</div>
+<p style="margin: 18px 0 0; font-size: 13px; color: var(--ink-secondary)">{p.trial}</p>
+</section>
+
+<section id="prices" aria-labelledby="prices-title" style="background: var(--surface-subtle); padding: var(--space-30) var(--space-6)">
+<div style="max-width: var(--container-max); margin: 0 auto">
+<div style="max-width: var(--lede-max); margin-bottom: var(--space-14)">
+<p style={eyebrow}>{t.priceEyebrow}</p>
+<h2 id="prices-title" style={sectionH2}>{t.priceTitle}</h2>
+<p style={lede}>{t.priceBody}</p>
+</div>
+<div style={`${card}; padding: var(--space-2); gap: 0`}>
+<table class="cmp" data-compare-table style="width: 100%; border-collapse: collapse">
+<caption class="sr-only">{t.caption}</caption>
+<thead><tr>
+<th scope="col">{t.cols.product}</th><th scope="col">{t.cols.price}</th><th scope="col">{t.cols.three}</th><th scope="col">{t.cols.billing}</th><th scope="col">{t.cols.macs}</th><th scope="col">{t.cols.goodFor}</th>
+</tr></thead>
+<tbody>
+{rows.map((r) => (
+<tr class={r.us ? 'us' : undefined} data-product={productName('en', r)}>
+<th scope="row">{productName(lang, r)}</th>
+{cells(r).map(([key, value]) => <td data-col={key} class={key === 'goodFor' ? undefined : 'nw'}><span class="k" aria-hidden="true">{t.cols[key]}</span><span>{value}</span></td>)}
+</tr>
+))}
+</tbody>
+</table>
+</div>
+<div style="margin-top: var(--space-6); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4)">
+<p data-checked style={`${small}; max-width: var(--reading-max)`}>{t.note}</p>
+{discounted && <p data-offer style="margin: 0; font-size: 13px; line-height: 19px; font-weight: 500; color: var(--success-ink); background: var(--success-soft); border-radius: var(--radius-full); padding: var(--space-1-5) var(--space-3)">{t.offer}</p>}
+</div>
+<p style="margin: var(--space-10) 0 0; max-width: var(--lede-max); font-size: 17px; line-height: 27px; font-weight: 500; color: var(--ink); text-wrap: pretty">{t.why}</p>
+</div>
+</section>
+
+<section id="left-out" style="padding: var(--space-32) var(--space-6)">
+<div style={twoColumns}>
+<div>
+<p style={eyebrow}>{t.leaveEyebrow}</p>
+<h2 style={`${sectionH2}; text-wrap: balance`}>{t.leaveTitle}</h2>
+<p style={`${lede}; max-width: 440px`}>{t.leaveBody}</p>
+</div>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column">
+{t.leave.map(([title, body], i) => (
+<li style={`display: flex; gap: var(--space-4); padding: var(--space-6) 0; border-top: 1px solid var(--line)${i === t.leave.length - 1 ? '; border-bottom: 1px solid var(--line)' : ''}`}>
+<Fragment set:html={dash} />
+<div>
+<h3 style={titleMd}>{title}</h3>
+<p style={rowBody}>{body}</p>
+</div>
+</li>
+))}
+</ul>
+</div>
+</section>
+
+<section id="does" style="background: var(--surface-subtle); padding: var(--space-30) var(--space-6)">
+<div style="max-width: var(--container-max); margin: 0 auto">
+<div style="max-width: var(--lede-max); margin-bottom: var(--space-14)">
+<p style={eyebrow}>{t.doesEyebrow}</p>
+<h2 style={sectionH2}>{t.doesTitle}</h2>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--space-6)">
+{t.does.map(([title, body]) => (
+<article style={`${card}; flex-direction: row; gap: var(--space-4)`}>
+<Fragment set:html={check} />
+<div>
+<h3 style={titleMd}>{title}</h3>
+<p style={rowBody}>{body}</p>
+</div>
+</article>
+))}
+</div>
+</div>
+</section>
+
+<section id="faq" style="padding: var(--space-32) var(--space-6)">
+<div style={twoColumns}>
+<div>
+<p style={eyebrow}>FAQ</p>
+<h2 style={`${sectionH2}; text-wrap: balance`}>{t.faqTitle}</h2>
+</div>
+<div style="display: flex; flex-direction: column">
+{t.faq.map(([q, a], i) => (
+<div style={faqItem(i, t.faq.length)}>
+<h3 style={faqQuestion}>{q}</h3>
+<p style="margin: var(--space-2) 0 0; font-size: 15px; line-height: 24px; color: var(--ink-soft)">{a}</p>
+</div>
+))}
+</div>
+</div>
+</section>
+
+<ClosingCta size="home" title={t.closingTitle} body={t.closingBody} href={download} cta={p.download} />
+</main>
+<Footer path={path} overview trademarks={t.trademarks} />
+</Base>

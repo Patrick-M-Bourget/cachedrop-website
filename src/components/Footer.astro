@@ -4,7 +4,7 @@
 // The "Privacy Policy" link in the bottom row is Decision 19; the handoff has none.
 // The terms of sale, refund policy and license agreement links after it are Decision 43; the row wraps.
 // The language switch at the end of that row is Decision 5: it opens this page in the other language.
-// "Resend License Key" at the end of Product is Decision 42.
+// "Resend License Key" at the end of Product is Decision 42; "Compare to CleanMyMac" after it is Decision 54.
 // The producer page's link after the two guides is Decision 48.
 // The System Data guide's link after it is #110.
 // The app uninstall guide's link after it is #111 (Decision 51).
@@ -51,6 +51,7 @@ const { path, overview = false, trademarks = t.trademarks } = Astro.props;
 <a class="flink" href={href('/download/')}>{t.download}</a>
 <a class="flink" href="#feedback" data-feedback>{t.feedback}</a>
 <a class="flink" href={href('/resend-license-key/')}>{t.resendKey}</a>
+<a class="flink" href={href('/cleanmymac-alternative/')}>{t.compare}</a>
 </nav>
 <div style="display: flex; flex-direction: column; gap: var(--space-2-5); font-size: 13px; color: var(--ink-secondary)">
 <h3 style="margin: 0 0 var(--space-1); font-size: 13px; font-weight: 600; color: var(--ink)">{t.platform}</h3>

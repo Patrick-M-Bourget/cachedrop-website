@@ -6,7 +6,7 @@
 // Each `from` is replaced everywhere in its page, which keeps visible FAQ text and the
 // FAQPage JSON-LD in step. Checked against mac-cleaner main at 5bf77c7 on 2026-10-29.
 // The platform claim is the handoff's own again (Decision 46): CacheDrop 1.0.1 is universal, macOS 14 or later.
-import { pricingCopy } from '../src/components/pricing';
+import { compareLive, pricingCopy } from '../src/components/pricing';
 
 export type CopyFix = { from: string; to: string; why: string };
 
@@ -19,8 +19,10 @@ const guideDownloadBlock = (note: string, newNote: string): CopyFix => ({
   to:
     `${newNote}</span>\n</div>\n` +
     `<p style="margin: 18px 0 0; font-size: 13px; color: #6E6E73">${pricingCopy.en.trial}</p>\n` +
-    `<p style="margin: 6px 0 0; font-size: 13px; color: #6E6E73">Up to 3 Macs: ${pricingCopy.en.license}.</p>\n`,
-  why: '#112 (Decision 51): every guide has the same download block. The trial line, with macOS 14, sits under the button, so the note beside it drops “macOS 14+”.',
+    `<p style="margin: 6px 0 0; font-size: 13px; color: #6E6E73">Up to 3 Macs: ${pricingCopy.en.license}.` +
+    (compareLive.en ? ` · <a class="textlink" href="/cleanmymac-alternative/" style="color: #0066CC">${pricingCopy.en.compare}</a>` : '') +
+    `</p>\n`,
+  why: '#112 (Decision 51): every guide has the same download block. The trial line, with macOS 14, sits under the button, so the note beside it drops “macOS 14+”. Decision 54 adds the compare page link after the price.',
 });
 
 export const copyFixes: Record<string, CopyFix[]> = {

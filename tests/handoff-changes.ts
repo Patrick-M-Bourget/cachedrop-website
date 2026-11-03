@@ -34,6 +34,12 @@ export const handoffChanges: HandoffChange[] = [
     replace: '<a class="flink" href="#feedback" data-feedback>Provide Feedback</a><a class="flink" href="/resend-license-key/">Resend License Key</a>',
   },
   {
+    decision: 54,
+    why: 'The footer\'s Product column links to the CleanMyMac alternative page after Resend License Key. Applied after the Decision 42 change.',
+    find: '<a class="flink" href="/resend-license-key/">Resend License Key</a>',
+    replace: '<a class="flink" href="/resend-license-key/">Resend License Key</a><a class="flink" href="/cleanmymac-alternative/">Compare to CleanMyMac</a>',
+  },
+  {
     decision: 48,
     why: 'The nav links to the producer page after For Creators.',
     find: 'For Creators</a>',

@@ -4,6 +4,7 @@
 import { footerCopy } from './footer';
 import { guides } from './guides';
 import { pricingCopy } from './pricing';
+import { compareDescription } from './compare';
 import { localize, type Lang } from '../i18n';
 
 const guideKeys = ['developer', 'creator', 'producer', 'systemData', 'apps'] as const;
@@ -38,6 +39,10 @@ export function llmsTxt(site: string): string {
     '',
     ...guideLines('en'),
     '',
+    '## Compare',
+    '',
+    `- [${en.compare}](${link('en', '/cleanmymac-alternative/')}): ${compareDescription.en}`,
+    '',
     '## Policies',
     '',
     ...(['privacy', 'terms', 'refunds', 'license'] as const).map((key, i) =>
@@ -47,6 +52,7 @@ export function llmsTxt(site: string): string {
     '',
     `- [CacheDrop](${link('fr', '/')}): ${footerCopy.fr.tagline}`,
     ...guideLines('fr'),
+    `- [${footerCopy.fr.compare}](${link('fr', '/cleanmymac-alternative/')}): ${compareDescription.fr}`,
     '',
   ].join('\n');
 }
