@@ -1,0 +1,344 @@
+---
+// The System Data guide (#110, slice 4 of #103, Decision 51): a guide in the guide format (Decision 50), at
+// /clear-system-data-mac/ and under /fr/ (Decision 5, English slug per the French glossary). Each section opens
+// with a two-sentence answer for search and answer engines.
+// Every claim about CacheDrop follows the build on the update feed (Decision 48), checked against mac-cleaner 1.0.1
+// (022d2aee): CatalogPresentation.swift (category names), AppCaches.swift (logs and crash reports),
+// TemporaryFiles.swift (old temporary files, 3 days), ICloudCopies.swift ("Remove local copies"),
+// BuiltInCatalog+Guidance.swift and Guidance.swift (snapshots and device backups: guidance only, "Open Storage
+// Settings", "Open Finder"), TmutilSnapshots.swift (count only, no sizes). It never deletes local snapshots
+// (mac-cleaner #637) or touches system caches and logs (#641), and never asks for an admin password (SPEC section 9).
+// Strings with <span class="ic"> are HTML.
+import Guide from '../../../layouts/Guide.astro';
+import Toc from '../../../components/Toc.astro';
+import CodeBlock from '../../../components/CodeBlock.astro';
+import Kicker from '../../../components/Kicker.astro';
+import { guideH2, guideP } from '../../../components/guide-styles';
+import { guides } from '../../../components/guides';
+import { langOf, langPaths } from '../../../i18n';
+
+export const getStaticPaths = langPaths;
+
+const section = 'padding-top: var(--space-22); display: flex; flex-direction: column; gap: var(--space-5)';
+const pair = 'margin-top: var(--space-4); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: var(--space-4)';
+const card = 'padding: var(--space-7); border-radius: var(--radius-2xl); display: flex; flex-direction: column; gap: 14px';
+const manual = `${card}; border: 1px solid var(--line)`;
+const ours = `${card}; background: var(--surface-subtle)`;
+const h3 = 'margin: 0; font-size: 20px; line-height: 26px; font-weight: 600; letter-spacing: -0.015em';
+const list = 'margin: 0; padding: 0 0 0 var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); font-size: 16px; line-height: 25px; color: var(--ink-body)';
+const cell = 'padding: var(--space-3) var(--space-4) var(--space-3) 0; border-top: 1px solid var(--line); text-align: left; vertical-align: top';
+const head = `${cell}; font-size: 13px; font-weight: 600; color: var(--ink-secondary); border-top: 0`;
+
+// Read-only: lists the biggest folders in your Library. Nothing here deletes anything.
+const sizes = 'du -sh ~/Library/* 2>/dev/null | sort -h | tail -15\ndu -sh ~/Library/Caches/* 2>/dev/null | sort -h | tail -15';
+// Read-only, no password: what CacheDrop itself runs (TmutilSnapshots.swift).
+const listSnapshots = 'tmutil listlocalsnapshots /';
+// Deletes one Time Machine snapshot by its date. The date is an example.
+const deleteSnapshot = 'sudo tmutil deletelocalsnapshots 2026-11-03-101112';
+
+const copy = {
+  en: {
+    guide: {
+      ...guides.systemData.en,
+      crumb: 'System Data Guide',
+      headline: 'How to clear System Data on Mac',
+      lede: 'System Data is the grey bar in Storage settings that macOS won’t explain. Here is what’s in it, what you can safely remove, and what to leave alone.',
+      cta: 'Download for Mac',
+      ctaNote: 'Caches · Logs · Developer files · macOS 14+',
+      updated: 'November 2026',
+      readTime: '8 min read',
+      faqTitle: 'System Data FAQ',
+      faq: [
+        ['What is System Data on a Mac?', 'It’s the space macOS doesn’t count in one of its other categories, such as Applications, Documents or Photos. It includes caches, logs, temporary files, Time Machine local snapshots and files macOS itself uses.'],
+        ['Why is System Data so big on my Mac?', 'Usually app and developer caches that grew over months, plus local snapshots while Time Machine is on. macOS also creates and removes temporary files and snapshots on its own, so the figure can rise and fall from one day to the next.'],
+        ['Is it safe to delete System Data?', 'Not as a whole, and macOS has no button for it. Parts of it are safe to remove: the caches and logs in your own Library, with their apps quit. Leave <span class="ic">/System</span>, <span class="ic">/Library</span> and <span class="ic">/private/var</span> alone.'],
+        ['Does restarting a Mac reduce System Data?', 'Often a little. A restart clears the swap files macOS writes when memory runs short, and some temporary files. Caches and snapshots stay.'],
+        ['How do I delete Time Machine local snapshots?', 'You rarely need to: macOS deletes them after about 24 hours, or sooner when space runs low. To delete one yourself, list them with <span class="ic">tmutil listlocalsnapshots /</span> and delete one by its date with <span class="ic">sudo tmutil deletelocalsnapshots</span>. Backups on your Time Machine disk aren’t affected.'],
+        ['Why does System Data come back after I clear it?', 'Caches and logs fill up again as you use your apps: that’s their job. Clearing them is worth it when they’ve grown over months, not as a daily habit.'],
+        ['Does CacheDrop clear System Data?', 'It clears the parts that live in your own account: app caches, old temporary files, logs and crash reports, and developer caches and build files. It shows Time Machine local snapshots and device backups with where to manage them, and never touches system files or asks for your password.'],
+        ['Can I try CacheDrop before I buy?', 'Yes. Scanning is always free, and cleanup is free until it has freed 2 GB.'],
+      ] as Array<[string, string]>,
+      other: { eyebrow: 'Write code?', title: 'How to clear Xcode DerivedData, node_modules and Docker caches', href: '/clear-mac-developer-caches/', link: 'Read the developer guide' },
+      closing: { title: 'See what System Data is made of.', body: 'CacheDrop names the caches, logs and developer files behind it in one scan, with the size of each.' },
+      trademarks: 'Apple, Mac, macOS, Finder, iCloud, Time Machine and Xcode are trademarks of Apple Inc.',
+    },
+    toc: ['What is System Data on a Mac?', 'Why is System Data so big?', 'What’s safe to remove from System Data?', 'How to clear System Data on Mac', 'How to delete Time Machine local snapshots', 'What CacheDrop clears, and what it leaves'],
+    what: {
+      p1: 'System Data is the space macOS doesn’t count in one of its other storage categories, such as Applications, Documents or Photos. Most of it is caches, logs, temporary files and snapshots, plus files macOS needs to run.',
+      p2: 'To see it, open System Settings › General › Storage and wait until every size has finished calculating. macOS doesn’t break System Data down any further, so the rest of this guide shows where to look.',
+    },
+    why: {
+      p1: 'System Data grows because apps, developer tools and macOS keep copies of things to save time later, and rarely clean up after themselves. Over months, a few gigabytes of caches and logs can become tens of gigabytes.',
+      items: [
+        'Caches: apps and browsers keep downloaded and generated files in <span class="ic">~/Library/Caches</span> so they open faster. They rebuild them as needed.',
+        'Logs, crash reports and temporary files: <span class="ic">~/Library/Logs</span> and your own temporary folder fill up as apps run.',
+        'Developer files: Xcode DerivedData, simulators, Docker and package caches can reach tens of gigabytes on their own.',
+        'iCloud copies: iCloud Drive files you’ve opened stay downloaded on this Mac. macOS usually counts those under iCloud Drive, but data apps sync and keep in your Library can show up as System Data.',
+        'Time Machine local snapshots: while Time Machine is on, macOS keeps snapshots of your disk on the disk itself, so you can restore files when your backup disk isn’t connected.',
+      ],
+    },
+    safe: {
+      p1: 'Caches and logs in your own Library are safe to remove with their apps quit, because apps make them again as needed. Everything macOS keeps in system folders, and the data apps keep in Application Support, should stay where it is.',
+      what: 'What',
+      todo: 'What to do',
+      rows: [
+        ['App caches', '~/Library/Caches', 'Safe to delete with the app quit. It makes them again, so it may be slower the first time.'],
+        ['Logs and crash reports', '~/Library/Logs', 'Safe to delete. Apps write new ones as they run.'],
+        ['Developer caches and build files', '~/Library/Developer', 'Safe to delete with your tools quit; see the <a class="textlink" href="{dev}" style="color: var(--accent-text); font-weight: 500">developer guide</a>.'],
+        ['Downloaded iCloud files', 'iCloud Drive', 'Remove the download in Finder. The file stays in iCloud and downloads again when you open it.'],
+        ['iPhone and iPad backups', '~/Library/Application Support/MobileSync/Backup', 'Delete old ones in Finder: select the connected device, then Manage Backups.'],
+        ['Time Machine local snapshots', 'tmutil listlocalsnapshots /', 'macOS deletes them on its own. Delete one yourself only if you need the space now (below).'],
+        ['App data and settings', '~/Library/Application Support, ~/Library/Containers', 'Leave alone. It holds your settings, documents and sign-ins.'],
+        ['System files', '/System, /Library, /private/var', 'Leave alone. macOS needs them, and deleting them can stop apps or macOS from working.'],
+      ] as Array<[string, string, string]>,
+    },
+    clear: {
+      p1: 'Clear System Data by hand by removing the caches, logs and developer files in your own Library, then restarting. Quit the apps first, and move things to the Trash instead of deleting them, so you can put back anything you miss.',
+      manualTitle: 'The manual way',
+      manual: [
+        'Open System Settings › General › Storage and wait for the sizes, so you know where you started.',
+        'Quit your apps. In Finder, choose Go › Go to Folder, enter ~/Library/Caches, and move the folders of apps you know to the Trash.',
+        'Do the same in ~/Library/Logs for old logs and crash reports.',
+        'Remove developer files you don’t need, such as Xcode DerivedData, with the developer guide.',
+        'In iCloud Drive, Control-click files you don’t need on this Mac and choose Remove Download. They stay in iCloud.',
+        'Empty the Trash, then restart your Mac, which also clears its swap files.',
+        'Check Storage again.',
+      ],
+      oursTitle: 'The CacheDrop way',
+      ours: [
+        'Run a scan. Overview lists each category with its size, and Smart clean picks what’s safe to clean, all ticked.',
+        'Untick anything you want to keep in App caches, Logs and crash reports, and Developer caches and build files.',
+        'Review, then Clean up. Caches and logs that apps make again are deleted; your files go to the Trash. An app that’s open keeps its caches until you quit it.',
+        'For Downloaded iCloud files, Remove local copies keeps the originals in iCloud.',
+      ],
+      sizesKicker: 'See what takes the space',
+      sizesP: 'These commands only read sizes and change nothing. They list the 15 biggest folders in your Library, then in its Caches folder. macOS may ask whether Terminal can access other apps’ data: either answer is fine, the list just leaves those folders out.',
+      label: 'Terminal',
+    },
+    snapshots: {
+      p1: 'You usually don’t need to delete Time Machine local snapshots: macOS keeps them for about 24 hours and deletes the oldest on its own when space runs low. If you need the space right away, you can delete one by its date in Terminal.',
+      listP: 'First, list them. This reads only, and needs no password:',
+      listNote: 'Each line like <span class="ic">com.apple.TimeMachine.2026-11-03-101112.local</span> is one Time Machine snapshot, named by its date and time. Leave any other snapshot alone: another backup app or a macOS update made it.',
+      warnTitle: 'Before you delete a snapshot',
+      warn: [
+        'It can’t be undone, and you can no longer restore files from that moment on this Mac.',
+        'Backups on your Time Machine disk aren’t affected.',
+        'macOS doesn’t say how much space a snapshot holds, so you can’t know in advance what you’ll get back.',
+        'Never delete snapshots or other files in /System or /private/var by hand.',
+      ],
+      deleteP: 'To delete one, put its date from the list in place of the example. Terminal asks for your Mac’s password, and shows nothing as you type it:',
+      label: 'Terminal',
+    },
+    cachedrop: {
+      p1: 'CacheDrop clears the parts of System Data that live in your own account and that apps make again: app caches, old temporary files, logs and crash reports, and developer caches and build files. It never deletes Time Machine local snapshots and never touches system files.',
+      doesTitle: 'What it clears',
+      does: [
+        'App caches: each app’s caches, with the app quit, and Old temporary files apps left in your temporary folder, unchanged for 3 days.',
+        'Logs and crash reports in your own Library.',
+        'Developer caches and build files: Xcode DerivedData, unavailable simulators, old device support files, package caches and Docker’s unused images and build cache.',
+        'Downloaded iCloud files: Remove local copies frees the space and keeps the originals in iCloud.',
+      ],
+      leavesTitle: 'What it leaves to you',
+      leaves: [
+        'Time Machine local snapshots: it shows how many there are, with Open Storage Settings. macOS doesn’t report their size.',
+        'iPhone and iPad backups, Mail and Messages attachments, and Photos libraries: their size, and the app that manages them.',
+        'System caches and logs in /Library and /System, which would need an admin password. CacheDrop never asks for one.',
+      ],
+      p2: 'Before anything is cleaned, CacheDrop checks each item again, skips what an open app is using, and afterwards shows the space it measured as freed.',
+    },
+    howTo: 'How to clear System Data on Mac',
+  },
+  fr: {
+    guide: {
+      ...guides.systemData.fr,
+      crumb: 'Guide des Données système',
+      headline: 'Comment vider les Données système sur Mac',
+      lede: 'Les Données système, c’est la barre grise des réglages de stockage que macOS n’explique pas. Voici ce qu’elle contient, ce que vous pouvez retirer sans risque et ce qu’il faut laisser en place.',
+      cta: 'Télécharger pour Mac',
+      ctaNote: 'Caches · Journaux · Fichiers de développement · macOS 14+',
+      updated: 'novembre 2026',
+      readTime: '8 min de lecture',
+      faqTitle: 'FAQ sur les Données système',
+      faq: [
+        ['Que sont les Données système sur un Mac?', 'C’est l’espace que macOS ne compte dans aucune de ses autres catégories, comme Applications, Documents ou Photos. On y trouve des caches, des journaux, des fichiers temporaires, des instantanés locaux Time Machine et des fichiers dont macOS lui-même se sert.'],
+        ['Pourquoi les Données système prennent-elles autant de place sur mon Mac?', 'Le plus souvent, ce sont des caches d’applications et de développement qui ont grossi pendant des mois, plus des instantanés locaux quand Time Machine est activé. macOS crée et supprime aussi des fichiers temporaires et des instantanés de lui-même, donc le chiffre peut monter et descendre d’un jour à l’autre.'],
+        ['Peut-on supprimer les Données système sans risque?', 'Pas en bloc, et macOS n’offre aucun bouton pour le faire. Certaines parties se suppriment sans risque : les caches et les journaux de votre propre dossier Bibliothèque, une fois leurs applications quittées. Laissez <span class="ic">/System</span>, <span class="ic">/Library</span> et <span class="ic">/private/var</span> tranquilles.'],
+        ['Redémarrer un Mac réduit-il les Données système?', 'Souvent un peu. Un redémarrage efface les fichiers d’échange que macOS écrit quand la mémoire manque, et certains fichiers temporaires. Les caches et les instantanés restent.'],
+        ['Comment supprimer les instantanés locaux Time Machine?', 'C’est rarement nécessaire : macOS les supprime après environ 24 heures, ou plus tôt quand l’espace manque. Pour en supprimer un vous-même, listez-les avec <span class="ic">tmutil listlocalsnapshots /</span> et supprimez-en un par sa date avec <span class="ic">sudo tmutil deletelocalsnapshots</span>. Les sauvegardes sur votre disque Time Machine ne sont pas touchées.'],
+        ['Pourquoi les Données système reviennent-elles après les avoir vidées?', 'Les caches et les journaux se remplissent de nouveau à mesure que vous utilisez vos applications : c’est leur rôle. Les vider vaut la peine quand ils ont grossi pendant des mois, pas tous les jours.'],
+        ['CacheDrop vide-t-il les Données système?', 'Il vide les parties qui se trouvent dans votre propre compte : les caches d’applications, les vieux fichiers temporaires, les journaux et rapports de plantage, et les caches et fichiers de compilation de développement. Il montre les instantanés locaux Time Machine et les sauvegardes d’appareils avec l’endroit où les gérer, et ne touche jamais aux fichiers système ni ne demande votre mot de passe.'],
+        ['Puis-je essayer CacheDrop avant d’acheter?', 'Oui. L’analyse est toujours gratuite, et le nettoyage est gratuit jusqu’à 2 Go libérés.'],
+      ] as Array<[string, string]>,
+      other: { eyebrow: 'Vous codez?', title: 'Comment vider DerivedData de Xcode, node_modules et les caches Docker', href: '/clear-mac-developer-caches/', link: 'Lire le guide pour développeurs' },
+      closing: { title: 'Voyez de quoi sont faites vos Données système.', body: 'CacheDrop nomme les caches, les journaux et les fichiers de développement qui les composent en une seule analyse, avec la taille de chacun.' },
+      trademarks: 'Apple, Mac, macOS, Finder, iCloud, Time Machine et Xcode sont des marques de commerce d’Apple Inc.',
+    },
+    toc: ['Que sont les Données système sur un Mac?', 'Pourquoi les Données système prennent-elles autant de place?', 'Que peut-on retirer des Données système sans risque?', 'Comment vider les Données système sur Mac', 'Comment supprimer les instantanés locaux Time Machine', 'Ce que CacheDrop vide, et ce qu’il laisse'],
+    what: {
+      p1: 'Les Données système, c’est l’espace que macOS ne compte dans aucune de ses autres catégories de stockage, comme Applications, Documents ou Photos. Il s’agit surtout de caches, de journaux, de fichiers temporaires et d’instantanés, plus des fichiers dont macOS a besoin pour fonctionner.',
+      p2: 'Pour les voir, ouvrez Réglages Système › Général › Stockage et attendez que chaque taille ait fini d’être calculée. macOS ne détaille pas davantage les Données système; la suite de ce guide montre où regarder.',
+    },
+    why: {
+      p1: 'Les Données système grossissent parce que les applications, les outils de développement et macOS gardent des copies pour gagner du temps plus tard, et font rarement le ménage derrière eux. En quelques mois, quelques gigaoctets de caches et de journaux peuvent devenir des dizaines de gigaoctets.',
+      items: [
+        'Les caches : les applications et les navigateurs gardent des fichiers téléchargés ou générés dans <span class="ic">~/Library/Caches</span> pour s’ouvrir plus vite. Ils les reconstruisent au besoin.',
+        'Les journaux, rapports de plantage et fichiers temporaires : <span class="ic">~/Library/Logs</span> et votre propre dossier temporaire se remplissent à mesure que les applications tournent.',
+        'Les fichiers de développement : DerivedData de Xcode, les simulateurs, Docker et les caches de paquets peuvent à eux seuls atteindre des dizaines de gigaoctets.',
+        'Les copies iCloud : les fichiers iCloud Drive que vous avez ouverts restent téléchargés sur ce Mac. macOS les compte habituellement dans iCloud Drive, mais les données que des applications synchronisent et gardent dans votre dossier Bibliothèque peuvent apparaître dans les Données système.',
+        'Les instantanés locaux Time Machine : tant que Time Machine est activé, macOS garde des instantanés de votre disque sur le disque lui-même, pour que vous puissiez restaurer des fichiers quand votre disque de sauvegarde n’est pas branché.',
+      ],
+    },
+    safe: {
+      p1: 'Les caches et les journaux de votre propre dossier Bibliothèque se suppriment sans risque une fois leurs applications quittées, parce que les applications les recréent au besoin. Tout ce que macOS garde dans les dossiers système, et les données que les applications gardent dans Application Support, doit rester en place.',
+      what: 'Quoi',
+      todo: 'Que faire',
+      rows: [
+        ['Caches d’applications', '~/Library/Caches', 'Se suppriment sans risque une fois l’application quittée. Elle les recrée, et peut donc être plus lente la première fois.'],
+        ['Journaux et rapports de plantage', '~/Library/Logs', 'Se suppriment sans risque. Les applications en écrivent de nouveaux en tournant.'],
+        ['Caches et fichiers de compilation de développement', '~/Library/Developer', 'Se suppriment sans risque une fois vos outils quittés; voyez le <a class="textlink" href="{dev}" style="color: var(--accent-text); font-weight: 500">guide pour développeurs</a>.'],
+        ['Fichiers iCloud téléchargés', 'iCloud Drive', 'Supprimez le téléchargement dans le Finder. Le fichier reste dans iCloud et se télécharge de nouveau quand vous l’ouvrez.'],
+        ['Sauvegardes d’iPhone et d’iPad', '~/Library/Application Support/MobileSync/Backup', 'Supprimez les anciennes dans le Finder : sélectionnez l’appareil branché, puis Gérer les sauvegardes.'],
+        ['Instantanés locaux Time Machine', 'tmutil listlocalsnapshots /', 'macOS les supprime de lui-même. N’en supprimez un vous-même que si vous avez besoin de l’espace tout de suite (plus bas).'],
+        ['Données et réglages des applications', '~/Library/Application Support, ~/Library/Containers', 'Laissez-les tranquilles. Ils contiennent vos réglages, vos documents et vos connexions.'],
+        ['Fichiers système', '/System, /Library, /private/var', 'Laissez-les tranquilles. macOS en a besoin, et les supprimer peut empêcher des applications ou macOS de fonctionner.'],
+      ] as Array<[string, string, string]>,
+    },
+    clear: {
+      p1: 'Pour vider les Données système à la main, retirez les caches, les journaux et les fichiers de développement de votre propre dossier Bibliothèque, puis redémarrez. Quittez d’abord les applications, et mettez les éléments à la Corbeille plutôt que de les supprimer, pour pouvoir remettre en place ce qui vous manquerait.',
+      manualTitle: 'La méthode manuelle',
+      manual: [
+        'Ouvrez Réglages Système › Général › Stockage et attendez les tailles, pour savoir d’où vous partez.',
+        'Quittez vos applications. Dans le Finder, choisissez Aller › Aller au dossier, entrez ~/Library/Caches et mettez à la Corbeille les dossiers des applications que vous connaissez.',
+        'Faites de même dans ~/Library/Logs pour les vieux journaux et rapports de plantage.',
+        'Retirez les fichiers de développement dont vous n’avez pas besoin, comme DerivedData de Xcode, avec le guide pour développeurs.',
+        'Dans iCloud Drive, cliquez en maintenant la touche Contrôle sur les fichiers dont vous n’avez pas besoin sur ce Mac et choisissez Supprimer le téléchargement. Ils restent dans iCloud.',
+        'Videz la Corbeille, puis redémarrez votre Mac, ce qui efface aussi ses fichiers d’échange.',
+        'Vérifiez de nouveau le Stockage.',
+      ],
+      oursTitle: 'La méthode CacheDrop',
+      ours: [
+        'Lancez une analyse. Overview liste chaque catégorie avec sa taille, et Smart clean choisit ce qui se nettoie sans risque, tout coché.',
+        'Décochez ce que vous voulez garder dans App caches, Logs and crash reports et Developer caches and build files.',
+        'Vérifiez, puis Clean up. Les caches et les journaux que les applications recréent sont supprimés; vos fichiers vont à la Corbeille. Une application ouverte garde ses caches jusqu’à ce que vous la quittiez.',
+        'Pour Downloaded iCloud files, Remove local copies garde les originaux dans iCloud.',
+      ],
+      sizesKicker: 'Voir ce qui prend la place',
+      sizesP: 'Ces commandes lisent seulement les tailles et ne changent rien. Elles listent les 15 plus gros dossiers de votre dossier Bibliothèque, puis de son dossier Caches. macOS peut demander si Terminal peut accéder aux données d’autres applications : les deux réponses conviennent, la liste laisse simplement ces dossiers de côté.',
+      label: 'Terminal',
+    },
+    snapshots: {
+      p1: 'Vous n’avez habituellement pas besoin de supprimer les instantanés locaux Time Machine : macOS les garde environ 24 heures et supprime les plus anciens de lui-même quand l’espace manque. Si vous avez besoin de l’espace tout de suite, vous pouvez en supprimer un par sa date dans Terminal.',
+      listP: 'D’abord, listez-les. Cette commande ne fait que lire et ne demande aucun mot de passe :',
+      listNote: 'Chaque ligne comme <span class="ic">com.apple.TimeMachine.2026-11-03-101112.local</span> est un instantané Time Machine, nommé par sa date et son heure. Laissez tout autre instantané tranquille : une autre application de sauvegarde ou une mise à jour de macOS l’a créé.',
+      warnTitle: 'Avant de supprimer un instantané',
+      warn: [
+        'C’est irréversible, et vous ne pourrez plus restaurer de fichiers de ce moment-là sur ce Mac.',
+        'Les sauvegardes sur votre disque Time Machine ne sont pas touchées.',
+        'macOS n’indique pas l’espace qu’occupe un instantané; vous ne pouvez donc pas savoir d’avance ce que vous récupérerez.',
+        'Ne supprimez jamais à la main des instantanés ou d’autres fichiers dans /System ou /private/var.',
+      ],
+      deleteP: 'Pour en supprimer un, remplacez la date de l’exemple par une date de la liste. Terminal demande le mot de passe de votre Mac et n’affiche rien pendant que vous le tapez :',
+      label: 'Terminal',
+    },
+    cachedrop: {
+      p1: 'CacheDrop vide les parties des Données système qui se trouvent dans votre propre compte et que les applications recréent : les caches d’applications, les vieux fichiers temporaires, les journaux et rapports de plantage, et les caches et fichiers de compilation de développement. Il ne supprime jamais les instantanés locaux Time Machine et ne touche jamais aux fichiers système.',
+      doesTitle: 'Ce qu’il vide',
+      does: [
+        'App caches : les caches de chaque application, une fois l’application quittée, et Old temporary files, les fichiers temporaires que des applications ont laissés dans votre dossier temporaire, inchangés depuis 3 jours.',
+        'Les journaux et rapports de plantage de votre propre dossier Bibliothèque.',
+        'Developer caches and build files : DerivedData de Xcode, les simulateurs indisponibles, les vieux fichiers de prise en charge d’appareils, les caches de paquets, et les images et le cache de compilation inutilisés de Docker.',
+        'Downloaded iCloud files : Remove local copies libère l’espace et garde les originaux dans iCloud.',
+      ],
+      leavesTitle: 'Ce qu’il vous laisse',
+      leaves: [
+        'Les instantanés locaux Time Machine : il montre combien il y en a, avec Open Storage Settings. macOS n’en indique pas la taille.',
+        'Les sauvegardes d’iPhone et d’iPad, les pièces jointes de Mail et de Messages, et les bibliothèques Photos : leur taille, et l’application qui les gère.',
+        'Les caches et journaux système de /Library et /System, qui demanderaient un mot de passe d’administrateur. CacheDrop n’en demande jamais.',
+      ],
+      p2: 'Avant de nettoyer quoi que ce soit, CacheDrop vérifie de nouveau chaque élément, laisse de côté ce qu’une application ouverte utilise, puis affiche l’espace qu’il a mesuré comme libéré.',
+    },
+    howTo: 'Comment vider les Données système sur Mac',
+  },
+};
+const lang = langOf(Astro.url);
+const t = copy[lang];
+const dev = lang === 'fr' ? '/fr/clear-mac-developer-caches/' : '/clear-mac-developer-caches/';
+const ids = ['what', 'why', 'safe', 'clear', 'snapshots', 'cachedrop'];
+const howTo = { name: t.howTo, steps: t.clear.manual };
+---
+<Guide {...t.guide} path="/clear-system-data-mac/" dateModified="2026-11-03" howTo={howTo}>
+<Toc items={[...ids.map((id, i) => [`#${id}`, t.toc[i]] as [string, string]), ['#faq', t.guide.faqTitle]]} />
+
+<section id="what" style="padding-top: var(--space-16); display: flex; flex-direction: column; gap: var(--space-5)">
+<h2 style={guideH2}>{t.toc[0]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.what.p1}</p>
+<p style={`${guideP}; text-wrap: pretty`}>{t.what.p2}</p>
+</section>
+
+<section id="why" style={section}>
+<h2 style={guideH2}>{t.toc[1]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.why.p1}</p>
+<ul style={list}>{t.why.items.map((s) => <li set:html={s}></li>)}</ul>
+</section>
+
+<section id="safe" style={section}>
+<h2 style={guideH2}>{t.toc[2]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.safe.p1}</p>
+<table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 21px; color: var(--ink-body)">
+<thead><tr><th scope="col" style={head}>{t.safe.what}</th><th scope="col" style={head}>{t.safe.todo}</th></tr></thead>
+<tbody>
+{t.safe.rows.map(([what, where, todo]) => (
+<tr><th scope="row" style={`${cell}; font-weight: 600; width: 42%`}><div style="display: flex; flex-direction: column; gap: var(--space-1-5)"><span>{what}</span><span class="ic" style="align-self: flex-start; font-weight: 400; overflow-wrap: anywhere">{where}</span></div></th><td style={cell} set:html={todo.replace('{dev}', dev)}></td></tr>
+))}
+</tbody>
+</table>
+</section>
+
+<section id="clear" style={section}>
+<h2 style={guideH2}>{t.toc[3]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.clear.p1}</p>
+<div style={pair}>
+<div style={manual}>
+<h3 style={h3}>{t.clear.manualTitle}</h3>
+<ol style={list}>{t.clear.manual.map((s) => <li>{s}</li>)}</ol>
+</div>
+<div style={ours}>
+<h3 style={h3}>{t.clear.oursTitle}</h3>
+<ol style={list}>{t.clear.ours.map((s) => <li>{s}</li>)}</ol>
+</div>
+</div>
+<Kicker>{t.clear.sizesKicker}</Kicker>
+<p style={`${guideP}; text-wrap: pretty`}>{t.clear.sizesP}</p>
+<CodeBlock label={t.clear.label} code={sizes} />
+</section>
+
+<section id="snapshots" style={section}>
+<h2 style={guideH2}>{t.toc[4]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.snapshots.p1}</p>
+<p style={`${guideP}; text-wrap: pretty`}>{t.snapshots.listP}</p>
+<CodeBlock label={t.snapshots.label} code={listSnapshots} />
+<p style={`${guideP}; text-wrap: pretty`} set:html={t.snapshots.listNote}></p>
+<div data-warning style={manual}>
+<h3 style={h3}>{t.snapshots.warnTitle}</h3>
+<ul style={list}>{t.snapshots.warn.map((s) => <li>{s}</li>)}</ul>
+</div>
+<p style={`${guideP}; text-wrap: pretty`}>{t.snapshots.deleteP}</p>
+<CodeBlock label={t.snapshots.label} code={deleteSnapshot} />
+</section>
+
+<section id="cachedrop" style={section}>
+<h2 style={guideH2}>{t.toc[5]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.cachedrop.p1}</p>
+<div style={pair}>
+<div style={ours}>
+<h3 style={h3}>{t.cachedrop.doesTitle}</h3>
+<ul style={list}>{t.cachedrop.does.map((s) => <li>{s}</li>)}</ul>
+</div>
+<div style={manual}>
+<h3 style={h3}>{t.cachedrop.leavesTitle}</h3>
+<ul style={list}>{t.cachedrop.leaves.map((s) => <li>{s}</li>)}</ul>
+</div>
+</div>
+<p style={`${guideP}; text-wrap: pretty`}>{t.cachedrop.p2}</p>
+</section>
+</Guide>

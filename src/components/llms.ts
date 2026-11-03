@@ -6,7 +6,7 @@ import { guides } from './guides';
 import { pricingCopy } from './pricing';
 import { localize, type Lang } from '../i18n';
 
-const guideKeys = ['developer', 'creator', 'producer'] as const;
+const guideKeys = ['developer', 'creator', 'producer', 'systemData'] as const;
 
 /** The file's text, with absolute links on `site` (e.g. `https://cachedrop.io`). */
 export function llmsTxt(site: string): string {

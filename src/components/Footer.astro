@@ -6,6 +6,7 @@
 // The language switch at the end of that row is Decision 5: it opens this page in the other language.
 // "Resend License Key" at the end of Product is Decision 42.
 // The producer page's link after the two guides is Decision 48.
+// The System Data guide's link after it is #110.
 import BrandMark from './BrandMark.astro';
 import { footerCopy as copy } from './footer';
 import { langOf, localize, other } from '../i18n';
@@ -40,6 +41,7 @@ const { path, overview = false, trademarks = t.trademarks } = Astro.props;
 <a class="flink" href={href('/clear-mac-developer-caches/')}>{t.developer}</a>
 <a class="flink" href={href('/clear-adobe-media-cache-mac/')}>{t.creator}</a>
 <a class="flink" href={href('/uninstall-audio-plugins-mac/')}>{t.producer}</a>
+<a class="flink" href={href('/clear-system-data-mac/')}>{t.systemData}</a>
 </nav>
 <nav aria-label="Product" style="display: flex; flex-direction: column; gap: var(--space-2-5); font-size: 13px">
 <h3 style="margin: 0 0 var(--space-1); font-size: 13px; font-weight: 600">{t.product}</h3>

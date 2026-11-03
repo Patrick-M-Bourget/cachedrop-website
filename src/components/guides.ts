@@ -35,4 +35,15 @@ export const guides = {
       description: 'Désinstallez les plug-ins VST, VST3, AU, AAX et CLAP sur Mac avec tous les fichiers qu’ils ont installés, trouvez où sont rangés les plug-ins et videz le cache d’Ableton Live sans toucher à vos licences.',
     },
   },
+  systemData: {
+    path: '/clear-system-data-mac/',
+    en: {
+      title: 'How to Clear System Data on Mac (and Why It’s So Big)',
+      description: 'What System Data on Mac is, why it grows so big, and what’s safe to remove: caches, logs, developer files and Time Machine local snapshots, with the Terminal commands and the risks.',
+    },
+    fr: {
+      title: 'Vider les Données système sur Mac (et pourquoi elles grossissent)',
+      description: 'Ce que sont les Données système sur Mac, pourquoi elles grossissent autant et ce que vous pouvez supprimer sans risque : caches, journaux, fichiers de développement et instantanés locaux Time Machine, avec les commandes Terminal et leurs risques.',
+    },
+  },
 } as const;

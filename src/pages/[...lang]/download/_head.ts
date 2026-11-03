@@ -25,6 +25,6 @@ export const downloadMeta = {
 
 /** The links to the guides at the bottom of both pages. */
 export const guideLinks = {
-  en: ['Clear Developer Caches guide', 'Clear Adobe Media Cache guide'],
-  fr: ['Guide pour vider les caches de développement', 'Guide pour vider le cache de média Adobe'],
+  en: ['Clear Developer Caches guide', 'Clear Adobe Media Cache guide', 'Clear System Data guide'],
+  fr: ['Guide pour vider les caches de développement', 'Guide pour vider le cache de média Adobe', 'Guide pour vider les Données système'],
 };
