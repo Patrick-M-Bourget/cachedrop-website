@@ -2,7 +2,7 @@
 // Sticky frosted nav from the handoff. On the homepage the logo links to #top;
 // elsewhere it links to /. `current` marks the matching nav link with aria-current.
 // With pricing live (Decision 44) the BETA badge goes, a Pricing link follows the two guides and
-// the button reads "Download Free".
+// the button reads "Download Free". For Producers follows For Creators (Decision 48).
 import BrandMark from './BrandMark.astro';
 import { pricingLive, withLaunch } from './pricing';
 import { langOf, localize } from '../i18n';
@@ -15,8 +15,8 @@ interface Props {
 }
 
 const copy = {
-  en: { home: 'CacheDrop home', beta: 'BETA', primary: 'Primary', developers: 'For Developers', creators: 'For Creators', feedback: 'Provide Feedback', download: 'Get Free Beta' },
-  fr: { home: 'Accueil CacheDrop', beta: 'BÊTA', primary: 'Principale', developers: 'Pour les développeurs', creators: 'Pour les créateurs', feedback: 'Donner votre avis', download: 'Obtenir la bêta gratuite' },
+  en: { home: 'CacheDrop home', beta: 'BETA', primary: 'Primary', developers: 'For Developers', creators: 'For Creators', producers: 'For Producers', feedback: 'Provide Feedback', download: 'Get Free Beta' },
+  fr: { home: 'Accueil CacheDrop', beta: 'BÊTA', primary: 'Principale', developers: 'Pour les développeurs', creators: 'Pour les créateurs', producers: 'Pour les producteurs', feedback: 'Donner votre avis', download: 'Obtenir la bêta gratuite' },
 };
 const launch = {
   en: { pricing: 'Pricing', download: 'Download Free' },
@@ -28,6 +28,7 @@ const { homeHref = localize(lang, '/'), current } = Astro.props;
 const links = [
   { path: '/clear-mac-developer-caches/', label: t.developers },
   { path: '/clear-adobe-media-cache-mac/', label: t.creators },
+  { path: '/uninstall-audio-plugins-mac/', label: t.producers },
   ...(pricingLive ? [{ path: '/pricing/', label: t.pricing }] : []),
 ];
 ---

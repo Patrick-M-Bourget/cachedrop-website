@@ -22,6 +22,10 @@ The target is Quebec French, following the Office québécois de la langue fran�
 
 | English | French | Note |
 | --- | --- | --- |
+| plug-in (audio) | plug-in, les plug-ins | Masculine. What producers say; OQLF's « module d’extension » is rare in studios. *Owner: check.* |
+| DAW | STAN (station audionumérique) | *Owner: « DAW » is also common among Quebec producers.* |
+| installer receipt | reçu de l’installateur | macOS's receipts in `/var/db/receipts`. |
+| support files | fichiers de soutien | Files an installer adds beside the plug-in. |
 | cache, caches | le cache, les caches | Masculine. OQLF's « antémémoire » is unknown to most readers. |
 | clear (a cache) | vider | « Vider le cache de média Adobe ». |
 | delete | supprimer | |
