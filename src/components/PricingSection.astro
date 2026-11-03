@@ -42,7 +42,7 @@ const textLink = 'color: var(--accent-text); font-weight: 500';
 <p style="margin: var(--space-3) 0 0; font-size: 13px; line-height: 19px; color: var(--ink-secondary)">{t.currencies}</p>
 </div>
 <div style="display: flex; flex-wrap: wrap; gap: var(--space-3)">
-<a class="btn-primary" href={buyHref(lang)} style={primaryLg}><span>{t.buy} ·{discounted && <> <span class="sr-only">{t.wasWord}</span>{' '}<s>{t.was}</s> <span class="sr-only">{t.nowWord}</span></>} {t.now} {t.buyOnce}</span></a>
+<a class="btn-primary" href={buyHref(lang)} style={primaryLg}><span>{t.buy} ·{discounted && <> <span class="sr-only">{t.wasWord}</span>{' '}<s>{t.was}</s> <span class="sr-only">{t.nowWord}</span></>} {t.now}{t.buyOnce && ` ${t.buyOnce}`}</span></a>
 <a class="btn-ghost" href={localize(lang, '/download/')} style={secondaryLg}>{t.download}</a>
 </div>
 <ul aria-label={t.included} style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column">

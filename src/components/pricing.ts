@@ -69,7 +69,8 @@ export const pricingCopy = {
       'Remboursement dans les 30 jours, sans avoir à vous justifier',
     ],
     buy: 'Acheter',
-    buyOnce: 'une seule fois',
+    // No « une seule fois » on the button: it wraps at 390 px, and the price above already says it (owner, #107).
+    buyOnce: '',
     wasWord: 'prix régulier',
     nowWord: 'maintenant',
     download: 'Télécharger pour Mac',

@@ -29,7 +29,7 @@ const copy = {
     currencies: 'Payez en USD, CAD, EUR, GBP ou AUD : le même montant dans chaque devise.',
     items: ['Nettoyage gratuit jusqu’à 2 Go, et l’analyse est toujours gratuite', 'Sur un maximum de 3 de vos Mac', 'Toutes les versions 1.x', 'Remboursement dans les 30 jours, sans avoir à vous justifier'],
     news: 'Envoyez-moi des nouvelles de CacheDrop par courriel : nouvelles fonctionnalités et sondages.',
-    buy: ['Acheter · prix régulier 29,99\u00a0$ maintenant 19,99\u00a0$ une seule fois', '/buy?lang=fr'],
+    buy: ['Acheter · prix régulier 29,99\u00a0$ maintenant 19,99\u00a0$', '/buy?lang=fr'],
     legal: [['conditions de vente', '/fr/terms-of-sale/'], ['politique de remboursement', '/fr/refund-policy/'], ['contrat de licence', '/fr/license-agreement/']],
     tried: ['Vous l’avez déjà essayé?', 'Achetez une licence'],
   },

@@ -56,7 +56,7 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | Provide Feedback / Give Fast Feedback | Donner votre avis | One label for both. |
 | Download for Mac (button; Decision 51) | Télécharger pour Mac | Every button to `/download/`: nav, footer, guides, pricing. |
 | Try CacheDrop (inline link) | Essayer CacheDrop | |
-| Buy · $29.99 once (button) | Acheter · 29,99 $ une seule fois | With the offer, the regular price is struck through before the offer. |
+| Buy · $29.99 once (button) | Acheter · 29,99 $ | Without « une seule fois », which the price above states and which wraps the button on phones (#107). With the offer, the regular price is struck through before the offer. |
 | Try it before you buy · No card needed · macOS 14 or later | Essayez-le avant d’acheter · Aucune carte requise · macOS 14 ou version ultérieure | The line under the primary button. |
 | free to try | essai gratuit; vous pouvez l’essayer gratuitement | « Essai gratuit » as a label, the verb in a sentence. |
 | Pricing (nav link, section) | Tarifs | Owner, 2026-11-02. |
