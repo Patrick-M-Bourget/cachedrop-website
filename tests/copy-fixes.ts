@@ -180,8 +180,8 @@ export const copyFixes: Record<string, CopyFix[]> = {
   'download/index.html': [
     {
       from: 'Download the free CacheDrop beta for Mac: a universal app',
-      to: 'Download CacheDrop for Mac, free to try: a universal app',
-      why: 'Decision 44: the description drops “beta”.',
+      to: 'Download CacheDrop for Mac: a universal app',
+      why: 'Decisions 44 and 51: the description drops “beta” and “free to try”.',
     },
     { from: 'Thanks for trying the CacheDrop beta.', to: 'Thanks for trying CacheDrop.', why: 'Decision 52.' },
     { from: 'CacheDrop is free while in beta.', to: 'CacheDrop is free to try.', why: 'Decision 44.' },

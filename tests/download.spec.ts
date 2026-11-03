@@ -23,6 +23,11 @@ test.describe('every Download button leads to the form', () => {
   test('and the form asks for an email', async ({ page }) => {
     await page.goto('/download/');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Download CacheDrop for Mac.');
+    await expect(page.getByText('We’ll email your download link and let you know when updates are ready.')).toBeVisible();
+    // The trial is stated once, in the email (Decision 51), so the page's meta line doesn't.
+    await expect(page.getByText('Universal: Apple Silicon & Intel')).toBeVisible();
+    await expect(page.getByText(/free to try/i)).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Uninstall Audio Plug-ins guide' })).toHaveAttribute('href', '/uninstall-audio-plugins-mac/');
     await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
     await expect(page.getByRole('radio')).toHaveCount(4);
     await expect(page.getByRole('radio', { checked: true })).toHaveCount(0);
@@ -45,7 +50,7 @@ test.describe('the form', () => {
     await page.goto('/download/');
     await page.getByLabel('Email', { exact: true }).fill(' ada@example.com ');
     await page.getByLabel('Video & photo').check();
-    await page.getByRole('button', { name: 'Send Download Link' }).click();
+    await page.getByRole('button', { name: 'Email Me the Link' }).click();
 
     await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeFocused();
     await expect(page.getByText('We sent a download link to ada@example.com.')).toBeVisible();
@@ -66,7 +71,7 @@ test.describe('the form', () => {
     const requests = await mockSignup(page);
     await page.goto('/download/');
     await page.getByLabel('Email', { exact: true }).fill('ada@example');
-    await page.getByRole('button', { name: 'Send Download Link' }).click();
+    await page.getByRole('button', { name: 'Email Me the Link' }).click();
     await expect(page.getByRole('alert')).toHaveText('Enter a full email address, like you@example.com.');
     await expect(page.getByLabel('Email', { exact: true })).toHaveAttribute('aria-invalid', 'true');
     expect(requests).toEqual([]);
@@ -76,7 +81,7 @@ test.describe('the form', () => {
     await mockSignup(page, 400, { error: 'invalid_email' });
     await page.goto('/download/');
     await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
-    await page.getByRole('button', { name: 'Send Download Link' }).click();
+    await page.getByRole('button', { name: 'Email Me the Link' }).click();
     await expect(page.getByRole('alert')).toHaveText('Enter a full email address, like you@example.com.');
   });
 
@@ -84,19 +89,63 @@ test.describe('the form', () => {
     await mockSignup(page, 502, { error: 'email_failed' });
     await page.goto('/download/');
     await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
-    await page.getByRole('button', { name: 'Send Download Link' }).click();
+    await page.getByRole('button', { name: 'Email Me the Link' }).click();
     await expect(page.getByRole('alert')).toHaveText('We couldn’t send the link. Check your connection and try again.');
-    await expect(page.getByRole('button', { name: 'Send Download Link' })).toBeEnabled();
+    await expect(page.getByRole('button', { name: 'Email Me the Link' })).toBeEnabled();
   });
 
   test('"Use a Different Email" brings the form back', async ({ page }) => {
     await mockSignup(page);
     await page.goto('/download/');
     await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
-    await page.getByRole('button', { name: 'Send Download Link' }).click();
+    await page.getByRole('button', { name: 'Email Me the Link' }).click();
     await page.getByRole('button', { name: 'Use a Different Email' }).click();
     await expect(page.getByLabel('Email', { exact: true })).toBeFocused();
     await expect(page.getByLabel('Email', { exact: true })).toHaveValue('');
+  });
+
+  // Decision 53: the done state opens the inbox and sends the email again.
+  test('the done state opens Gmail and Outlook in a new tab', async ({ page }) => {
+    await mockSignup(page);
+    await page.goto('/download/');
+    await page.getByLabel('Email', { exact: true }).fill('ada+mac@example.com');
+    await page.getByRole('button', { name: 'Email Me the Link' }).click();
+    const gmail = page.getByRole('link', { name: 'Open Gmail' });
+    const outlook = page.getByRole('link', { name: 'Open Outlook' });
+    await expect(gmail).toBeVisible();
+    await expect(outlook).toBeVisible();
+    // Gmail opens the account that was typed and searches every folder, spam included, for the sender.
+    await expect(gmail).toHaveAttribute('href', 'https://mail.google.com/mail/u/?authuser=ada%2Bmac%40example.com#search/from%3Ahello%40cachedrop.io+in%3Aanywhere');
+    await expect(outlook).toHaveAttribute('href', 'https://outlook.live.com/mail/0/');
+    for (const link of [gmail, outlook]) {
+      await expect(link).toHaveAttribute('target', '_blank');
+      await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    }
+  });
+
+  test('"Send it again" sends the same signup again and says so', async ({ page }) => {
+    const requests = await mockSignup(page);
+    await page.goto('/download/');
+    await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
+    await page.getByLabel('Development').check();
+    await page.getByRole('button', { name: 'Email Me the Link' }).click();
+    await expect(page.getByText('Didn’t get it?')).toBeVisible();
+    await page.getByRole('button', { name: 'Send it again' }).click();
+    await expect(page.getByRole('status')).toHaveText('Sent again. It can take a minute to arrive.');
+    await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
+    const sent = { email: 'ada@example.com', filling: 'development', news: false, lang: 'en', turnstile };
+    expect(requests).toEqual([sent, sent]);
+  });
+
+  test('"Send it again" says why when the second email could not be sent', async ({ page }) => {
+    let calls = 0;
+    await page.route('**/api/signup', (route) => route.fulfill(++calls === 1 ? { json: { ok: true } } : { status: 502, json: { error: 'email_failed' } }));
+    await page.goto('/download/');
+    await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
+    await page.getByRole('button', { name: 'Email Me the Link' }).click();
+    await page.getByRole('button', { name: 'Send it again' }).click();
+    await expect(page.getByRole('status')).toHaveText('We couldn’t send the link. Check your connection and try again.');
+    await expect(page.getByRole('button', { name: 'Send it again' })).toBeEnabled();
   });
 
   test('offers the news opt-in unticked, and the download never depends on it (Decision 3)', async ({ page }) => {
@@ -106,7 +155,7 @@ test.describe('the form', () => {
     await expect(news).not.toBeChecked();
     await expect(news).toHaveAccessibleDescription('Optional. You can unsubscribe at any time from any of our emails.');
     await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
-    await page.getByRole('button', { name: 'Send Download Link' }).click();
+    await page.getByRole('button', { name: 'Email Me the Link' }).click();
     await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
     expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false, lang: 'en', turnstile }]);
   });
@@ -116,7 +165,7 @@ test.describe('the form', () => {
     await page.goto('/download/');
     await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
     await page.getByRole('checkbox', { name: NEWS, exact: true }).check();
-    await page.getByRole('button', { name: 'Send Download Link' }).click();
+    await page.getByRole('button', { name: 'Email Me the Link' }).click();
     await page.getByRole('button', { name: 'Use a Different Email' }).click();
     await expect(page.getByRole('checkbox', { name: NEWS, exact: true })).not.toBeChecked();
     expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: true, lang: 'en', turnstile }]);
@@ -174,7 +223,7 @@ test.describe('the token page', () => {
       expect(starts).toEqual([]);
 
       await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
-      await page.getByRole('button', { name: 'Send Download Link' }).click();
+      await page.getByRole('button', { name: 'Email Me the Link' }).click();
       await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
       expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false, lang: 'en', turnstile }]);
     });
