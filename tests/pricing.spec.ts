@@ -160,7 +160,7 @@ test('the /pricing/ title and meta lead with what CacheDrop does, then the price
 // compare page's job; this fails if the switch and the build disagree either way.
 for (const lang of ['en', 'fr'] as const) {
   test(`${lang}: the pricing card links to the compare page exactly when it is live`, async ({ page, request }) => {
-    const target = lang === 'en' ? '/compare/' : '/fr/compare/';
+    const target = lang === 'en' ? '/cleanmymac-alternative/' : '/fr/cleanmymac-alternative/';
     const res = await request.get(target);
     const live = res.status() === 200 && !/<meta name="robots"[^>]*noindex/.test(await res.text());
     expect(compareLive[lang], `compareLive.${lang} must match whether ${target} is live`).toBe(live);
