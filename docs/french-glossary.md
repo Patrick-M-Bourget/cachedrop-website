@@ -31,6 +31,13 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | delete | supprimer | |
 | Trash | Corbeille | macOS's name. Capitalized. |
 | System Data | Données système | macOS's name in Storage settings. |
+| System Settings › General › Storage | Réglages Système › Général › Stockage | macOS's names (#110). |
+| Time Machine local snapshot | instantané local Time Machine | Apple's French support term (#110). |
+| swap files | fichiers d’échange | (#110). *Owner: check.* |
+| crash report | rapport de plantage | (#110). |
+| Remove Download (Finder) | Supprimer le téléchargement | Finder's French menu item (#110). *Owner: check against a French Finder.* |
+| Go › Go to Folder (Finder) | Aller › Aller au dossier | Finder's French menu (#110). |
+| Manage Backups (Finder) | Gérer les sauvegardes | Finder's French button (#110). *Owner: check.* |
 | storage cleaner | nettoyeur de stockage | « nettoyeur de stockage pour Mac ». |
 | free up space | libérer de l’espace | Main search term with « nettoyer son Mac ». |
 | build files, build output | fichiers de compilation, produits de compilation | |
