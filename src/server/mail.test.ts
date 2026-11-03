@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { mailerFor, siteUrlFrom } from './mail.ts';
 
-const EMAIL = { to: 'ada@example.com', subject: 'Your CacheDrop download link', text: 'text', html: '<p>html</p>' };
+const EMAIL = { to: 'ada@example.com', subject: 'Your CacheDrop download', text: 'text', html: '<p>html</p>' };
 
 function fakeResend(status = 200) {
   const calls: Array<{ url: string; init: RequestInit }> = [];

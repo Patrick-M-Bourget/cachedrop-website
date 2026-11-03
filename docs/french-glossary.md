@@ -7,7 +7,7 @@ The target is Quebec French, following the Office québécois de la langue fran�
 ## Conventions
 
 - **Address the reader as « vous ».** Same voice as the brand guide: plain, specific, calm. No exclamation marks.
-- **Sentence case everywhere.** French has no Title Case: buttons, card titles and headings capitalize only the first word and proper nouns (« Envoyer le lien de téléchargement », not « Envoyer le Lien de Téléchargement »). Buttons are infinitives (« Envoyer », « Annuler »).
+- **Sentence case everywhere.** French has no Title Case: buttons, card titles and headings capitalize only the first word and proper nouns (« Renvoyer la clé de licence », not « Renvoyer la Clé de Licence »). Buttons are infinitives (« Envoyer », « Annuler »).
 - **Punctuation (OQLF).** A non-breaking space before the colon (` :`). No space before `?`, `!` and `;`. Guillemets « » with non-breaking spaces inside. The apostrophe is the typographic `’`, as in the English pages.
 - **Units.** `Go`, `Mo` (gigaoctet, mégaoctet) with a non-breaking space after the number: « 100 Go+ », « 500 Mo+ ».
 - **Names stay as their owners write them.** CacheDrop, Mac, macOS, Xcode, DerivedData, node_modules, Docker, Homebrew, npm, Yarn, Premiere Pro, After Effects, Media Encoder, Final Cut Pro, Apple Silicon, Intel, Finder, Terminal. Commands, paths and file types are never translated.
@@ -72,12 +72,17 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | download link | lien de téléchargement | |
 | unsubscribe | se désabonner | The page says « Désabonnement confirmé. », which avoids choosing a gender for « vous êtes désabonné(e) ». |
 | Check your inbox | Vérifiez vos courriels | |
+| Email Me the Link (button; Decision 51) | M’envoyer le lien | The download form's button. |
+| Open Gmail, Open Outlook | Ouvrir Gmail, Ouvrir Outlook | The done state's buttons (Decision 53). |
+| Didn’t get it? Send it again | Rien reçu? Renvoyer le lien | The done state's resend link. |
+| Your CacheDrop download (email subject) | Votre téléchargement CacheDrop | Decision 53. |
+| Your first steps | Vos premières étapes | The download email's steps. |
 | disk image | image disque | |
 | Locations & access (app section) | stays in English | The app’s own label. |
 | repository (GitHub) | dépôt | |
 | issue (GitHub) | ticket (issue) | |
 | spam protection | protection contre les pourriels | « vérification antipourriel » for Turnstile. |
-| Submit Feedback | Envoyer mon avis | Distinct from the form's « Envoyer le lien de téléchargement ». |
+| Submit Feedback | Envoyer mon avis | Distinct from the download form's « M’envoyer le lien ». |
 | news emails | courriels de nouvelles | |
 | privacy policy | politique de confidentialité | |
 | personal information | renseignements personnels | Law 25's term. |

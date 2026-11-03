@@ -30,7 +30,7 @@ test.describe('the French download form', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Téléchargez CacheDrop pour Mac.');
     await page.getByLabel('Courriel', { exact: true }).fill('ada@example.com');
     await page.getByRole('radio', { name: 'Développement' }).check();
-    await page.getByRole('button', { name: 'Envoyer le lien de téléchargement' }).click();
+    await page.getByRole('button', { name: 'M’envoyer le lien' }).click();
     await expect(page.getByRole('heading', { name: 'Vérifiez vos courriels' })).toBeFocused();
     expect(requests).toEqual([{ email: 'ada@example.com', filling: 'development', news: false, lang: 'fr', turnstile: 'XXXX.DUMMY.TOKEN.XXXX' }]);
   });
@@ -39,7 +39,7 @@ test.describe('the French download form', () => {
     const requests = await mockSignup(page);
     await page.goto('/fr/download/');
     await page.getByLabel('Courriel', { exact: true }).fill('ada@');
-    await page.getByRole('button', { name: 'Envoyer le lien de téléchargement' }).click();
+    await page.getByRole('button', { name: 'M’envoyer le lien' }).click();
     await expect(page.getByRole('alert')).toHaveText('Entrez une adresse courriel complète, comme vous@exemple.com.');
     expect(requests).toEqual([]);
   });
@@ -48,8 +48,22 @@ test.describe('the French download form', () => {
     await mockSignup(page, 500, { error: 'send_failed' });
     await page.goto('/fr/download/');
     await page.getByLabel('Courriel', { exact: true }).fill('ada@example.com');
-    await page.getByRole('button', { name: 'Envoyer le lien de téléchargement' }).click();
+    await page.getByRole('button', { name: 'M’envoyer le lien' }).click();
     await expect(page.getByRole('alert')).toHaveText('Le lien n’a pas pu être envoyé. Vérifiez votre connexion et réessayez.');
+  });
+
+  test('the French done state offers Gmail, Outlook and the resend link in French', async ({ page }) => {
+    const requests = await mockSignup(page);
+    await page.goto('/fr/download/');
+    await expect(page.getByRole('link', { name: 'Guide pour désinstaller des plug-ins audio' })).toHaveAttribute('href', '/fr/uninstall-audio-plugins-mac/');
+    await page.getByLabel('Courriel', { exact: true }).fill('ada@example.com');
+    await page.getByRole('button', { name: 'M’envoyer le lien' }).click();
+    await expect(page.getByRole('link', { name: 'Ouvrir Gmail' })).toHaveAttribute('href', /^https:\/\/mail\.google\.com\/mail\/u\/\?authuser=ada%40example\.com#search\//);
+    await expect(page.getByRole('link', { name: 'Ouvrir Outlook' })).toHaveAttribute('href', 'https://outlook.live.com/mail/0/');
+    await expect(page.getByText('Rien reçu?')).toBeVisible();
+    await page.getByRole('button', { name: 'Renvoyer le lien' }).click();
+    await expect(page.getByRole('status')).toHaveText('Lien renvoyé. Il peut prendre une minute à arriver.');
+    expect(requests).toHaveLength(2);
   });
 
   test('links to the French privacy policy', async ({ page }) => {
@@ -80,7 +94,7 @@ test.describe('the French token page', () => {
     await expect(page).toHaveURL(/\/fr\/download\/\?link=expired$/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ce lien a expiré.');
     await page.getByLabel('Courriel', { exact: true }).fill('ada@example.com');
-    await page.getByRole('button', { name: 'Envoyer le lien de téléchargement' }).click();
+    await page.getByRole('button', { name: 'M’envoyer le lien' }).click();
     await expect(page.getByRole('heading', { name: 'Vérifiez vos courriels' })).toBeVisible();
     expect(requests).toEqual([{ email: 'ada@example.com', filling: null, news: false, lang: 'fr', turnstile: 'XXXX.DUMMY.TOKEN.XXXX' }]);
   });

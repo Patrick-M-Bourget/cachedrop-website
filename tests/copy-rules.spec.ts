@@ -3,7 +3,7 @@ import { pages } from './pages';
 
 // Decisions 51 and 52: no "beta" anywhere, no parenthesized "(Free)", and no "free" in a heading or
 // a button. "Free up space" is the verb, not the price, so it stays allowed. The download email is
-// checked in src/server/gate.test.ts.
+// checked in src/server/download-email.test.ts.
 const all = [...pages.map((p) => p.path), '/pricing/', '/fr/pricing/'];
 const BETA = /beta|bêta/i;
 const PAREN_FREE = /\((free|gratuit)\)/i;

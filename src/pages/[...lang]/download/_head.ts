@@ -8,19 +8,19 @@ export const downloadHead = {
   en: {
     ...shared,
     title: 'Download CacheDrop for Mac',
-    description: 'Download CacheDrop for Mac, free to try: a universal app for Apple Silicon and Intel Macs on macOS 14 or later.',
+    description: 'Download CacheDrop for Mac: a universal app for Apple Silicon and Intel Macs on macOS 14 or later.',
   },
   fr: {
     ...shared,
     title: 'Télécharger CacheDrop pour Mac',
-    description: 'Téléchargez CacheDrop pour Mac et essayez-le gratuitement : une application universelle pour les Mac Apple Silicon et Intel sous macOS 14 ou version ultérieure.',
+    description: 'Téléchargez CacheDrop pour Mac : une application universelle pour les Mac Apple Silicon et Intel sous macOS 14 ou version ultérieure.',
   },
 };
 
-/** The line under the title on both pages: price, architectures, macOS. */
+/** The line under the title on both pages: architectures and macOS. The trial line is stated once, in the email (Decision 51). */
 export const downloadMeta = {
-  en: ['Free to try', 'Universal: Apple Silicon & Intel', 'macOS 14 Sonoma or later'],
-  fr: ['Essai gratuit', 'Universelle : Apple Silicon et Intel', 'macOS 14 Sonoma ou version ultérieure'],
+  en: ['Universal: Apple Silicon & Intel', 'macOS 14 Sonoma or later'],
+  fr: ['Universelle : Apple Silicon et Intel', 'macOS 14 Sonoma ou version ultérieure'],
 };
 
 /** The links to the guides at the bottom of both pages. */

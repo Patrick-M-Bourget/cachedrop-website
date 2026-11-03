@@ -160,7 +160,7 @@ describe('signup', () => {
     const { deps, sent } = setup();
     await handleSignup(post({ email: 'ada@example.com' }), deps);
     const [email] = sent;
-    expect(email.subject).toBe('Your CacheDrop download link');
+    expect(email.subject).toBe('Your CacheDrop download');
     for (const part of [email.text, email.html]) {
       expect(part).toContain('CacheDrop is a Mac storage cleaner');
       expect(part).toContain('hello@cachedrop.io');
@@ -170,21 +170,6 @@ describe('signup', () => {
       expect(part).not.toContain('It works for 7 days');
     }
   });
-
-  // Decision 52: the email says "free to try", never "beta".
-  for (const [lang, free] of [
-    ['en', 'It is free to try.'],
-    ['fr', 'Vous pouvez l’essayer gratuitement.'],
-  ] as const) {
-    it(`${lang}: says "free to try" and never "beta"`, async () => {
-      const { deps, sent } = setup();
-      await handleSignup(post({ email: 'ada@example.com', lang }), deps);
-      for (const part of [sent[0].text, sent[0].html]) {
-        expect(part).toContain(free);
-        expect(part).not.toMatch(/beta|bêta/i);
-      }
-    });
-  }
 
   it('gives each request its own link, and never stores the token itself', async () => {
     const { deps, sent, state } = setup();
@@ -354,7 +339,7 @@ describe('emails in the signup language (Decision 5)', () => {
     const { deps, sent } = setup();
     await handleSignup(post({ email: 'ada@example.com', lang: 'fr' }), deps);
     const [email] = sent;
-    expect(email.subject).toBe('Votre lien de téléchargement CacheDrop');
+    expect(email.subject).toBe('Votre téléchargement CacheDrop');
     expect(email.html).toContain('<html lang="fr">');
     const [link, token] = tokenLinkIn(email, `${SITE}/fr`)!;
     const unsubscribe = email.text.match(new RegExp(`${SITE}/fr/unsubscribe/([A-Za-z0-9_-]{43})/`))!;
@@ -368,7 +353,7 @@ describe('emails in the signup language (Decision 5)', () => {
       expect(part).not.toContain('CacheDrop is a Mac storage cleaner');
       expect(part).not.toMatch(new RegExp(`${SITE}/(download|unsubscribe|privacy)/`));
     }
-    expect(email.html).toContain('Télécharger CacheDrop');
+    expect(email.html).toContain('Télécharger pour Mac');
     expect(email.html).toContain('Se désabonner');
     expect(email.html).toContain('Politique de confidentialité');
     // The link is the same token the API serves; only the page around it is French.
@@ -379,7 +364,7 @@ describe('emails in the signup language (Decision 5)', () => {
     const { deps, sent } = setup();
     await handleSignup(post({ email: 'ada@example.com', lang: 'en' }), deps);
     const [email] = sent;
-    expect(email.subject).toBe('Your CacheDrop download link');
+    expect(email.subject).toBe('Your CacheDrop download');
     expect(email.html).toContain('<html lang="en">');
     for (const part of [email.text, email.html]) {
       expect(part).not.toContain(`${SITE}/fr/`);
@@ -418,9 +403,9 @@ describe('emails in the signup language (Decision 5)', () => {
     await handleSignup(post({ email: 'ada@example.com', lang: 'fr' }), deps);
     await handleSignup(post({ email: 'ada@example.com', lang: 'en' }), deps);
     expect(sent.map((e) => e.subject)).toEqual([
-      'Your CacheDrop download link',
-      'Votre lien de téléchargement CacheDrop',
-      'Your CacheDrop download link',
+      'Your CacheDrop download',
+      'Votre téléchargement CacheDrop',
+      'Your CacheDrop download',
     ]);
     expect(tokenLinkIn(sent[1], `${SITE}/fr`)).not.toBeNull();
     expect(tokenLinkIn(sent[2], SITE)).not.toBeNull();
@@ -658,7 +643,7 @@ describe('unsubscribe', () => {
     const { deps, sent, state } = await signedUp();
     await handleUnsubscribe(oneClick(oneClickIn(sent[0])!), deps);
     expect((await handleSignup(post({ email: 'ada@example.com', lang: 'fr' }), deps)).status).toBe(200);
-    expect(sent[1].subject).toBe('Votre lien de téléchargement CacheDrop');
+    expect(sent[1].subject).toBe('Votre téléchargement CacheDrop');
     expect(state.signups[0]).toMatchObject({ unsubscribed: true, lang: 'en' });
   });
 
