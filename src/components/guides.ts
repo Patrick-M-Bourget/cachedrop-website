@@ -46,4 +46,15 @@ export const guides = {
       description: 'Ce que sont les Données système sur Mac, pourquoi elles grossissent autant et ce que vous pouvez supprimer sans risque : caches, journaux, fichiers de développement et instantanés locaux Time Machine, avec les commandes Terminal et leurs risques.',
     },
   },
+  apps: {
+    path: '/uninstall-apps-mac/',
+    en: {
+      title: 'How to Completely Uninstall Apps on Mac and Remove Leftovers',
+      description: 'Dragging an app to the Trash leaves its settings, caches and data behind. Find where app leftovers live on a Mac, remove them by hand, or uninstall apps with every file they left.',
+    },
+    fr: {
+      title: 'Désinstaller une application sur Mac et supprimer ses restes',
+      description: 'Glisser une application dans la Corbeille laisse ses réglages, ses caches et ses données. Trouvez où se cachent les restes d’applications sur Mac, supprimez-les à la main, ou désinstallez vos applications avec tous leurs fichiers.',
+    },
+  },
 } as const;
