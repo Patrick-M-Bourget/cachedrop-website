@@ -26,6 +26,22 @@ Dev credentials come only from `.env.local`, and must identify the known dev Sup
 scripts/promote-release.sh prod /path/to/artifact-directory https://cachedrop.io/updates/appcast.xml
 ```
 
+### One command for production
+
+Once the owner says "publish" for a version, Claude (or the owner) runs:
+
+```sh
+scripts/publish-release.sh /path/to/artifact-directory
+```
+
+It stages, then promotes to `https://cachedrop.io/updates/appcast.xml`, typing both `prod` confirmations, and fails with the completed and remaining state like the commands it runs; retry it with the same folder. The production secret key comes from the login Keychain, stored once by the owner (the prompt doesn't echo the key):
+
+```sh
+security add-generic-password -U -s cachedrop.prod.supabase -a secret-key -w
+```
+
+Decision 55 sets who may run it and when.
+
 Nothing runs implicitly after `release.sh`; the owner chooses when to stage and promote. The former single-step `publish-dmg.sh` refuses further releases once Sparkle publication starts, preventing it from bypassing version/build and artifact verification.
 
 ## Verification, order and retry
