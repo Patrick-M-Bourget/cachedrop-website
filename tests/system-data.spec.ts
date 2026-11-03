@@ -2,7 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 
 // The System Data guide (#110): a guide in the other guides' format (Decision 50), with a HowTo and an FAQPage
-// in its JSON-LD and an Updated date in step with the sitemap.
+// in its JSON-LD, an Updated date in step with the sitemap, and links from the footer and "While you wait".
 
 async function jsonLd(page: Page) {
   const raw = await page.locator('script[type="application/ld+json"]').first().textContent();
@@ -51,6 +51,13 @@ for (const l of langs) {
       // Every other command on the page only reads.
       const others = await page.locator('main pre').allTextContents();
       expect(others.filter((c) => /\b(rm|delete)/.test(c))).toEqual([codes[1]]);
+    });
+
+    test('is linked from the footer and from "While you wait"', async ({ page }) => {
+      await page.goto(l.path.replace('clear-system-data-mac/', ''));
+      await expect(page.getByRole('contentinfo').getByRole('link', { name: l.footer, exact: true })).toHaveAttribute('href', l.path);
+      await page.goto(l.download);
+      await expect(page.getByRole('main').getByRole('link', { name: l.wait })).toHaveAttribute('href', l.path);
     });
   });
 }
