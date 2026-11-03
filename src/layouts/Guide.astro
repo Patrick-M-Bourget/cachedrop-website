@@ -1,6 +1,8 @@
 ---
-// A cleaning guide: hero with breadcrumb, the guide body (default slot), the FAQ,
-// a link to the other guide and the closing call to action. It builds the
+// A cleaning guide: hero with breadcrumb and the download block, the guide body (default slot), the FAQ,
+// a link to the other guide and the closing call to action. The download block is the same on every
+// guide (#112, Decision 51): the button with the page's note beside it, the trial line under it, then
+// the price for up to 3 Macs and, once the compare page is live, a link to it. It builds the
 // Article, BreadcrumbList and FAQPage JSON-LD in the handoff's key order, plus HowTo when given.
 // The page passes its
 // strings in its own language; the layout's own few words are in `copy`.
@@ -9,6 +11,7 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { guideH2, primaryLg, arrowLink, faqItem, faqQuestion } from '../components/guide-styles';
 import ClosingCta from '../components/ClosingCta.astro';
+import { compareLive, pricingCopy } from '../components/pricing';
 import { langOf, localize } from '../i18n';
 
 interface Props {
@@ -24,7 +27,7 @@ interface Props {
   lede: string;
   /** Label of both download buttons. */
   cta: string;
-  /** Short line beside the hero button. */
+  /** Short line beside the hero button: what the guide's tools cover. The trial and macOS line is the layout's. */
   ctaNote: string;
   /** Visible "Updated …" month in the page's language, kept in step with `dateModified` and the sitemap lastmod (HANDOFF.md §4). */
   updated: string;
@@ -35,7 +38,7 @@ interface Props {
   faq: Array<[question: string, answerHtml: string]>;
   /** The other guide; `href` is its English path. */
   other: { eyebrow: string; title: string; href: string; link: string };
-  /** The closing title and line; the layout adds the price sentence after the line. */
+  /** The closing title and line. */
   closing: { title: string; body: string };
   trademarks: string;
   /** A HowTo for the page's main task: its name and plain-text steps. */
@@ -45,10 +48,12 @@ interface Props {
 const p = Astro.props;
 const lang = langOf(Astro.url);
 const copy = {
-  en: { breadcrumb: 'Breadcrumb', updated: 'Updated', price: 'Free to try.' },
-  fr: { breadcrumb: 'Fil d’Ariane', updated: 'Mis à jour en', price: 'Essai gratuit.' },
+  en: { breadcrumb: 'Breadcrumb', updated: 'Updated', price: `Up to 3 Macs: ${pricingCopy.en.license}.` },
+  fr: { breadcrumb: 'Fil d’Ariane', updated: 'Mis à jour en', price: `Jusqu’à 3 Mac\u00a0: ${pricingCopy.fr.license}.` },
 };
 const t = copy[lang];
+const pc = pricingCopy[lang];
+const small = 'font-size: 13px; color: var(--ink-secondary)';
 const site = Astro.site!.origin;
 const url = new URL(localize(lang, p.path), site).href;
 const home = `${site}${localize(lang, '/')}`;
@@ -107,9 +112,11 @@ const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" strok
 <Fragment set:html={download} />
 <span>{p.cta}</span>
 </a>
-<span style="font-size: 13px; color: var(--ink-secondary)">{p.ctaNote}</span>
+<span style={small}>{p.ctaNote}</span>
 </div>
-<p style="margin: var(--space-10) 0 0; font-size: 13px; color: var(--ink-secondary)">{t.updated} {p.updated} · {p.readTime}</p>
+<p style={`margin: 18px 0 0; ${small}`}>{pc.trial}</p>
+<p style={`margin: var(--space-1-5) 0 0; ${small}`}>{t.price}{compareLive[lang] && <> · <a class="textlink" data-compare href={localize(lang, '/cleanmymac-alternative/')} style="color: var(--accent-text)">{pc.compare}</a></>}</p>
+<p style={`margin: var(--space-10) 0 0; ${small}`}>{t.updated} {p.updated} · {p.readTime}</p>
 </div>
 </section>
 
@@ -139,7 +146,7 @@ const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" strok
 </aside>
 </div>
 
-<ClosingCta size="guide" title={p.closing.title} body={`${p.closing.body} ${t.price}`} href={downloadHref} cta={p.cta} />
+<ClosingCta size="guide" title={p.closing.title} body={p.closing.body} href={downloadHref} cta={p.cta} />
 </main>
 
 <Footer path={p.path} overview trademarks={p.trademarks} />

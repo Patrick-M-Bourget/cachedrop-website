@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { pages, ui } from './pages';
-import { compareLive } from '../src/components/pricing';
+import { compareLive, pricingCopy } from '../src/components/pricing';
+import { guides } from '../src/components/guides';
 
 // Pricing (Decisions 44 and 47) on every build: the launch setting retired with Decision 52.
 const withPricing = [...pages, { path: '/pricing/' }, { path: '/fr/pricing/', lang: 'fr' as const }];
@@ -201,11 +202,17 @@ for (const p of withPricing) {
   });
 }
 
-for (const path of ['/clear-mac-developer-caches/', '/clear-adobe-media-cache-mac/', '/fr/clear-mac-developer-caches/', '/fr/clear-adobe-media-cache-mac/']) {
-  test(`${path}: no Buy link on the guide`, async ({ page }) => {
+// Every guide has the same download block (#112, Decision 51): the trial line once, under the hero
+// button, and the price for up to 3 Macs. No Buy link, and no "Free to try" left in the closing line.
+for (const path of Object.values(guides).flatMap((g) => [g.path, `/fr${g.path}`])) {
+  test(`${path}: the download block states the trial once and the price, with no Buy link`, async ({ page }) => {
+    const lang = path.startsWith('/fr/') ? 'fr' : 'en';
     await page.goto(path);
     await expect(page.locator('a[href^="/buy"]')).toHaveCount(0);
-    await expect(page.getByText(path.startsWith('/fr/') ? /Essai gratuit\.$/ : /Free to try\.$/)).toBeVisible();
+    await expect(page.getByText(pricingCopy[lang].trial, { exact: true })).toHaveCount(1);
+    await expect(page.locator('main section').first().getByText(pricingCopy[lang].trial, { exact: true })).toBeVisible();
+    await expect(page.getByText(pricingCopy[lang].license, { exact: false }).first()).toBeVisible();
+    await expect(page.getByText(/Free to try|Essai gratuit/)).toHaveCount(0);
   });
 }
 
