@@ -83,6 +83,14 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | unsubscribe | se désabonner | The page says « Désabonnement confirmé. », which avoids choosing a gender for « vous êtes désabonné(e) ». |
 | Check your inbox | Vérifiez vos courriels | |
 | Email Me the Link (button; Decision 51) | M’envoyer le lien | The download form's button. |
+| Get your Mac’s space back. (homepage H1; Decision 51) | Récupérez l’espace de votre Mac. | #109. *Owner: check.* |
+| leftovers (app) | restes | « les restes d’applications ». |
+| app uninstaller | désinstalleur d’applications | #109. *Owner: check.* |
+| plug-in manager | gestionnaire de plug-ins | #109. |
+| History (the app’s view) | l’historique | In prose; the app’s own label stays « History ». |
+| Put back | Remettre en place | #109. |
+| notarized (by Apple) | notarié | Apple’s French developer term. *Owner: check.* |
+| Safe by design | Sûr dès la conception | #109 section eyebrow. *Owner: check.* |
 | Open Gmail, Open Outlook | Ouvrir Gmail, Ouvrir Outlook | The done state's buttons (Decision 53). |
 | Didn’t get it? Send it again | Rien reçu? Renvoyer le lien | The done state's resend link. |
 | Your CacheDrop download (email subject) | Votre téléchargement CacheDrop | Decision 53. |

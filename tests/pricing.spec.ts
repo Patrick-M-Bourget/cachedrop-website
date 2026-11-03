@@ -83,11 +83,12 @@ async function expectPricing(page: Page, lang: 'en' | 'fr', level: 1 | 2) {
 }
 
 for (const lang of ['en', 'fr'] as const) {
-  test(`${lang}: the homepage has the pricing section, between "Careful by default" and the FAQ`, async ({ page }) => {
+  test(`${lang}: the homepage has the pricing section, between "Safe by design" and the FAQ`, async ({ page }) => {
     await page.goto(ui[lang].home);
     await expectPricing(page, lang, 2);
     const order = await page.locator('section').evaluateAll((s) => s.map((e) => e.id));
     expect(order.indexOf('pricing')).toBe(order.indexOf('faq') - 1);
+    expect(order.indexOf('safe')).toBe(order.indexOf('pricing') - 1);
   });
 
   test(`${lang}: /pricing/ is the pricing section as a page, indexed with its alternates`, async ({ page }) => {
@@ -136,9 +137,9 @@ test('the price answers state the regular price and the discount (Decision 47)',
   expect(await page.title()).toContain('$29.99');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /\$29\.99 once, now \$19\.99 for a limited time/);
   await page.goto('/');
-  await expect(page.getByText('A license is $29.99 once, now $19.99 for a limited time, for up to 3 Macs.')).toBeVisible();
+  await expect(page.getByText('A license is $29.99 once, now $19.99 for a limited time, for up to 3 Macs, with 30-day refunds.')).toBeVisible();
   await page.goto('/fr/');
-  await expect(page.getByText('La licence coûte 29,99\u00a0$ une seule fois, maintenant 19,99\u00a0$ pour un temps limité, pour un maximum de 3 Mac.')).toBeVisible();
+  await expect(page.getByText('La licence coûte 29,99\u00a0$ une seule fois, maintenant 19,99\u00a0$ pour un temps limité, pour un maximum de 3 Mac, avec remboursement dans les 30 jours.')).toBeVisible();
 });
 
 test('the /pricing/ title and meta lead with what CacheDrop does, then the price and terms (#113)', async ({ page }) => {
