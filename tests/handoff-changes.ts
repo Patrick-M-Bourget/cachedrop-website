@@ -33,6 +33,18 @@ export const handoffChanges: HandoffChange[] = [
     find: '<a class="flink" href="#feedback" data-feedback>Provide Feedback</a>',
     replace: '<a class="flink" href="#feedback" data-feedback>Provide Feedback</a><a class="flink" href="/resend-license-key/">Resend License Key</a>',
   },
+  {
+    decision: 48,
+    why: 'The nav links to the producer page after For Creators.',
+    find: 'For Creators</a>',
+    replace: 'For Creators</a><a class="navlink" href="/uninstall-audio-plugins-mac/">For Producers</a>',
+  },
+  {
+    decision: 48,
+    why: 'The footer\'s Cleaning Guides column links to the producer page after the two guides.',
+    find: '<a class="flink" href="/clear-adobe-media-cache-mac/">Clear Adobe Media Cache</a>',
+    replace: '<a class="flink" href="/clear-adobe-media-cache-mac/">Clear Adobe Media Cache</a><a class="flink" href="/uninstall-audio-plugins-mac/">Uninstall Audio Plug-ins</a>',
+  },
 ];
 
 /** Returns the handoff page's HTML with every decided change applied. */

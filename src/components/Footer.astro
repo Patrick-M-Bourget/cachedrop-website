@@ -5,6 +5,7 @@
 // The terms of sale, refund policy and license agreement links after it are Decision 43; the row wraps.
 // The language switch after "Public beta" is Decision 5: it opens this page in the other language.
 // "Resend License Key" at the end of Product is Decision 42.
+// The producer page's link after the two guides is Decision 48.
 // With pricing live (Decision 44) the download link reads "Download Free" and "Public beta" goes.
 import BrandMark from './BrandMark.astro';
 import { pricingLive, withLaunch } from './pricing';
@@ -25,6 +26,7 @@ const copy = {
     guides: 'Cleaning Guides',
     developer: 'Clear Developer Caches',
     creator: 'Clear Adobe Media Cache',
+    producer: 'Uninstall Audio Plug-ins',
     product: 'Product',
     overview: 'Overview',
     download: 'Download Free Beta',
@@ -46,6 +48,7 @@ const copy = {
     guides: 'Guides de nettoyage',
     developer: 'Vider les caches de développement',
     creator: 'Vider le cache de média Adobe',
+    producer: 'Désinstaller des plug-ins audio',
     product: 'Produit',
     overview: 'Aperçu',
     download: 'Télécharger la bêta gratuite',
@@ -84,6 +87,7 @@ const { path, overview = false, trademarks = t.trademarks } = Astro.props;
 <h3 style="margin: 0 0 var(--space-1); font-size: 13px; font-weight: 600">{t.guides}</h3>
 <a class="flink" href={href('/clear-mac-developer-caches/')}>{t.developer}</a>
 <a class="flink" href={href('/clear-adobe-media-cache-mac/')}>{t.creator}</a>
+<a class="flink" href={href('/uninstall-audio-plugins-mac/')}>{t.producer}</a>
 </nav>
 <nav aria-label="Product" style="display: flex; flex-direction: column; gap: var(--space-2-5); font-size: 13px">
 <h3 style="margin: 0 0 var(--space-1); font-size: 13px; font-weight: 600">{t.product}</h3>

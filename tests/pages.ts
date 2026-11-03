@@ -18,6 +18,7 @@ export const pages: PageUnderTest[] = [
   { path: '/', handoff: 'index.html', screenshots: 'home' },
   { path: '/clear-mac-developer-caches/', handoff: 'clear-mac-developer-caches/index.html', screenshots: 'developer-guide' },
   { path: '/clear-adobe-media-cache-mac/', handoff: 'clear-adobe-media-cache-mac/index.html', screenshots: 'creator-guide' },
+  { path: '/uninstall-audio-plugins-mac/' }, // the producer page (Decision 48): no handoff original
   { path: '/privacy/' }, // no handoff original: token and modal tests only
   { path: '/unsubscribe/' }, // new (Decision 4); vercel.json serves it at /unsubscribe/<token>/
   // The email form (Decision 1) is new; it keeps the handoff download page's head.
@@ -33,6 +34,7 @@ export const pages: PageUnderTest[] = [
   { path: '/fr/', lang: 'fr' },
   { path: '/fr/clear-mac-developer-caches/', lang: 'fr' },
   { path: '/fr/clear-adobe-media-cache-mac/', lang: 'fr' },
+  { path: '/fr/uninstall-audio-plugins-mac/', lang: 'fr' },
   { path: '/fr/privacy/', lang: 'fr' },
   { path: '/fr/unsubscribe/', lang: 'fr' },
   { path: '/fr/download/', lang: 'fr' },
@@ -57,6 +59,7 @@ export const pairs: Pair[] = [
   pair('/', true),
   pair('/clear-mac-developer-caches/', true),
   pair('/clear-adobe-media-cache-mac/', true),
+  pair('/uninstall-audio-plugins-mac/', true),
   pair('/privacy/', true),
   pair('/download/', false),
   pair('/download/link/', false, '/download/'),

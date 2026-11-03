@@ -126,7 +126,7 @@ for (const p of live) {
     await expect(nav.getByText(/^(BETA|BÊTA)$/)).toHaveCount(0);
     const primary = nav.getByRole('navigation');
     const links = await primary.getByRole('link').allTextContents();
-    expect(links.slice(0, 3)).toEqual(lang === 'en' ? ['For Developers', 'For Creators', 'Pricing'] : ['Pour les développeurs', 'Pour les créateurs', 'Tarifs']);
+    expect(links.slice(0, 4)).toEqual(lang === 'en' ? ['For Developers', 'For Creators', 'For Producers', 'Pricing'] : ['Pour les développeurs', 'Pour les créateurs', 'Pour les producteurs', 'Tarifs']);
     await expect(primary.getByRole('link', { name: c.pricing[0], exact: true })).toHaveAttribute('href', c.pricing[1]);
     await expect(nav.getByRole('link', { name: c.download, exact: true })).toHaveAttribute('href', ui[lang].download);
     await expect(nav.locator('a[href^="/buy"]')).toHaveCount(0);

@@ -1,0 +1,263 @@
+---
+// The music producers page (#52, Decision 48): the music ad's landing page and a search page, led by
+// plug-in uninstalls. Built on the Guide layout with the signup form in the hero, at
+// /uninstall-audio-plugins-mac/ and under /fr/ (Decision 5, English slug per the French glossary).
+// Every claim follows the shipping build (Decision 48), checked against mac-cleaner 1.0.1 (022d2aee):
+// PlugInInventory.swift (formats, folders), PlugInUninstall.swift (receipts, hosts, vendor content),
+// RemovedAppLeftovers.swift (deleted apps, licence data), AppDataCaches.swift (Ableton Live cache),
+// ApplicationsView.swift ("Needs your password to remove"), Trial.swift (2 GB).
+// Strings with <span class="ic"> are HTML.
+import Guide from '../../../layouts/Guide.astro';
+import Toc from '../../../components/Toc.astro';
+import CodeBlock from '../../../components/CodeBlock.astro';
+import { guideH2, guideP } from '../../../components/guide-styles';
+import { withLaunch } from '../../../components/pricing';
+import { langOf, langPaths } from '../../../i18n';
+
+export const getStaticPaths = langPaths;
+
+const section = 'padding-top: var(--space-22); display: flex; flex-direction: column; gap: var(--space-5)';
+const pair = 'margin-top: var(--space-4); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: var(--space-4)';
+const card = 'padding: var(--space-7); border-radius: var(--radius-2xl); display: flex; flex-direction: column; gap: 14px';
+const manual = `${card}; border: 1px solid var(--line)`;
+const ours = `${card}; background: var(--surface-subtle)`;
+const h3 = 'margin: 0; font-size: 20px; line-height: 26px; font-weight: 600; letter-spacing: -0.015em';
+const list = 'margin: 0; padding: 0 0 0 var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); font-size: 16px; line-height: 25px; color: var(--ink-body)';
+const cell = 'padding: var(--space-3) var(--space-4) var(--space-3) 0; border-top: 1px solid var(--line); text-align: left; vertical-align: top';
+const head = `${cell}; font-size: 13px; font-weight: 600; color: var(--ink-secondary); border-top: 0`;
+const label = 'display: block; font-size: 12px; color: var(--ink-secondary)';
+
+// Plug-in folders: PlugInInventory.folders. AAX has no folder in the home folder.
+const folders: Array<[format: string, system: string, user: string]> = [
+  ['AU (Audio Units)', '/Library/Audio/Plug-Ins/Components', '~/Library/Audio/Plug-Ins/Components'],
+  ['VST', '/Library/Audio/Plug-Ins/VST', '~/Library/Audio/Plug-Ins/VST'],
+  ['VST3', '/Library/Audio/Plug-Ins/VST3', '~/Library/Audio/Plug-Ins/VST3'],
+  ['CLAP', '/Library/Audio/Plug-Ins/CLAP', '~/Library/Audio/Plug-Ins/CLAP'],
+  ['AAX (Pro Tools)', '/Library/Application Support/Avid/Audio/Plug-Ins', '—'],
+];
+const hosts = 'Logic Pro, GarageBand, MainStage, Ableton Live, Reason, Pro Tools, Cubase, Studio One, Bitwig Studio, FL Studio, REAPER';
+
+const copy = {
+  en: {
+    guide: {
+      title: 'How to Uninstall Audio Plug-ins on Mac (VST, AU, AAX, CLAP)',
+      description: 'Uninstall VST, VST3, AU, AAX and CLAP plug-ins on a Mac with every file they installed, find where plug-ins are stored, and clear Ableton Live’s cache without touching your licenses.',
+      crumb: 'Music Producer Storage Guide',
+      headline: 'Uninstall audio plug-ins on Mac, every file they left.',
+      lede: 'Plug-ins you stopped using, caches your DAW rebuilds, files from apps you already deleted. CacheDrop lists every format of every plug-in in one place and moves what you pick to the Trash.',
+      cta: 'Get CacheDrop free',
+      ctaNote: 'AU · VST · VST3 · AAX · CLAP · macOS 14+ · Free while in beta.',
+      updated: 'November 2026',
+      readTime: '7 min read',
+      faqTitle: 'Plug-in and music storage FAQ',
+      faq: [
+        ['How do I completely uninstall a VST plugin on Mac?', 'Quit your DAW, then delete the plug-in from every format folder it was installed to (VST, VST3, AU and AAX each have their own) and remove the support files its installer added. <span class="ic">pkgutil --files</span> lists what an installer wrote. CacheDrop does this in one list per product.'],
+        ['How do I remove AAX plugins from Pro Tools on Mac?', 'Quit Pro Tools and delete the <span class="ic">.aaxplugin</span> from <span class="ic">/Library/Application Support/Avid/Audio/Plug-Ins</span>. If the same plug-in came in other formats, they stay behind unless you remove them too.'],
+        ['Is it safe to delete the Ableton cache folder?', 'Yes, with Live closed. It holds decoded copies of compressed samples, and Live decodes them again the next time a Set needs them. Live’s own Cleanup button, in Settings › File &amp; Folder › Decoding Cache, deletes what the open Set doesn’t use.'],
+        ['Can I delete the Logic Pro sound library to free up space?', 'Manage it from Logic Pro › Sound Library, which installs and removes sound packs, and Apple lets you move the library to an external drive. CacheDrop shows its size but never removes Apple’s sound library.'],
+        ['Does uninstalling plugins delete my iLok licenses?', 'Not with CacheDrop: iLok, PACE, eLicenser and CodeMeter files, and anything named for a license, activation or serial, are never offered. An activation stays on your iLok account, so deactivate it in iLok License Manager first if you want to use it on another Mac.'],
+        ['How do I uninstall Waves, UAD or Native Instruments plugins on Mac?', 'Their own managers, Waves Central, UA Connect and Native Access, remove their products. CacheDrop lists them by product like any other plug-in, with each format and the files their installers list.'],
+        ['What files do plugins leave behind after I delete them?', 'Usually the other formats, presets and support files in Application Support, preferences, and the installer’s receipt. CacheDrop groups these with the plug-in, and lists files from apps you already deleted on their own.'],
+        ['Is there a free plugin uninstaller for Mac?', 'CacheDrop is free while in beta: scanning, the plug-in list and uninstalls.'],
+      ] as Array<[string, string]>,
+      other: { eyebrow: 'Also edit video?', title: 'How to clear the Adobe media cache and Final Cut Pro render files', href: '/clear-adobe-media-cache-mac/', link: 'Read the creator guide' },
+      closing: { title: 'Make room for the next session.', body: 'CacheDrop finds your plug-ins, Ableton’s cache and files from deleted apps in one scan.' },
+      trademarks: 'Ableton and Live are trademarks of Ableton AG. Pro Tools and AAX are trademarks of Avid Technology. VST is a trademark of Steinberg Media Technologies GmbH. iLok is a trademark of PACE Anti-Piracy. Logic Pro, GarageBand, MainStage, Apple, Mac and macOS are trademarks of Apple Inc. Other names are trademarks of their owners.',
+    },
+    toc: ['How to uninstall audio plug-ins on Mac', 'Where are VST, AU, AAX and CLAP plug-ins stored?', 'Why deleting the .vst3 isn’t enough', 'Will it break my licenses?', 'How to clear Ableton Live’s cache', 'Sample libraries and sound packs', 'Files from deleted apps'],
+    uninstall: {
+      intro: 'A plug-in is rarely one file. Most installers put the same plug-in in two to four formats, in different folders, plus presets and support files elsewhere. Deleting one bundle leaves the rest.',
+      manualTitle: 'The manual way',
+      manual: ['Quit your DAW and any app that loads plug-ins.', 'Use the maker’s uninstaller or manager if it has one.', 'Otherwise delete the plug-in from each format folder below. The AU and VST folders in /Library usually ask for your password.', 'Remove its support files in Application Support and its preferences.', 'Check the installer’s receipt for anything else (below).'],
+      oursTitle: 'The CacheDrop way',
+      ours: ['Open Applications › Plug-ins: every product, with its formats and size.', 'Tick a product. Its formats and the support files its installer receipt lists are ticked with it.', `CacheDrop asks you to quit any open host first: ${hosts}.`, 'Everything macOS lets it move goes to the Trash, and Put back restores it. Files that need your password are listed with Reveal in Finder.'],
+      never: 'It reads plug-ins without loading them, and never calls one unused or a duplicate: you decide what goes.',
+    },
+    where: {
+      intro: 'macOS has one folder per format, for all users in /Library and for you alone in your home folder. AUv3 plug-ins live inside their app and go when you delete the app.',
+      format: 'Format',
+      folders: 'Folders',
+      system: 'All users',
+      user: 'Your home folder only',
+    },
+    receipts: {
+      p1: 'Installers also write presets, manuals, sound content and helper files to Application Support, and macOS keeps a receipt of what each installer package wrote. To see it in Terminal:',
+      label: 'Terminal',
+      p2: 'CacheDrop reads the same receipts, so the support files go with their plug-in: only what that product’s receipt lists, never a maker’s folder other products share, and only kinds of files it knows are safe to move.',
+    },
+    licences: {
+      p1: 'Copy protection keeps its data apart from the plug-ins. CacheDrop never offers iLok and PACE, eLicenser or CodeMeter files, or anything named for a license, activation or serial, and checks again right before it moves anything.',
+      p2: 'Uninstalling doesn’t give back an activation. If a plug-in is activated on this Mac and you want it on another, deactivate it in iLok License Manager or the maker’s manager first.',
+    },
+    ableton: {
+      p1: 'When you use compressed samples, such as MP3 or FLAC, Live decodes them into a cache. It grows with every project and Live rebuilds it as needed.',
+      label: 'Path',
+      p2: 'CacheDrop’s Smart clean deletes it, and leaves it unticked while Live is running. The caches other music apps keep in ~/Library/Caches are cleared the same way, as App caches.',
+    },
+    libraries: {
+      p1: 'Sample libraries are often the biggest folders a producer has, and they’re yours to keep. CacheDrop shows their size and where to manage them, and never removes them on its own:',
+      items: ['Logic Pro and GarageBand sound library: Logic Pro › Sound Library.', 'Ableton Packs: Live’s browser, under Packs.', 'Splice samples: the Splice app.', 'Ableton’s User Library and your own Apple Loops: labelled as yours.'],
+      p2: 'When you uninstall a plug-in, sound banks its maker installed for it can go too, each ticked one by one. Apple’s folders, your User Library and Splice never are.',
+    },
+    deleted: {
+      p1: 'Deleting an app from the Applications folder leaves its settings, caches and data in your Library. CacheDrop lists them under Files from deleted apps, each tied to its app by its bundle ID or installer receipt, and moves what you pick to the Trash.',
+      p2: 'A folder that only shares a name with a deleted app is shown as possibly related, with the reason, and Smart clean never picks it.',
+    },
+    howTo: 'How to uninstall an audio plug-in on Mac',
+  },
+  fr: {
+    guide: {
+      title: 'Désinstaller des plug-ins audio sur Mac (VST, AU, AAX, CLAP)',
+      description: 'Désinstallez les plug-ins VST, VST3, AU, AAX et CLAP sur Mac avec tous les fichiers qu’ils ont installés, trouvez où sont rangés les plug-ins et videz le cache d’Ableton Live sans toucher à vos licences.',
+      crumb: 'Guide de stockage pour producteurs',
+      headline: 'Désinstallez vos plug-ins audio sur Mac, avec tout ce qu’ils ont laissé.',
+      lede: 'Des plug-ins que vous n’utilisez plus, des caches que votre STAN reconstruit, des fichiers d’applications déjà supprimées. CacheDrop liste chaque format de chaque plug-in au même endroit et met ce que vous choisissez à la Corbeille.',
+      cta: 'Obtenir CacheDrop gratuitement',
+      ctaNote: 'AU · VST · VST3 · AAX · CLAP · macOS 14+ · Gratuit pendant la bêta.',
+      updated: 'novembre 2026',
+      readTime: '7 min de lecture',
+      faqTitle: 'FAQ sur les plug-ins et le stockage musical',
+      faq: [
+        ['Comment désinstaller complètement un plug-in VST sur Mac?', 'Quittez votre STAN, puis supprimez le plug-in de chaque dossier de format où il a été installé (VST, VST3, AU et AAX ont chacun le leur) et retirez les fichiers de soutien que son installateur a ajoutés. <span class="ic">pkgutil --files</span> liste ce qu’un installateur a écrit. CacheDrop le fait en une seule liste par produit.'],
+        ['Comment retirer des plug-ins AAX de Pro Tools sur Mac?', 'Quittez Pro Tools et supprimez le fichier <span class="ic">.aaxplugin</span> de <span class="ic">/Library/Application Support/Avid/Audio/Plug-Ins</span>. Si le même plug-in a été installé dans d’autres formats, ceux-ci restent, à moins de les retirer aussi.'],
+        ['Peut-on supprimer le dossier de cache d’Ableton sans risque?', 'Oui, avec Live fermé. Il contient des copies décodées d’échantillons compressés, et Live les décode de nouveau la prochaine fois qu’un Set en a besoin. Le bouton Cleanup de Live, dans Settings › File &amp; Folder › Decoding Cache, supprime ce que le Set ouvert n’utilise pas.'],
+        ['Peut-on supprimer la bibliothèque de sons de Logic Pro pour libérer de l’espace?', 'Gérez-la depuis Logic Pro › Sound Library, qui installe et retire les packs de sons, et Apple permet de déplacer la bibliothèque sur un disque externe. CacheDrop en montre la taille, mais ne retire jamais la bibliothèque de sons d’Apple.'],
+        ['Désinstaller des plug-ins supprime-t-il mes licences iLok?', 'Pas avec CacheDrop : les fichiers iLok, PACE, eLicenser et CodeMeter, et tout ce qui porte le nom d’une licence, d’une activation ou d’un numéro de série, ne sont jamais proposés. Une activation reste dans votre compte iLok ; désactivez-la d’abord dans iLok License Manager si vous voulez l’utiliser sur un autre Mac.'],
+        ['Comment désinstaller les plug-ins Waves, UAD ou Native Instruments sur Mac?', 'Leurs propres gestionnaires, Waves Central, UA Connect et Native Access, retirent leurs produits. CacheDrop les liste par produit comme tout autre plug-in, avec chaque format et les fichiers que leurs installateurs listent.'],
+        ['Quels fichiers les plug-ins laissent-ils derrière eux?', 'Souvent les autres formats, des préréglages et des fichiers de soutien dans Application Support, des préférences et le reçu de l’installateur. CacheDrop les regroupe avec le plug-in, et liste à part les fichiers d’applications déjà supprimées.'],
+        ['Existe-t-il un désinstallateur de plug-ins gratuit pour Mac?', 'CacheDrop est gratuit pendant la bêta : l’analyse, la liste des plug-ins et les désinstallations.'],
+      ] as Array<[string, string]>,
+      other: { eyebrow: 'Vous faites aussi du montage?', title: 'Comment vider le cache de média Adobe et les fichiers de rendu de Final Cut Pro', href: '/clear-adobe-media-cache-mac/', link: 'Lire le guide pour créateurs' },
+      closing: { title: 'Faites de la place pour la prochaine session.', body: 'CacheDrop trouve vos plug-ins, le cache d’Ableton et les fichiers d’applications supprimées en une seule analyse.' },
+      trademarks: 'Ableton et Live sont des marques de commerce d’Ableton AG. Pro Tools et AAX sont des marques de commerce d’Avid Technology. VST est une marque de commerce de Steinberg Media Technologies GmbH. iLok est une marque de commerce de PACE Anti-Piracy. Logic Pro, GarageBand, MainStage, Apple, Mac et macOS sont des marques de commerce d’Apple Inc. Les autres noms sont des marques de commerce de leurs propriétaires.',
+    },
+    toc: ['Comment désinstaller des plug-ins audio sur Mac', 'Où sont rangés les plug-ins VST, AU, AAX et CLAP?', 'Pourquoi supprimer le .vst3 ne suffit pas', 'Mes licences sont-elles en danger?', 'Comment vider le cache d’Ableton Live', 'Bibliothèques d’échantillons et packs de sons', 'Fichiers d’applications supprimées'],
+    uninstall: {
+      intro: 'Un plug-in tient rarement en un seul fichier. La plupart des installateurs placent le même plug-in en deux à quatre formats, dans des dossiers différents, plus des préréglages et des fichiers de soutien ailleurs. Supprimer un seul paquet laisse le reste.',
+      manualTitle: 'La méthode manuelle',
+      manual: ['Quittez votre STAN et toute application qui charge des plug-ins.', 'Utilisez le désinstallateur ou le gestionnaire du fabricant s’il en a un.', 'Sinon, supprimez le plug-in de chaque dossier de format ci-dessous. Les dossiers AU et VST de /Library demandent souvent votre mot de passe.', 'Retirez ses fichiers de soutien dans Application Support et ses préférences.', 'Vérifiez le reçu de l’installateur pour le reste (ci-dessous).'],
+      oursTitle: 'La méthode CacheDrop',
+      ours: ['Ouvrez Applications › Plug-ins : chaque produit, avec ses formats et sa taille.', 'Cochez un produit. Ses formats et les fichiers de soutien que liste le reçu de son installateur sont cochés avec lui.', `CacheDrop vous demande d’abord de quitter toute application hôte ouverte : ${hosts}.`, 'Tout ce que macOS le laisse déplacer va à la Corbeille, et Put back le remet en place. Les fichiers qui demandent votre mot de passe sont listés avec Reveal in Finder.'],
+      never: 'Il lit les plug-ins sans les charger et n’en qualifie jamais un d’inutilisé ou de doublon : c’est vous qui décidez.',
+    },
+    where: {
+      intro: 'macOS a un dossier par format, pour tous les utilisateurs dans /Library et pour vous seul dans votre dossier de départ. Les plug-ins AUv3 vivent dans leur application et partent quand vous la supprimez.',
+      format: 'Format',
+      folders: 'Dossiers',
+      system: 'Tous les utilisateurs',
+      user: 'Votre dossier de départ seulement',
+    },
+    receipts: {
+      p1: 'Les installateurs écrivent aussi des préréglages, des manuels, du contenu sonore et des fichiers d’aide dans Application Support, et macOS garde un reçu de ce que chaque paquet d’installation a écrit. Pour le voir dans Terminal :',
+      label: 'Terminal',
+      p2: 'CacheDrop lit les mêmes reçus, donc les fichiers de soutien partent avec leur plug-in : seulement ce que liste le reçu de ce produit, jamais le dossier d’un fabricant que d’autres produits partagent, et seulement les types de fichiers qu’il sait sûrs à déplacer.',
+    },
+    licences: {
+      p1: 'La protection contre la copie garde ses données à part des plug-ins. CacheDrop ne propose jamais les fichiers iLok et PACE, eLicenser ou CodeMeter, ni rien qui porte le nom d’une licence, d’une activation ou d’un numéro de série, et vérifie de nouveau juste avant de déplacer quoi que ce soit.',
+      p2: 'Désinstaller ne rend pas une activation. Si un plug-in est activé sur ce Mac et que vous le voulez sur un autre, désactivez-le d’abord dans iLok License Manager ou le gestionnaire du fabricant.',
+    },
+    ableton: {
+      p1: 'Quand vous utilisez des échantillons compressés, comme du MP3 ou du FLAC, Live les décode dans un cache. Il grossit à chaque projet, et Live le reconstruit au besoin.',
+      label: 'Chemin',
+      p2: 'Le Smart clean de CacheDrop le supprime, et le laisse décoché tant que Live est ouvert. Les caches que d’autres applications de musique gardent dans ~/Library/Caches sont vidés de la même façon, comme App caches.',
+    },
+    libraries: {
+      p1: 'Les bibliothèques d’échantillons sont souvent les plus gros dossiers d’un producteur, et elles sont à vous. CacheDrop montre leur taille et où les gérer, et ne les retire jamais de lui-même :',
+      items: ['Bibliothèque de sons de Logic Pro et GarageBand : Logic Pro › Sound Library.', 'Packs Ableton : le navigateur de Live, sous Packs.', 'Échantillons Splice : l’application Splice.', 'La User Library d’Ableton et vos propres Apple Loops : marquées comme les vôtres.'],
+      p2: 'Quand vous désinstallez un plug-in, les banques de sons que son fabricant a installées pour lui peuvent partir aussi, cochées une à une. Les dossiers d’Apple, votre User Library et Splice, jamais.',
+    },
+    deleted: {
+      p1: 'Supprimer une application du dossier Applications laisse ses réglages, ses caches et ses données dans votre Bibliothèque. CacheDrop les liste sous Files from deleted apps, chacun lié à son application par son identifiant ou le reçu de son installateur, et met ce que vous choisissez à la Corbeille.',
+      p2: 'Un dossier qui partage seulement un nom avec une application supprimée est montré comme possiblement lié, avec la raison, et le Smart clean ne le choisit jamais.',
+    },
+    howTo: 'Comment désinstaller un plug-in audio sur Mac',
+  },
+};
+// Decision 44 and 48: with pricing live, the trial terms replace "free while in beta". Uninstalls count
+// toward the 2 GB (Trial.swift), so no line says uninstalling is free.
+const launch = {
+  en: {
+    ctaNote: 'AU · VST · VST3 · AAX · CLAP · macOS 14+',
+    trial: 'Scanning and the plug-in list are always free. Cleanup and uninstalls are free until they’ve freed 2 GB.',
+  },
+  fr: {
+    ctaNote: 'AU · VST · VST3 · AAX · CLAP · macOS 14+',
+    trial: 'L’analyse et la liste des plug-ins sont toujours gratuites. Le nettoyage et les désinstallations sont gratuits jusqu’à 2 Go libérés.',
+  },
+};
+const lang = langOf(Astro.url);
+const base = copy[lang];
+const live = withLaunch({ ctaNote: base.guide.ctaNote, trial: '' }, launch[lang]);
+const faq = live.trial ? base.guide.faq.map(([q, a], i, all) => [q, i === all.length - 1 ? live.trial : a] as [string, string]) : base.guide.faq;
+const t = { ...base, guide: { ...base.guide, ctaNote: live.trial ? `${live.ctaNote} · ${live.trial}` : live.ctaNote, faq } };
+const ids = ['uninstall', 'where', 'receipts', 'licences', 'ableton', 'libraries', 'deleted-apps'];
+const howTo = { name: t.howTo, steps: t.uninstall.manual };
+---
+<Guide {...t.guide} path="/uninstall-audio-plugins-mac/" dateModified="2026-11-02" signup="music-audio" howTo={howTo}>
+<Toc items={[...ids.map((id, i) => [`#${id}`, t.toc[i]] as [string, string]), ['#faq', t.guide.faqTitle]]} />
+
+<section id="uninstall" style="padding-top: var(--space-16); display: flex; flex-direction: column; gap: var(--space-5)">
+<h2 style={guideH2}>{t.toc[0]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.uninstall.intro}</p>
+<div style={pair}>
+<div style={manual}>
+<h3 style={h3}>{t.uninstall.manualTitle}</h3>
+<ol style={list}>{t.uninstall.manual.map((s) => <li>{s}</li>)}</ol>
+</div>
+<div style={ours}>
+<h3 style={h3}>{t.uninstall.oursTitle}</h3>
+<ol style={list}>{t.uninstall.ours.map((s) => <li>{s}</li>)}</ol>
+</div>
+</div>
+<p style={guideP}>{t.uninstall.never}</p>
+</section>
+
+<section id="where" style={section}>
+<h2 style={guideH2}>{t.toc[1]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.where.intro}</p>
+<table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 21px; color: var(--ink-body)">
+<thead><tr><th scope="col" style={head}>{t.where.format}</th><th scope="col" style={head}>{t.where.folders}</th></tr></thead>
+<tbody>
+{folders.map(([format, system, user]) => (
+<tr><th scope="row" style={`${cell}; font-weight: 600`}>{format}</th><td style={cell}><div style="display: flex; flex-direction: column; gap: var(--space-1-5)">
+<span><span style={label}>{t.where.system}</span> <span class="ic" style="overflow-wrap: anywhere">{system}</span></span>
+{user !== '—' && <span><span style={label}>{t.where.user}</span> <span class="ic" style="overflow-wrap: anywhere">{user}</span></span>}
+</div></td></tr>
+))}
+</tbody>
+</table>
+</section>
+
+<section id="receipts" style={section}>
+<h2 style={guideH2}>{t.toc[2]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.receipts.p1}</p>
+<CodeBlock label={t.receipts.label} code={'pkgutil --pkgs | grep -i maker-name\npkgutil --files com.maker.pkg.ProductName'} />
+<p style={`${guideP}; text-wrap: pretty`}>{t.receipts.p2}</p>
+</section>
+
+<section id="licences" style={section}>
+<h2 style={guideH2}>{t.toc[3]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.licences.p1}</p>
+<p style={`${guideP}; text-wrap: pretty`}>{t.licences.p2}</p>
+</section>
+
+<section id="ableton" style={section}>
+<h2 style={guideH2}>{t.toc[4]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.ableton.p1}</p>
+<CodeBlock label={t.ableton.label} code="~/Library/Caches/Ableton/Cache" />
+<p style={`${guideP}; text-wrap: pretty`}>{t.ableton.p2}</p>
+</section>
+
+<section id="libraries" style={section}>
+<h2 style={guideH2}>{t.toc[5]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.libraries.p1}</p>
+<ul style={list}>{t.libraries.items.map((s) => <li>{s}</li>)}</ul>
+<p style={`${guideP}; text-wrap: pretty`}>{t.libraries.p2}</p>
+</section>
+
+<section id="deleted-apps" style={section}>
+<h2 style={guideH2}>{t.toc[6]}</h2>
+<p style={`${guideP}; text-wrap: pretty`}>{t.deleted.p1}</p>
+<p style={`${guideP}; text-wrap: pretty`}>{t.deleted.p2}</p>
+</section>
+</Guide>
