@@ -146,7 +146,7 @@ export const rows: CompareRow[] = [
       fr: 'La surveillance du système et des outils de performance, avec du nettoyage.',
     },
     source: 'https://cindori.com/store/sensei',
-    checkedOn: '2026-11-02',
+    checkedOn: '2026-11-03',
   },
   {
     product: 'Mole',
@@ -157,7 +157,7 @@ export const rows: CompareRow[] = [
       fr: 'Le nettoyage, plus des moniteurs système et le contrôle des ventilateurs, pour 2 Mac.',
     },
     source: 'https://mole.fit/',
-    checkedOn: '2026-11-02',
+    checkedOn: '2026-11-03',
   },
   {
     product: 'DaisyDisk',
@@ -179,7 +179,7 @@ export const rows: CompareRow[] = [
       fr: 'Des scripts d’entretien et des réglages système cachés, sans frais.',
     },
     source: 'https://www.titanium-software.fr/en/onyx.html',
-    checkedOn: '2026-11-02',
+    checkedOn: '2026-11-03',
   },
   {
     product: 'AppCleaner',
@@ -190,7 +190,7 @@ export const rows: CompareRow[] = [
       fr: 'Supprimer une application et ses fichiers, une à la fois, sans frais.',
     },
     source: 'https://freemacsoft.net/appcleaner/',
-    checkedOn: '2026-11-02',
+    checkedOn: '2026-11-03',
   },
 ];
 
