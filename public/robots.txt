@@ -1,4 +1,14 @@
+# Every crawler may read the whole site. The AI crawlers are named too, so the intent is on
+# record (#94): answer engines may read and cite every page. /llms.txt maps the site for them.
 User-agent: *
+Allow: /
+
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ClaudeBot
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
 Allow: /
 
 Sitemap: https://cachedrop.io/sitemap.xml

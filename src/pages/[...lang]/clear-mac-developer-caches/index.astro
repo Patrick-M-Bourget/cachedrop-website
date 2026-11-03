@@ -6,6 +6,7 @@ import Toc from '../../../components/Toc.astro';
 import CodeBlock from '../../../components/CodeBlock.astro';
 import Kicker from '../../../components/Kicker.astro';
 import { guideH2, guideP, guideSection } from '../../../components/guide-styles';
+import { guides } from '../../../components/guides';
 import { langOf, langPaths } from '../../../i18n';
 
 export const getStaticPaths = langPaths;
@@ -22,8 +23,7 @@ const caches = [
 const copy = {
   en: {
     guide: {
-      title: 'Clear Xcode DerivedData, node_modules & Docker Cache on Mac',
-      description: 'Delete Xcode DerivedData, clear old node_modules and Docker caches on your Mac. Manual Terminal steps, plus a free developer Mac cleaner that does it safely.',
+      ...guides.developer.en,
       crumb: 'Developer Storage Guide',
       headline: 'Reclaim gigabytes of forgotten code.',
       lede: 'If you write code on a Mac, your biggest space hog isn’t your files. It’s the build artifacts scattered across every old project.',
@@ -79,8 +79,7 @@ const copy = {
   },
   fr: {
     guide: {
-      title: 'Vider DerivedData de Xcode, node_modules et le cache Docker sur Mac',
-      description: 'Supprimez les DerivedData de Xcode, les vieux node_modules et les caches Docker de votre Mac. Les commandes Terminal à la main, plus un nettoyeur gratuit pour développeurs qui le fait sans risque.',
+      ...guides.developer.fr,
       crumb: 'Guide de stockage pour développeurs',
       headline: 'Récupérez des gigaoctets de code oublié.',
       lede: 'Si vous codez sur un Mac, ce qui prend le plus de place, ce ne sont pas vos fichiers. Ce sont les artefacts de compilation éparpillés dans chacun de vos vieux projets.',
