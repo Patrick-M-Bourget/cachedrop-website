@@ -36,7 +36,7 @@ test('a French signup gets the French email; a later English one switches back',
   const storedLang = async () => (await dev!.from('signups').select('lang').eq('email', email).single()).data?.lang;
 
   const fr = await signup('fr');
-  expect(fr.subject).toBe('Votre lien de téléchargement CacheDrop');
+  expect(fr.subject).toBe('Votre téléchargement CacheDrop');
   const token = fr.text.match(/https:\/\/\S+\/fr\/download\/([A-Za-z0-9_-]{43})\//)![1];
   expect(fr.text).toMatch(/https:\/\/\S+\/fr\/unsubscribe\/[A-Za-z0-9_-]{43}\//);
   expect(fr.text).toMatch(/https:\/\/\S+\/fr\/privacy\//);
@@ -47,7 +47,7 @@ test('a French signup gets the French email; a later English one switches back',
   if (dev) expect(await storedLang()).toBe('fr');
 
   const en = await signup('en');
-  expect(en.subject).toBe('Your CacheDrop download link');
+  expect(en.subject).toBe('Your CacheDrop download');
   expect(en.text).not.toContain('/fr/');
   if (dev) expect(await storedLang()).toBe('en');
 });
@@ -78,7 +78,7 @@ async function authorise(page: Page, api: string, extra: Record<string, string>)
 async function sendFrenchForm(page: Page, address: string) {
   await page.goto('/fr/download/');
   await page.getByLabel('Courriel', { exact: true }).fill(address);
-  await page.getByRole('button', { name: 'Envoyer le lien de téléchargement' }).click();
+  await page.getByRole('button', { name: 'M’envoyer le lien' }).click();
 }
 
 test.describe('the French forms', () => {
@@ -91,7 +91,7 @@ test.describe('the French forms', () => {
     expect(sent.map((s) => s.status)).toEqual([200]);
     expect(sent[0].body).toMatchObject({ email: address, lang: 'fr', turnstile: PASS });
     const captured = sent[0].json.captured as { subject: string; text: string };
-    expect(captured.subject).toBe('Votre lien de téléchargement CacheDrop');
+    expect(captured.subject).toBe('Votre téléchargement CacheDrop');
     expect(captured.text).toMatch(/https:\/\/\S+\/fr\/download\/[A-Za-z0-9_-]{43}\//);
   });
 

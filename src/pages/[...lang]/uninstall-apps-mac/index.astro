@@ -12,6 +12,7 @@ import Guide from '../../../layouts/Guide.astro';
 import Toc from '../../../components/Toc.astro';
 import CodeBlock from '../../../components/CodeBlock.astro';
 import { guideH2, guideP } from '../../../components/guide-styles';
+import { guides } from '../../../components/guides';
 import { langOf, langPaths, localize } from '../../../i18n';
 
 export const getStaticPaths = langPaths;
@@ -32,8 +33,7 @@ const folders = ['Application Support', 'Caches', 'Containers', 'Group Container
 const copy = {
   en: {
     guide: {
-      title: 'How to Completely Uninstall Apps on Mac and Remove Leftovers',
-      description: 'Dragging an app to the Trash leaves its settings, caches and data behind. Find where app leftovers live on a Mac, remove them by hand, or uninstall apps with every file they left.',
+      ...guides.apps.en,
       crumb: 'App Uninstall Guide',
       headline: 'How to completely uninstall apps on Mac',
       lede: 'Dragging an app to the Trash removes the app, not the settings, caches and data it left in your Library. Here’s where those leftovers live, how to remove them by hand, and how CacheDrop finds them for you.',
@@ -118,8 +118,7 @@ const copy = {
   },
   fr: {
     guide: {
-      title: 'Désinstaller une application sur Mac et supprimer ses restes',
-      description: 'Glisser une application dans la Corbeille laisse ses réglages, ses caches et ses données. Trouvez où se cachent les restes d’applications sur Mac, supprimez-les à la main, ou désinstallez vos applications avec tous leurs fichiers.',
+      ...guides.apps.fr,
       crumb: 'Guide de désinstallation d’applications',
       headline: 'Comment désinstaller complètement une application sur Mac',
       lede: 'Glisser une application dans la Corbeille retire l’application, pas les réglages, les caches et les données qu’elle a laissés dans votre Bibliothèque. Voici où se trouvent ces restes, comment les supprimer à la main et comment CacheDrop les trouve pour vous.',

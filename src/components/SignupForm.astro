@@ -1,5 +1,6 @@
 ---
-// The download signup card (Decision 1): the email form and its "check your inbox" done state.
+// The download signup card (Decision 1): the email form and its "check your inbox" done state,
+// which offers Open Gmail and Open Outlook and a link that sends the email again (Decision 53).
 // Used by /download/ and by landing pages that take the signup without another click (Decision 48).
 // The form posts to /api/signup, which saves the signup and emails a download link in `lang`.
 // The news checkbox always starts unticked and the download never depends on it (Decision 3).
@@ -28,12 +29,17 @@ const copy = {
     optional: '(optional)',
     news: 'Email me news about CacheDrop, like new features and surveys.',
     newsNote: 'Optional. You can unsubscribe at any time from any of our emails.',
-    send: 'Send Download Link',
+    send: 'Email Me the Link',
     promise: 'We email you the link, then only about new versions and security.',
     privacy: 'Privacy Policy',
     sentTitle: 'Check your inbox',
     sentBefore: 'We sent a download link to ',
     sentAfter: '. If it isn’t there in a minute, check your spam folder.',
+    gmail: 'Open Gmail',
+    outlook: 'Open Outlook',
+    resendBefore: 'Didn’t get it?',
+    resend: 'Send it again',
+    resent: 'Sent again. It can take a minute to arrive.',
     again: 'Use a Different Email',
     badEmail: 'Enter a full email address, like you@example.com.',
     failed: 'We couldn’t send the link. Check your connection and try again.',
@@ -46,12 +52,17 @@ const copy = {
     optional: '(facultatif)',
     news: 'Envoyez-moi des nouvelles de CacheDrop par courriel : nouvelles fonctionnalités et sondages.',
     newsNote: 'Facultatif. Vous pouvez vous désabonner en tout temps à partir de n’importe lequel de nos courriels.',
-    send: 'Envoyer le lien de téléchargement',
+    send: 'M’envoyer le lien',
     promise: 'Nous vous envoyons le lien, puis seulement des courriels sur les nouvelles versions et la sécurité.',
     privacy: 'Politique de confidentialité',
     sentTitle: 'Vérifiez vos courriels',
     sentBefore: 'Nous avons envoyé un lien de téléchargement à ',
     sentAfter: '. S’il n’est pas arrivé d’ici une minute, vérifiez votre dossier de courrier indésirable.',
+    gmail: 'Ouvrir Gmail',
+    outlook: 'Ouvrir Outlook',
+    resendBefore: 'Rien reçu?',
+    resend: 'Renvoyer le lien',
+    resent: 'Lien renvoyé. Il peut prendre une minute à arriver.',
     again: 'Utiliser une autre adresse',
     badEmail: 'Entrez une adresse courriel complète, comme vous@exemple.com.',
     failed: 'Le lien n’a pas pu être envoyé. Vérifiez votre connexion et réessayez.',
@@ -59,7 +70,12 @@ const copy = {
 };
 const t = copy[lang];
 const filling = ['development', 'video-photo', 'music-audio', 'other'].map((value, i) => [value, t.filling[i]]);
-const msg = { lang, badEmail: t.badEmail, failed: t.failed };
+const msg = { lang, badEmail: t.badEmail, failed: t.failed, resent: t.resent };
+// The done state's webmail buttons open the inbox in a new tab. Gmail searches every folder,
+// spam included, for the sender (src/server/mail.ts); the script adds the address as authuser so
+// Gmail opens that account when several are signed in. Outlook.com has no search link, so it opens the inbox.
+const GMAIL = 'https://mail.google.com/mail/u/0/#search/from%3Ahello%40cachedrop.io+in%3Aanywhere';
+const OUTLOOK = 'https://outlook.live.com/mail/0/';
 const label = 'font-size: 13px; line-height: 18px; font-weight: 500';
 ---
 <div data-gate style={`width: 100%; max-width: var(--modal-max); padding: var(--space-8); border: 1px solid var(--line); border-radius: var(--radius-2xl); background: var(--surface-raised); box-shadow: var(--shadow-card); text-align: left; ${style}`}>
@@ -90,7 +106,13 @@ const label = 'font-size: 13px; line-height: 18px; font-weight: 500';
 <div style="width: var(--control-lg); height: var(--control-lg); border-radius: var(--radius-full); background: var(--success-soft); color: var(--success-ink); display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></div>
 <h2 data-gate-done-title tabindex="-1" style={`${titleMd}; outline: none`}>{t.sentTitle}</h2>
 <p style="margin: 0; font-size: 14px; line-height: 20px; color: var(--ink-secondary)">{t.sentBefore}<span data-gate-sent-to style="font-weight: 500; color: var(--ink); overflow-wrap: anywhere"></span>{t.sentAfter}</p>
-<button type="button" class="gate-btn gate-quiet" data-gate-again style="margin-top: var(--space-1)">{t.again}</button>
+<div style="margin-top: var(--space-2); display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3)">
+<a class="gate-btn gate-secondary" data-gate-gmail href={GMAIL} target="_blank" rel="noopener noreferrer">{t.gmail}</a>
+<a class="gate-btn gate-secondary" data-gate-outlook href={OUTLOOK} target="_blank" rel="noopener noreferrer">{t.outlook}</a>
+</div>
+<p style="margin: var(--space-1) 0 0; font-size: 14px; line-height: 20px; color: var(--ink-secondary)">{t.resendBefore} <button type="button" class="textlink gate-link" data-gate-resend>{t.resend}</button></p>
+<p data-gate-resend-status role="status" hidden style="margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-secondary)"></p>
+<button type="button" class="gate-btn gate-quiet" data-gate-again>{t.again}</button>
 </div>
 </div>
 
@@ -99,9 +121,13 @@ const label = 'font-size: 13px; line-height: 18px; font-weight: 500';
   var form = document.querySelector('[data-gate-form]');
   var done = document.querySelector('[data-gate-done]');
   var error = document.querySelector('[data-gate-error]');
+  var status = document.querySelector('[data-gate-resend-status]');
+  var resend = document.querySelector('[data-gate-resend]');
+  var gmail = document.querySelector('[data-gate-gmail]');
   var check = form.querySelector('[data-bot-check]');
   var email = form.email;
   var submit = form.querySelector('[type=submit]');
+  var gmailBase = gmail.getAttribute('href');
   // bot-check.js is deferred, so it runs after this and before DOMContentLoaded.
   document.addEventListener('DOMContentLoaded', function () { window.CacheDropBotCheck.prepare(check); });
 
@@ -114,40 +140,62 @@ const label = 'font-size: 13px; line-height: 18px; font-weight: 500';
   var BAD_EMAIL = msg.badEmail;
   var NOT_SENT = msg.failed;
 
+  // Posts one signup, then calls ok() or refused(message, isBadEmail). The resend link posts the
+  // same answers again, so a second email goes out with a fresh link.
+  function post(body, ok, refused) {
+    var bot = window.CacheDropBotCheck;
+    return bot.token(check)
+      .then(function (token) {
+        body.turnstile = token;
+        return fetch('/api/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        }).then(function (res) {
+          bot.reset(check); // a token works once
+          if (res.ok) return ok();
+          return res.json().catch(function () { return {}; }).then(function (answer) {
+            var message = bot.message(check, res, answer);
+            if (message) refused(message);
+            else if (answer.error === 'invalid_email') refused(BAD_EMAIL, true);
+            else refused(NOT_SENT);
+          });
+        }, function () { bot.reset(check); refused(NOT_SENT); });
+      }, function () { refused(bot.failed(check)); });
+  }
+
+  var last = null;
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     clear();
     var address = email.value.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) return fail(BAD_EMAIL, true);
     var choice = form.querySelector('[name=filling]:checked');
-    var bot = window.CacheDropBotCheck;
+    last = { email: address, filling: choice ? choice.value : null, news: form.news.checked, lang: msg.lang };
     submit.disabled = true;
-    bot.token(check)
-      .then(function (token) {
-        return fetch('/api/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: address, filling: choice ? choice.value : null, news: form.news.checked, lang: msg.lang, turnstile: token })
-        }).then(function (res) {
-          bot.reset(check); // a token works once
-          if (res.ok) {
-            document.querySelector('[data-gate-sent-to]').textContent = address;
-            form.hidden = true;
-            done.hidden = false;
-            document.querySelector('[data-gate-done-title]').focus();
-            return;
-          }
-          return res.json().catch(function () { return {}; }).then(function (body) {
-            var refused = bot.message(check, res, body);
-            if (refused) fail(refused);
-            else if (body.error === 'invalid_email') fail(BAD_EMAIL, true);
-            else fail(NOT_SENT);
-          });
-        }, function () { bot.reset(check); fail(NOT_SENT); });
-      }, function () { fail(bot.failed(check)); })
-      .then(function () { submit.disabled = false; });
+    post(Object.assign({}, last), function () {
+      document.querySelector('[data-gate-sent-to]').textContent = address;
+      gmail.href = gmailBase.replace('/u/0/', '/u/?authuser=' + encodeURIComponent(address));
+      status.hidden = true;
+      form.hidden = true;
+      done.hidden = false;
+      document.querySelector('[data-gate-done-title]').focus();
+    }, fail).then(function () { submit.disabled = false; });
   });
   email.addEventListener('input', clear);
+  resend.addEventListener('click', function () {
+    resend.disabled = true;
+    status.hidden = true;
+    post(Object.assign({}, last), function () {
+      status.textContent = msg.resent;
+      status.style.color = 'var(--ink-secondary)';
+      status.hidden = false;
+    }, function (message) {
+      status.textContent = message;
+      status.style.color = 'var(--danger-ink)';
+      status.hidden = false;
+    }).then(function () { resend.disabled = false; });
+  });
   document.querySelector('[data-gate-again]').addEventListener('click', function () {
     form.reset();
     done.hidden = true;

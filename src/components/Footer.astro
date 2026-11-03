@@ -6,8 +6,10 @@
 // The language switch at the end of that row is Decision 5: it opens this page in the other language.
 // "Resend License Key" at the end of Product is Decision 42.
 // The producer page's link after the two guides is Decision 48.
+// The System Data guide's link after it is #110.
 // The app uninstall guide's link after it is #111 (Decision 51).
 import BrandMark from './BrandMark.astro';
+import { footerCopy as copy } from './footer';
 import { langOf, localize, other } from '../i18n';
 
 interface Props {
@@ -19,52 +21,6 @@ interface Props {
   trademarks?: string;
 }
 
-const copy = {
-  en: {
-    tagline: 'A careful Mac storage cleaner for developer caches and creative render files.',
-    guides: 'Cleaning Guides',
-    developer: 'Clear Developer Caches',
-    creator: 'Clear Adobe Media Cache',
-    producer: 'Uninstall Audio Plug-ins',
-    apps: 'Uninstall Apps',
-    product: 'Product',
-    overview: 'Overview',
-    download: 'Download for Mac',
-    feedback: 'Provide Feedback',
-    resendKey: 'Resend License Key',
-    platform: 'Platform',
-    chips: 'Apple Silicon & Intel',
-    macos: 'macOS 14 Sonoma and later',
-    trademarks: 'Apple, Mac, and macOS are trademarks of Apple Inc.',
-    privacy: 'Privacy Policy',
-    terms: 'Terms of Sale',
-    refunds: 'Refund Policy',
-    license: 'License Agreement',
-    switchTo: 'Français',
-  },
-  fr: {
-    tagline: 'Un nettoyeur de stockage prudent pour Mac, fait pour les caches de développement et les fichiers de rendu.',
-    guides: 'Guides de nettoyage',
-    developer: 'Vider les caches de développement',
-    creator: 'Vider le cache de média Adobe',
-    producer: 'Désinstaller des plug-ins audio',
-    apps: 'Désinstaller des applications',
-    product: 'Produit',
-    overview: 'Aperçu',
-    download: 'Télécharger pour Mac',
-    feedback: 'Donner votre avis',
-    resendKey: 'Renvoyer la clé de licence',
-    platform: 'Plateforme',
-    chips: 'Apple Silicon et Intel',
-    macos: 'macOS 14 Sonoma ou version ultérieure',
-    trademarks: 'Apple, Mac et macOS sont des marques de commerce d’Apple Inc.',
-    privacy: 'Politique de confidentialité',
-    terms: 'Conditions de vente',
-    refunds: 'Politique de remboursement',
-    license: 'Contrat de licence',
-    switchTo: 'English',
-  },
-};
 const lang = langOf(Astro.url);
 const t = copy[lang];
 const to = other(lang);
@@ -86,6 +42,7 @@ const { path, overview = false, trademarks = t.trademarks } = Astro.props;
 <a class="flink" href={href('/clear-mac-developer-caches/')}>{t.developer}</a>
 <a class="flink" href={href('/clear-adobe-media-cache-mac/')}>{t.creator}</a>
 <a class="flink" href={href('/uninstall-audio-plugins-mac/')}>{t.producer}</a>
+<a class="flink" href={href('/clear-system-data-mac/')}>{t.systemData}</a>
 <a class="flink" href={href('/uninstall-apps-mac/')}>{t.apps}</a>
 </nav>
 <nav aria-label="Product" style="display: flex; flex-direction: column; gap: var(--space-2-5); font-size: 13px">

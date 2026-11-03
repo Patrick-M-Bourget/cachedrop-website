@@ -19,6 +19,7 @@ export const pages: PageUnderTest[] = [
   { path: '/clear-mac-developer-caches/', handoff: 'clear-mac-developer-caches/index.html', screenshots: 'developer-guide' },
   { path: '/clear-adobe-media-cache-mac/', handoff: 'clear-adobe-media-cache-mac/index.html', screenshots: 'creator-guide' },
   { path: '/uninstall-audio-plugins-mac/' }, // the producer page (Decision 48): no handoff original
+  { path: '/clear-system-data-mac/' }, // the System Data guide (#110): no handoff original
   { path: '/uninstall-apps-mac/' }, // the app uninstall guide (#111): no handoff original
   { path: '/privacy/' }, // no handoff original: token and modal tests only
   { path: '/unsubscribe/' }, // new (Decision 4); vercel.json serves it at /unsubscribe/<token>/
@@ -36,6 +37,7 @@ export const pages: PageUnderTest[] = [
   { path: '/fr/clear-mac-developer-caches/', lang: 'fr' },
   { path: '/fr/clear-adobe-media-cache-mac/', lang: 'fr' },
   { path: '/fr/uninstall-audio-plugins-mac/', lang: 'fr' },
+  { path: '/fr/clear-system-data-mac/', lang: 'fr' },
   { path: '/fr/uninstall-apps-mac/', lang: 'fr' },
   { path: '/fr/privacy/', lang: 'fr' },
   { path: '/fr/unsubscribe/', lang: 'fr' },
@@ -62,6 +64,7 @@ export const pairs: Pair[] = [
   pair('/clear-mac-developer-caches/', true),
   pair('/clear-adobe-media-cache-mac/', true),
   pair('/uninstall-audio-plugins-mac/', true),
+  pair('/clear-system-data-mac/', true),
   pair('/uninstall-apps-mac/', true),
   pair('/privacy/', true),
   pair('/download/', false),

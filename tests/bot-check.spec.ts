@@ -59,7 +59,7 @@ test.describe("Cloudflare's script", () => {
 
 async function sendSignup(page: Page) {
   await page.getByLabel('Email', { exact: true }).fill('ada@example.com');
-  await page.getByRole('button', { name: 'Send Download Link' }).click();
+  await page.getByRole('button', { name: 'Email Me the Link' }).click();
 }
 
 test.describe('the download form', () => {
@@ -78,7 +78,7 @@ test.describe('the download form', () => {
     await sendSignup(page);
     await expect(page.getByRole('alert')).toHaveText(FAILED);
     await expect(page.getByLabel('Email', { exact: true })).not.toHaveAttribute('aria-invalid');
-    await page.getByRole('button', { name: 'Send Download Link' }).click();
+    await page.getByRole('button', { name: 'Email Me the Link' }).click();
     await expect.poll(() => sent.length).toBe(2);
     expect(sent[1].turnstile).toBe(DUMMY);
   });
@@ -96,7 +96,7 @@ test.describe('the download form', () => {
     await page.goto('/download/');
     await sendSignup(page);
     await expect(page.getByRole('alert')).toHaveText(FAILED);
-    await expect(page.getByRole('button', { name: 'Send Download Link' })).toBeEnabled();
+    await expect(page.getByRole('button', { name: 'Email Me the Link' })).toBeEnabled();
     expect(sent).toEqual([]);
   });
 
@@ -149,7 +149,7 @@ test.describe('the feedback modal', () => {
 // The same states on the French pages (Decision 5): the widget's copy comes from the page's language.
 async function sendSignupFr(page: Page) {
   await page.getByLabel('Courriel', { exact: true }).fill('ada@example.com');
-  await page.getByRole('button', { name: 'Envoyer le lien de téléchargement' }).click();
+  await page.getByRole('button', { name: 'M’envoyer le lien' }).click();
 }
 
 test.describe('the French download form', () => {

@@ -11,6 +11,7 @@ import Guide from '../../../layouts/Guide.astro';
 import Toc from '../../../components/Toc.astro';
 import CodeBlock from '../../../components/CodeBlock.astro';
 import { guideH2, guideP } from '../../../components/guide-styles';
+import { guides } from '../../../components/guides';
 import { langOf, langPaths, localize } from '../../../i18n';
 
 export const getStaticPaths = langPaths;
@@ -39,8 +40,7 @@ const hosts = 'Logic Pro, GarageBand, MainStage, Ableton Live, Reason, Pro Tools
 const copy = {
   en: {
     guide: {
-      title: 'How to Uninstall Audio Plug-ins on Mac (VST, AU, AAX, CLAP)',
-      description: 'Uninstall VST, VST3, AU, AAX and CLAP plug-ins on a Mac with every file they installed, find where plug-ins are stored, and clear Ableton Live’s cache without touching your licenses.',
+      ...guides.producer.en,
       crumb: 'Music Producer Storage Guide',
       headline: 'Uninstall audio plug-ins on Mac, every file they left.',
       lede: 'Plug-ins you stopped using, caches your DAW rebuilds, files from apps you already deleted. CacheDrop lists every format of every plug-in in one place and moves what you pick to the Trash.',
@@ -108,8 +108,7 @@ const copy = {
   },
   fr: {
     guide: {
-      title: 'Désinstaller des plug-ins audio sur Mac (VST, AU, AAX, CLAP)',
-      description: 'Désinstallez les plug-ins VST, VST3, AU, AAX et CLAP sur Mac avec tous les fichiers qu’ils ont installés, trouvez où sont rangés les plug-ins et videz le cache d’Ableton Live sans toucher à vos licences.',
+      ...guides.producer.fr,
       crumb: 'Guide de stockage pour producteurs',
       headline: 'Désinstallez vos plug-ins audio sur Mac, avec tout ce qu’ils ont laissé.',
       lede: 'Des plug-ins que vous n’utilisez plus, des caches que votre STAN reconstruit, des fichiers d’applications déjà supprimées. CacheDrop liste chaque format de chaque plug-in au même endroit et met ce que vous choisissez à la Corbeille.',

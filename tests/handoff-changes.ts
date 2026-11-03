@@ -76,6 +76,12 @@ export const handoffChanges: HandoffChange[] = [
     replace: '<a class="flink" href="/download/">Download for Mac</a>',
   },
   {
+    decision: 51,
+    why: 'The footer\'s Cleaning Guides column links to the System Data guide after the producer page (#110).',
+    find: '<a class="flink" href="/uninstall-audio-plugins-mac/">Uninstall Audio Plug-ins</a>',
+    replace: '<a class="flink" href="/uninstall-audio-plugins-mac/">Uninstall Audio Plug-ins</a><a class="flink" href="/clear-system-data-mac/">Clear System Data</a>',
+  },
+  {
     decision: 52,
     why: 'The footer\'s "Public beta" label goes with the badge. Applied last: the Decision 19 and 5 changes anchor on it.',
     find: '<span>Public beta</span>',
