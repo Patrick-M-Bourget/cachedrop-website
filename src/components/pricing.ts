@@ -13,6 +13,13 @@ export const buyHref = (lang: Lang) => (lang === 'fr' ? '/buy?lang=fr' : '/buy')
  */
 export const price: { readonly regular: string; readonly offer: string } = { regular: '29.99', offer: '19.99' };
 
+/**
+ * Whether the pricing section links to the compare page (#87) in each language. It stays off until
+ * that page is built and indexed in the language, so the link never leads to a 404 or a draft;
+ * tests/pricing.spec.ts fails if this disagrees with the build either way.
+ */
+export const compareLive: Readonly<Record<Lang, boolean>> = { en: false, fr: false };
+
 /** Whether the limited-time offer is running. */
 export const discounted = price.offer !== price.regular;
 
@@ -24,8 +31,9 @@ const fr = (n: string) => `${n.replace('.', ',')}\u00a0$`;
 export const pricingCopy = {
   en: {
     eyebrow: 'Pricing',
-    title: 'Try it before you buy. Pay once.',
-    body: 'Scanning is always free, and you can clean up to 2 GB before you buy. One license covers every 1.x release.',
+    // Outcomes first, then the price (Decision 51, #113).
+    title: 'Pay once. Use it on 3 Macs.',
+    body: 'See what’s filling your Mac, clean it up safely, and remove apps and plug-ins completely. You check everything first, and your files go to the Trash, so nothing is lost by mistake.',
     name: 'CacheDrop license',
     was: en(price.regular),
     now: en(price.offer),
@@ -35,11 +43,14 @@ export const pricingCopy = {
     currencies: 'Pay in USD, CAD, EUR, GBP or AUD: the same number in each.',
     included: 'What’s included',
     items: [
-      'Free cleanup up to 2 GB, and scanning is always free',
-      'Use it on up to 3 of your Macs',
-      'Every 1.x release',
-      '30-day refunds, no questions asked',
+      'Use it on up to 3 of your Macs.',
+      'Every update through version 1, ready for each new macOS when it ships.',
+      'No subscription. Nothing to cancel.',
+      '30-day refunds, no questions asked.',
+      'Scanning is always free, and you can clean up to 2 GB before you buy.',
     ],
+    // Shown only while the compare page (#87) is built and indexed in this language (`compareLive`).
+    compare: 'Compare CacheDrop with other Mac cleaners',
     // The Buy button (Decision 51): "Buy · $29.99 once", with the offer shown as on the card (Decision 47).
     buy: 'Buy',
     buyOnce: 'once',
@@ -53,8 +64,8 @@ export const pricingCopy = {
   },
   fr: {
     eyebrow: 'Tarifs',
-    title: 'Essayez-le avant d’acheter. Payez une seule fois.',
-    body: 'L’analyse est toujours gratuite, et vous pouvez nettoyer jusqu’à 2 Go avant d’acheter. Une licence vous donne toutes les versions 1.x.',
+    title: 'Payez une seule fois. Utilisez-le sur 3 Mac.',
+    body: 'Voyez ce qui remplit votre Mac, nettoyez-le en toute sécurité et désinstallez complètement applications et plug-ins. Vous vérifiez tout avant, et vos fichiers vont dans la Corbeille, donc rien n’est perdu par erreur.',
     name: 'Licence CacheDrop',
     was: fr(price.regular),
     now: fr(price.offer),
@@ -64,11 +75,13 @@ export const pricingCopy = {
     currencies: 'Payez en USD, CAD, EUR, GBP ou AUD : le même montant dans chaque devise.',
     included: 'Ce qui est inclus',
     items: [
-      'Nettoyage gratuit jusqu’à 2 Go, et l’analyse est toujours gratuite',
-      'Sur un maximum de 3 de vos Mac',
-      'Toutes les versions 1.x',
-      'Remboursement dans les 30 jours, sans avoir à vous justifier',
+      'Utilisez-le sur un maximum de 3 de vos Mac.',
+      'Toutes les mises à jour de la version 1, prêtes pour chaque nouvelle version de macOS dès sa sortie.',
+      'Aucun abonnement. Rien à annuler.',
+      'Remboursement dans les 30 jours, sans avoir à vous justifier.',
+      'L’analyse est toujours gratuite, et vous pouvez nettoyer jusqu’à 2 Go avant d’acheter.',
     ],
+    compare: 'Comparer CacheDrop aux autres nettoyeurs pour Mac',
     buy: 'Acheter',
     // No « une seule fois » on the button: it wraps at 390 px, and the price above already says it (owner, #107).
     buyOnce: '',

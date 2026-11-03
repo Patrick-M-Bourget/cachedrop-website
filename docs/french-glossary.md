@@ -60,7 +60,10 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | Try it before you buy · No card needed · macOS 14 or later | Essayez-le avant d’acheter · Aucune carte requise · macOS 14 ou version ultérieure | The line under the primary button. |
 | free to try | essai gratuit; vous pouvez l’essayer gratuitement | « Essai gratuit » as a label, the verb in a sentence. |
 | Pricing (nav link, section) | Tarifs | Owner, 2026-11-02. |
-| Try it before you buy. Pay once. | Essayez-le avant d’acheter. Payez une seule fois. | The pricing section's title. |
+| Pay once. Use it on 3 Macs. | Payez une seule fois. Utilisez-le sur 3 Mac. | The pricing section's title (#113). |
+| Every update through version 1, ready for each new macOS when it ships. | Toutes les mises à jour de la version 1, prêtes pour chaque nouvelle version de macOS dès sa sortie. | Decision 51's promise, on the pricing card. *Owner: check.* |
+| No subscription. Nothing to cancel. | Aucun abonnement. Rien à annuler. | |
+| Compare CacheDrop with other Mac cleaners (link) | Comparer CacheDrop aux autres nettoyeurs pour Mac | The pricing card's link to the compare page (#87). |
 | Already tried it? Buy a license | Vous l’avez déjà essayé? Achetez une licence | The download page's line. |
 | Was $29.99, now $19.99 for a limited time (spoken) | Prix régulier 29,99 $, maintenant 19,99 $ pour un temps limité | What screen readers hear for the struck-through price. |
 | Limited-time price (pill) | Prix pour un temps limité | Decision 47. |
