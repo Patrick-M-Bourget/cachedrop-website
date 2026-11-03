@@ -9,7 +9,6 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { guideH2, primaryLg, arrowLink, faqItem, faqQuestion } from '../components/guide-styles';
 import ClosingCta from '../components/ClosingCta.astro';
-import { withLaunch } from '../components/pricing';
 import { langOf, localize } from '../i18n';
 
 interface Props {
@@ -46,12 +45,10 @@ interface Props {
 const p = Astro.props;
 const lang = langOf(Astro.url);
 const copy = {
-  en: { breadcrumb: 'Breadcrumb', updated: 'Updated', price: 'Free while in beta.' },
-  fr: { breadcrumb: 'Fil d’Ariane', updated: 'Mis à jour en', price: 'Gratuit pendant la bêta.' },
+  en: { breadcrumb: 'Breadcrumb', updated: 'Updated', price: 'Free to try.' },
+  fr: { breadcrumb: 'Fil d’Ariane', updated: 'Mis à jour en', price: 'Essai gratuit.' },
 };
-// Decision 44: with pricing live, the closing line says "Free to try." instead.
-const launch = { en: { price: 'Free to try.' }, fr: { price: 'Essai gratuit.' } };
-const t = withLaunch(copy[lang], launch[lang]);
+const t = copy[lang];
 const site = Astro.site!.origin;
 const url = new URL(localize(lang, p.path), site).href;
 const home = `${site}${localize(lang, '/')}`;

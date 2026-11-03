@@ -1,10 +1,8 @@
 ---
 // Sticky frosted nav from the handoff. On the homepage the logo links to #top;
 // elsewhere it links to /. `current` marks the matching nav link with aria-current.
-// With pricing live (Decision 44) the BETA badge goes, a Pricing link follows the two guides and
-// the button reads "Download Free". For Music Producers follows For Creators (Decisions 48, 50).
+// A Pricing link follows the guides (Decision 44); For Music Producers follows For Creators (Decisions 48, 50).
 import BrandMark from './BrandMark.astro';
-import { pricingLive, withLaunch } from './pricing';
 import { langOf, localize } from '../i18n';
 
 interface Props {
@@ -15,21 +13,17 @@ interface Props {
 }
 
 const copy = {
-  en: { home: 'CacheDrop home', beta: 'BETA', primary: 'Primary', developers: 'For Developers', creators: 'For Creators', producers: 'For Music Producers', feedback: 'Provide Feedback', download: 'Get Free Beta' },
-  fr: { home: 'Accueil CacheDrop', beta: 'BÊTA', primary: 'Principale', developers: 'Pour les développeurs', creators: 'Pour les créateurs', producers: 'Pour les producteurs de musique', feedback: 'Donner votre avis', download: 'Obtenir la bêta gratuite' },
-};
-const launch = {
-  en: { pricing: 'Pricing', download: 'Download Free' },
-  fr: { pricing: 'Tarifs', download: 'Télécharger gratuitement' },
+  en: { home: 'CacheDrop home', primary: 'Primary', developers: 'For Developers', creators: 'For Creators', producers: 'For Music Producers', pricing: 'Pricing', feedback: 'Provide Feedback', download: 'Download for Mac' },
+  fr: { home: 'Accueil CacheDrop', primary: 'Principale', developers: 'Pour les développeurs', creators: 'Pour les créateurs', producers: 'Pour les producteurs de musique', pricing: 'Tarifs', feedback: 'Donner votre avis', download: 'Télécharger pour Mac' },
 };
 const lang = langOf(Astro.url);
-const t = withLaunch({ ...copy[lang], pricing: '' }, launch[lang]);
+const t = copy[lang];
 const { homeHref = localize(lang, '/'), current } = Astro.props;
 const links = [
   { path: '/clear-mac-developer-caches/', label: t.developers },
   { path: '/clear-adobe-media-cache-mac/', label: t.creators },
   { path: '/uninstall-audio-plugins-mac/', label: t.producers },
-  ...(pricingLive ? [{ path: '/pricing/', label: t.pricing }] : []),
+  { path: '/pricing/', label: t.pricing },
 ];
 ---
 <header style="position: sticky; top: 0; z-index: var(--z-nav); background: var(--glass); backdrop-filter: var(--backdrop-nav); -webkit-backdrop-filter: var(--backdrop-nav); border-bottom: 1px solid var(--glass-line)">
@@ -37,7 +31,6 @@ const links = [
 <a href={homeHref} aria-label={t.home} style="display: flex; align-items: center; gap: var(--space-2); color: var(--ink)">
 <BrandMark width={13} height={18} />
 <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em">CacheDrop</span>
-{!pricingLive && <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: var(--ink-secondary); background: var(--surface-subtle); border-radius: var(--radius-full); padding: var(--space-0-5) 7px">{t.beta}</span>}
 </a>
 <nav class="navlinks" aria-label={t.primary} style="display: flex; align-items: center; gap: var(--space-7); font-size: 13px">
 {links.map((l) =>

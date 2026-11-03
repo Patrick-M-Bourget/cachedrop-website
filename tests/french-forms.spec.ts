@@ -27,7 +27,7 @@ test.describe('the French download form', () => {
   test('asks for an email in French and sends lang: "fr" with the signup', async ({ page }) => {
     const requests = await mockSignup(page);
     await page.goto('/fr/download/');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Obtenez la bêta de CacheDrop.');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Téléchargez CacheDrop pour Mac.');
     await page.getByLabel('Courriel', { exact: true }).fill('ada@example.com');
     await page.getByRole('radio', { name: 'Développement' }).check();
     await page.getByRole('button', { name: 'Envoyer le lien de téléchargement' }).click();

@@ -1,10 +1,20 @@
-// The agreed copy changes against the handoff (Decision 23: claims match the app).
+// The agreed copy changes against the handoff: claims that match the app (Decision 23), and the
+// copy that replaced the beta's (Decisions 44, 47, 51 and 52), with the homepage's pricing section.
 // The head diff and the same-browser screenshot compare the build with the handoff
 // original after these replacements, so every other byte of copy still has to match.
 // Each `from` is replaced everywhere in its page, which keeps visible FAQ text and the
 // FAQPage JSON-LD in step. Checked against mac-cleaner main at 5bf77c7 on 2026-10-29.
 // The platform claim is the handoff's own again (Decision 46): CacheDrop 1.0.1 is universal, macOS 14 or later.
+import { readFileSync } from 'node:fs';
+import { price, pricingCopy } from '../src/components/pricing';
+
 export type CopyFix = { from: string; to: string; why: string };
+
+/** The pricing section as the handoff would write it (tests/fixtures/handoff-pricing-section.html). */
+const pricingSection = readFileSync(new URL('./fixtures/handoff-pricing-section.html', import.meta.url), 'utf8');
+
+/** The guides' closing line (Decision 44). */
+const guideClosing: CopyFix = { from: 'in one scan. Free while in beta.', to: 'in one scan. Free to try.', why: 'Decision 44: the guides’ closing line says “Free to try.”' };
 
 export const copyFixes: Record<string, CopyFix[]> = {
   'index.html': [
@@ -65,6 +75,31 @@ export const copyFixes: Record<string, CopyFix[]> = {
       to: 'alone. It deletes only files apps make again, like caches, and sends your own files to the Trash.',
       why: 'RESET.md Decision 3.',
     },
+    { from: 'clears them safely. Free beta.', to: 'clears them safely. Free to try.', why: 'Decision 44: the description says “Free to try.”' },
+    { from: '<span>Free Mac storage cleaner · Public beta</span>', to: '<span>Mac storage cleaner · Free to try</span>', why: 'Decision 44: the badge.' },
+    { from: '<span>Download Free Beta</span>', to: '<span>Download for Mac</span>', why: 'Decision 51: the hero and closing buttons.' },
+    {
+      from: 'Free for a limited time · Help us build it · macOS 14+ on Apple Silicon &amp; Intel',
+      to: 'Try it before you buy · No card needed · macOS 14 or later',
+      why: 'Decision 51: the trial line under the primary button.',
+    },
+    {
+      from: 'Is CacheDrop free, and which Macs does it support?',
+      to: 'How much does CacheDrop cost, and which Macs does it support?',
+      why: 'Decision 51: no “free” in a heading.',
+    },
+    {
+      from: 'It’s free for a limited time during the public beta. It’s a universal app',
+      to: `It’s free to try: scanning is always free, and you can clean up to 2\u00a0GB before you buy. A license is ${pricingCopy.en.license}, for up to 3 Macs. It’s a universal app`,
+      why: 'Decisions 44 and 47: the price answer.',
+    },
+    { from: 'Free while in beta. One universal app', to: 'Free to try. One universal app', why: 'Decision 44: the closing line.' },
+    {
+      from: '"price": "0",\n    "priceCurrency": "USD"\n   }',
+      to: `"price": "${price.offer}", "priceCurrency": "USD", "priceSpecification": { "@type": "UnitPriceSpecification", "priceType": "https://schema.org/StrikethroughPrice", "price": "${price.regular}", "priceCurrency": "USD" } }`,
+      why: 'Decision 47: the SoftwareApplication offer is what a buyer pays today, with the regular price struck through.',
+    },
+    { from: '<section id="faq"', to: `${pricingSection}<section id="faq"`, why: 'Decision 44: the pricing section sits between “Careful by default” and the FAQ.' },
   ],
   'clear-mac-developer-caches/index.html': [
     {
@@ -97,6 +132,8 @@ export const copyFixes: Record<string, CopyFix[]> = {
       to: 'CacheDrop groups the Docker, Homebrew and npm caches under Developer caches',
       why: '“These caches” included Dart’s .pub-cache, which the app doesn’t clean.',
     },
+    { from: '<span>Download CacheDrop (Free)</span>', to: '<span>Download for Mac</span>', why: 'Decision 51: the hero and closing buttons.' },
+    guideClosing,
   ],
   'clear-adobe-media-cache-mac/index.html': [
     {
@@ -130,8 +167,18 @@ export const copyFixes: Record<string, CopyFix[]> = {
       to: 'Adobe media cache and your Final Cut Pro libraries in one scan',
       why: 'As above.',
     },
+    { from: '<span>Get Your Space Back (Free)</span>', to: '<span>Download for Mac</span>', why: 'Decision 51: the hero and closing buttons.' },
+    { from: 'Get CacheDrop free', to: 'Try CacheDrop', why: 'Decision 51: the inline link to /download/.' },
+    guideClosing,
   ],
   'download/index.html': [
+    {
+      from: 'Download the free CacheDrop beta for Mac: a universal app',
+      to: 'Download CacheDrop for Mac, free to try: a universal app',
+      why: 'Decision 44: the description drops “beta”.',
+    },
+    { from: 'Thanks for trying the CacheDrop beta.', to: 'Thanks for trying CacheDrop.', why: 'Decision 52.' },
+    { from: 'CacheDrop is free while in beta.', to: 'CacheDrop is free to try.', why: 'Decision 44.' },
   ],
 };
 

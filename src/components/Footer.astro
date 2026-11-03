@@ -3,12 +3,10 @@
 // purpose (HANDOFF.md §4); don't rename them.
 // The "Privacy Policy" link in the bottom row is Decision 19; the handoff has none.
 // The terms of sale, refund policy and license agreement links after it are Decision 43; the row wraps.
-// The language switch after "Public beta" is Decision 5: it opens this page in the other language.
+// The language switch at the end of that row is Decision 5: it opens this page in the other language.
 // "Resend License Key" at the end of Product is Decision 42.
 // The producer page's link after the two guides is Decision 48.
-// With pricing live (Decision 44) the download link reads "Download Free" and "Public beta" goes.
 import BrandMark from './BrandMark.astro';
-import { pricingLive, withLaunch } from './pricing';
 import { langOf, localize, other } from '../i18n';
 
 interface Props {
@@ -29,7 +27,7 @@ const copy = {
     producer: 'Uninstall Audio Plug-ins',
     product: 'Product',
     overview: 'Overview',
-    download: 'Download Free Beta',
+    download: 'Download for Mac',
     feedback: 'Provide Feedback',
     resendKey: 'Resend License Key',
     platform: 'Platform',
@@ -40,7 +38,6 @@ const copy = {
     terms: 'Terms of Sale',
     refunds: 'Refund Policy',
     license: 'License Agreement',
-    beta: 'Public beta',
     switchTo: 'Français',
   },
   fr: {
@@ -51,7 +48,7 @@ const copy = {
     producer: 'Désinstaller des plug-ins audio',
     product: 'Produit',
     overview: 'Aperçu',
-    download: 'Télécharger la bêta gratuite',
+    download: 'Télécharger pour Mac',
     feedback: 'Donner votre avis',
     resendKey: 'Renvoyer la clé de licence',
     platform: 'Plateforme',
@@ -62,13 +59,11 @@ const copy = {
     terms: 'Conditions de vente',
     refunds: 'Politique de remboursement',
     license: 'Contrat de licence',
-    beta: 'Bêta publique',
     switchTo: 'English',
   },
 };
-const launch = { en: { download: 'Download Free' }, fr: { download: 'Télécharger gratuitement' } };
 const lang = langOf(Astro.url);
-const t = withLaunch(copy[lang], launch[lang]);
+const t = copy[lang];
 const to = other(lang);
 const href = (english: string) => localize(lang, english);
 const { path, overview = false, trademarks = t.trademarks } = Astro.props;
@@ -104,7 +99,7 @@ const { path, overview = false, trademarks = t.trademarks } = Astro.props;
 </div>
 <div style="margin-top: var(--space-14); padding-top: var(--space-6); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3); font-size: 12px; color: var(--ink-secondary)">
 <span>© 2026 CacheDrop. {trademarks}</span>
-<span style="display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4)"><a class="flink" href={href('/privacy/')}>{t.privacy}</a><a class="flink" href={href('/terms-of-sale/')}>{t.terms}</a><a class="flink" href={href('/refund-policy/')}>{t.refunds}</a><a class="flink" href={href('/license-agreement/')}>{t.license}</a>{!pricingLive && <span>{t.beta}</span>}<a class="flink" href={localize(to, path)} hreflang={to} lang={to}>{t.switchTo}</a></span>
+<span style="display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4)"><a class="flink" href={href('/privacy/')}>{t.privacy}</a><a class="flink" href={href('/terms-of-sale/')}>{t.terms}</a><a class="flink" href={href('/refund-policy/')}>{t.refunds}</a><a class="flink" href={href('/license-agreement/')}>{t.license}</a><a class="flink" href={localize(to, path)} hreflang={to} lang={to}>{t.switchTo}</a></span>
 </div>
 </div>
 </footer>

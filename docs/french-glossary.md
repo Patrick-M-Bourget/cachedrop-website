@@ -7,7 +7,7 @@ The target is Quebec French, following the Office québécois de la langue fran�
 ## Conventions
 
 - **Address the reader as « vous ».** Same voice as the brand guide: plain, specific, calm. No exclamation marks.
-- **Sentence case everywhere.** French has no Title Case: buttons, card titles and headings capitalize only the first word and proper nouns (« Télécharger la bêta gratuite », not « Télécharger la Bêta Gratuite »). Buttons are infinitives (« Envoyer », « Annuler »).
+- **Sentence case everywhere.** French has no Title Case: buttons, card titles and headings capitalize only the first word and proper nouns (« Envoyer le lien de téléchargement », not « Envoyer le Lien de Téléchargement »). Buttons are infinitives (« Envoyer », « Annuler »).
 - **Punctuation (OQLF).** A non-breaking space before the colon (` :`). No space before `?`, `!` and `;`. Guillemets « » with non-breaking spaces inside. The apostrophe is the typographic `’`, as in the English pages.
 - **Units.** `Go`, `Mo` (gigaoctet, mégaoctet) with a non-breaking space after the number: « 100 Go+ », « 500 Mo+ ».
 - **Names stay as their owners write them.** CacheDrop, Mac, macOS, Xcode, DerivedData, node_modules, Docker, Homebrew, npm, Yarn, Premiere Pro, After Effects, Media Encoder, Final Cut Pro, Apple Silicon, Intel, Finder, Terminal. Commands, paths and file types are never translated.
@@ -54,14 +54,13 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | bug | bogue | OQLF. |
 | feedback | avis | « Donner votre avis », « Donnez-nous votre avis ». |
 | Provide Feedback / Give Fast Feedback | Donner votre avis | One label for both. |
-| beta, public beta | bêta, bêta publique | With the accent; the nav tag reads BÊTA. |
-| Download Free Beta | Télécharger la bêta gratuite | |
-| Get Free Beta (nav) | Obtenir la bêta gratuite | |
-| Download Free (nav, footer, pricing; Decision 44) | Télécharger gratuitement | Replaces the two beta labels above once pricing is live. |
+| Download for Mac (button; Decision 51) | Télécharger pour Mac | Every button to `/download/`: nav, footer, guides, pricing. |
+| Try CacheDrop (inline link) | Essayer CacheDrop | |
+| Buy · $29.99 once (button) | Acheter · 29,99 $ une seule fois | With the offer, the regular price is struck through before the offer. |
+| Try it before you buy · No card needed · macOS 14 or later | Essayez-le avant d’acheter · Aucune carte requise · macOS 14 ou version ultérieure | The line under the primary button. |
 | free to try | essai gratuit; vous pouvez l’essayer gratuitement | « Essai gratuit » as a label, the verb in a sentence. |
 | Pricing (nav link, section) | Tarifs | Owner, 2026-11-02. |
-| Try it free. Pay once. | Essayez-le gratuitement. Payez une seule fois. | The pricing section's title. |
-| Buy a License (button) | Acheter une licence | |
+| Try it before you buy. Pay once. | Essayez-le avant d’acheter. Payez une seule fois. | The pricing section's title. |
 | Already tried it? Buy a license | Vous l’avez déjà essayé? Achetez une licence | The download page's line. |
 | Was $29.99, now $19.99 (spoken) | Prix régulier 29,99 $, maintenant 19,99 $ | What screen readers hear for the struck-through price. |
 | the same number in each (currency) | le même montant dans chaque devise | |

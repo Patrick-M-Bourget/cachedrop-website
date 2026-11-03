@@ -1,14 +1,13 @@
 ---
-// /pricing/ and /fr/pricing/ (Decision 44): the homepage's pricing section as a page of its own,
-// built only when the launch setting is on. With it off, getStaticPaths builds nothing.
+// /pricing/ and /fr/pricing/ (Decision 44): the homepage's pricing section as a page of its own.
 import Base from '../../../layouts/Base.astro';
 import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
 import PricingSection from '../../../components/PricingSection.astro';
-import { pricingCopy, pricingLive } from '../../../components/pricing';
+import { pricingCopy } from '../../../components/pricing';
 import { langOf, langPaths } from '../../../i18n';
 
-export const getStaticPaths = () => (pricingLive ? langPaths() : []);
+export const getStaticPaths = langPaths;
 
 const copy = {
   en: {

@@ -16,9 +16,7 @@ function serviceClient() {
 
 export function gateDeps(request: Request): GateDeps {
   const db = serviceClient() as unknown as GateDb;
-  // The same variable the pages are built with (Decision 44), read here at run time.
-  const pricingLive = process.env.PUBLIC_PRICING_LIVE === '1';
-  return { db, send: mailerFor(request, process.env, fetch), siteUrl: siteUrlFrom(process.env), pricingLive };
+  return { db, send: mailerFor(request, process.env, fetch), siteUrl: siteUrlFrom(process.env) };
 }
 
 /** The bot check and rate limit for one form submission (Decision 12), minus the database. */
