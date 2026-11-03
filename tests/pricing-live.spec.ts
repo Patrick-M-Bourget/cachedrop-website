@@ -11,7 +11,7 @@ const copy = {
     pricing: ['Pricing', '/pricing/'],
     download: 'Download Free',
     title: 'Try it free. Pay once.',
-    spoken: 'Was $29.99, now $19.99, one-time.',
+    spoken: 'Was $29.99, now $19.99 for a limited time, one-time.',
     shown: ['$29.99', '$19.99', 'one-time'],
     currencies: 'Pay in USD, CAD, EUR, GBP or AUD: the same number in each.',
     items: ['Free cleanup up to 2 GB, and scanning is always free', 'Use it on up to 3 of your Macs', 'Every 1.x release', '30-day refunds, no questions asked'],
@@ -92,9 +92,25 @@ for (const lang of ['en', 'fr'] as const) {
   test(`${lang}: the homepage offer carries the price`, async ({ page }) => {
     await page.goto(ui[lang].home);
     const ld = JSON.parse((await page.locator('script[type="application/ld+json"]').textContent())!);
-    expect(ld['@graph'][1].offers).toEqual({ '@type': 'Offer', price: '19.99', priceCurrency: 'USD' });
+    // Decision 47: what a buyer pays today, with the regular price struck through.
+    expect(ld['@graph'][1].offers).toEqual({
+      '@type': 'Offer',
+      price: '19.99',
+      priceCurrency: 'USD',
+      priceSpecification: { '@type': 'UnitPriceSpecification', priceType: 'https://schema.org/StrikethroughPrice', price: '29.99', priceCurrency: 'USD' },
+    });
   });
 }
+
+test('the price answers state the regular price and the discount (Decision 47)', async ({ page }) => {
+  await page.goto('/pricing/');
+  expect(await page.title()).toContain('$29.99');
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /\$29\.99 once, now \$19\.99 for a limited time/);
+  await page.goto('/');
+  await expect(page.getByText('A license is $29.99 once, now $19.99 for a limited time, for up to 3 Macs.')).toBeVisible();
+  await page.goto('/fr/');
+  await expect(page.getByText('La licence coûte 29,99\u00a0$ une seule fois, maintenant 19,99\u00a0$ pour un temps limité, pour un maximum de 3 Mac.')).toBeVisible();
+});
 
 test('the sitemap lists /pricing/ and /fr/pricing/', async ({ request }) => {
   const xml = await (await request.get('/sitemap.xml')).text();

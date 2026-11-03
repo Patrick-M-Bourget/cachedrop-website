@@ -7,7 +7,7 @@ import Footer from '../../components/Footer.astro';
 import AppWindow from '../../components/AppWindow.astro';
 import ClosingCta from '../../components/ClosingCta.astro';
 import PricingSection from '../../components/PricingSection.astro';
-import { pricingLive, withLaunch } from '../../components/pricing';
+import { discounted, price, pricingCopy, pricingLive, withLaunch } from '../../components/pricing';
 import { card, eyebrow, faqItem, faqQuestion, primaryLg, secondaryLg, sectionH2, titleMd } from '../../components/guide-styles';
 import { langOf, langPaths, localize } from '../../i18n';
 
@@ -127,7 +127,7 @@ const launch = {
     badge: 'Mac storage cleaner · Free to try',
     download: 'Download Free',
     meta: 'Free to try · Pay once · macOS 14+ on Apple Silicon & Intel',
-    priceAnswer: ['Is CacheDrop free, and which Macs does it support?', 'It’s free to try: scanning is always free, and you can clean up to 2\u00a0GB before you buy. A license is $19.99, paid once, for up to 3 Macs. It’s a universal app for Apple Silicon and Intel Macs running macOS 14 Sonoma or later.'],
+    priceAnswer: ['Is CacheDrop free, and which Macs does it support?', `It’s free to try: scanning is always free, and you can clean up to 2\u00a0GB before you buy. A license is ${pricingCopy.en.license}, for up to 3 Macs. It’s a universal app for Apple Silicon and Intel Macs running macOS 14 Sonoma or later.`],
     closingBody: 'Free to try. One universal app for Apple Silicon and Intel Macs on macOS 14 or later.',
   },
   fr: {
@@ -135,7 +135,7 @@ const launch = {
     badge: 'Nettoyeur de stockage pour Mac · Essai gratuit',
     download: 'Télécharger gratuitement',
     meta: 'Essai gratuit · Payez une seule fois · macOS 14+ sur Apple Silicon et Intel',
-    priceAnswer: ['CacheDrop est-il gratuit, et sur quels Mac fonctionne-t-il?', 'Vous pouvez l’essayer gratuitement\u00a0: l’analyse est toujours gratuite, et vous pouvez nettoyer jusqu’à 2\u00a0Go avant d’acheter. La licence coûte 19,99\u00a0$, payée une seule fois, pour un maximum de 3 Mac. C’est une application universelle pour les Mac Apple Silicon et Intel sous macOS 14 Sonoma ou version ultérieure.'],
+    priceAnswer: ['CacheDrop est-il gratuit, et sur quels Mac fonctionne-t-il?', `Vous pouvez l’essayer gratuitement\u00a0: l’analyse est toujours gratuite, et vous pouvez nettoyer jusqu’à 2\u00a0Go avant d’acheter. La licence coûte ${pricingCopy.fr.license}, pour un maximum de 3 Mac. C’est une application universelle pour les Mac Apple Silicon et Intel sous macOS 14 Sonoma ou version ultérieure.`],
     closingBody: 'Essai gratuit. Une seule application universelle pour les Mac Apple Silicon et Intel sous macOS 14 ou version ultérieure.',
   },
 };
@@ -157,7 +157,18 @@ const jsonLd = {
       operatingSystem: t.operatingSystem,
       description: t.description,
       publisher: { '@id': `${site}/#org` },
-      offers: { '@type': 'Offer', price: pricingLive ? '19.99' : '0', priceCurrency: 'USD' },
+      // Decision 47: the price a buyer pays today, with the regular price as the struck-through one
+      // while the limited-time offer runs (schema.org StrikethroughPrice).
+      offers: pricingLive
+        ? {
+            '@type': 'Offer',
+            price: price.offer,
+            priceCurrency: 'USD',
+            ...(discounted && {
+              priceSpecification: { '@type': 'UnitPriceSpecification', priceType: 'https://schema.org/StrikethroughPrice', price: price.regular, priceCurrency: 'USD' },
+            }),
+          }
+        : { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     },
     {
       '@type': 'FAQPage',
