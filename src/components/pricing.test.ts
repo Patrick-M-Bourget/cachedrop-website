@@ -22,17 +22,22 @@ describe('the launch setting', () => {
   });
 });
 
-// Decision 47: 29.99 is the price, 19.99 the launch discount, and both live only in pricing.ts.
+// Decision 47: 29.99 is the price, 19.99 a limited-time offer, and both live only in pricing.ts.
 describe('the price', () => {
-  it('is 29.99, discounted to 19.99 at launch', () => {
-    expect(price).toEqual({ regular: '29.99', launch: '19.99' });
+  it('is 29.99, offered at 19.99 for a limited time', () => {
+    expect(price).toEqual({ regular: '29.99', offer: '19.99' });
     expect(discounted).toBe(true);
   });
 
   it('builds every price string from the two numbers', () => {
-    expect(pricingCopy.en).toMatchObject({ was: '$29.99', now: '$19.99', spoken: 'Was $29.99, now $19.99, one-time.' });
+    expect(pricingCopy.en).toMatchObject({ was: '$29.99', now: '$19.99', spoken: 'Was $29.99, now $19.99 for a limited time, one-time.', limited: 'Limited-time price' });
     expect(pricingCopy.fr).toMatchObject({ was: '29,99\u00a0$', now: '19,99\u00a0$' });
-    expect(pricingCopy.en.license).toBe('$29.99 once, now $19.99 with the launch discount');
+    expect(pricingCopy.en.license).toBe('$29.99 once, now $19.99 for a limited time');
+  });
+
+  it('never calls the offer a launch price in any copy', () => {
+    const copy = JSON.stringify(pricingCopy);
+    expect(copy).not.toMatch(/launch|lancement/i);
   });
 
   it('is never written into a page (the terms of sale state it in their own legal wording)', () => {

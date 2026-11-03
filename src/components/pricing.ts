@@ -15,14 +15,14 @@ export const buyHref = (lang: Lang) => (lang === 'fr' ? '/buy?lang=fr' : '/buy')
 
 /**
  * The price in each currency's number (Decision 47, amends 44): the regular price is 29.99 and 19.99
- * is the launch discount (the LAUNCH code). Every page reads these; ending the discount means
- * setting `launch` to `regular` here and the matching Stripe change, and nothing else in the copy.
+ * is a limited-time offer. Copy never calls it a launch price. Every page reads these; ending the offer
+ * means setting `offer` to `regular` here and the matching Stripe change, and nothing else in the copy.
  * The terms of sale state both numbers in their own legal wording and are checked by legal.spec.ts.
  */
-export const price: { readonly regular: string; readonly launch: string } = { regular: '29.99', launch: '19.99' };
+export const price: { readonly regular: string; readonly offer: string } = { regular: '29.99', offer: '19.99' };
 
-/** Whether a discount is running. */
-export const discounted = price.launch !== price.regular;
+/** Whether the limited-time offer is running. */
+export const discounted = price.offer !== price.regular;
 
 const en = (n: string) => `$${n}`;
 const fr = (n: string) => `${n.replace('.', ',')}\u00a0$`;
@@ -39,8 +39,9 @@ export const pricingCopy = {
     body: 'Scanning is always free, and you can clean up to 2 GB before you buy. One license covers every 1.x release.',
     name: 'CacheDrop license',
     was: en(price.regular),
-    now: en(price.launch),
-    spoken: `Was ${en(price.regular)}, now ${en(price.launch)}, one-time.`,
+    now: en(price.offer),
+    spoken: `Was ${en(price.regular)}, now ${en(price.offer)} for a limited time, one-time.`,
+    limited: 'Limited-time price',
     once: 'one-time',
     currencies: 'Pay in USD, CAD, EUR, GBP or AUD: the same number in each.',
     included: 'What’s included',
@@ -54,7 +55,7 @@ export const pricingCopy = {
     download: 'Download Free',
     // Odd entries are the links to the terms of sale, refund policy and license agreement, in order.
     // Prose for meta descriptions and answers: the regular price, then the discount while it runs.
-    license: discounted ? `${en(price.regular)} once, now ${en(price.launch)} with the launch discount` : `${en(price.regular)} once`,
+    license: discounted ? `${en(price.regular)} once, now ${en(price.offer)} for a limited time` : `${en(price.regular)} once`,
     legal: ['Read the ', 'terms of sale', ', the ', 'refund policy', ' and the ', 'license agreement', '.'],
   },
   fr: {
@@ -76,7 +77,7 @@ export const pricingCopy = {
     ],
     buy: 'Acheter une licence',
     download: 'Télécharger gratuitement',
-    license: discounted ? `${fr(price.regular)} une seule fois, maintenant ${fr(price.launch)} avec le rabais de lancement` : `${fr(price.regular)} une seule fois`,
+    license: discounted ? `${fr(price.regular)} une seule fois, maintenant ${fr(price.offer)} pour un temps limité` : `${fr(price.regular)} une seule fois`,
     legal: ['Consultez les ', 'conditions de vente', ', la ', 'politique de remboursement', ' et le ', 'contrat de licence', '.'],
   },
 } satisfies Record<Lang, Record<string, string | string[]>>;

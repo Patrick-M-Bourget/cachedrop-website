@@ -158,11 +158,11 @@ const jsonLd = {
       description: t.description,
       publisher: { '@id': `${site}/#org` },
       // Decision 47: the price a buyer pays today, with the regular price as the struck-through one
-      // while the launch discount runs (schema.org StrikethroughPrice).
+      // while the limited-time offer runs (schema.org StrikethroughPrice).
       offers: pricingLive
         ? {
             '@type': 'Offer',
-            price: price.launch,
+            price: price.offer,
             priceCurrency: 'USD',
             ...(discounted && {
               priceSpecification: { '@type': 'UnitPriceSpecification', priceType: 'https://schema.org/StrikethroughPrice', price: price.regular, priceCurrency: 'USD' },
