@@ -15,7 +15,7 @@ export const buyHref = (lang: Lang) => (lang === 'fr' ? '/buy?lang=fr' : '/buy')
 
 /**
  * The price in each currency's number (Decision 47, amends 44): the regular price is 29.99 and 19.99
- * is a limited-time offer. Copy never calls it a launch price. Every page reads these; ending the offer
+ * is a limited-time offer. Copy never calls it a launch price (the Stripe code stays LAUNCH). Every page reads these; ending the offer
  * means setting `offer` to `regular` here and the matching Stripe change, and nothing else in the copy.
  * The terms of sale state both numbers in their own legal wording and are checked by legal.spec.ts.
  */
