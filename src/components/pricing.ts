@@ -31,6 +31,8 @@ const fr = (n: string) => `${n.replace('.', ',')}\u00a0$`;
 export const pricingCopy = {
   en: {
     eyebrow: 'Pricing',
+    // The trial, stated once under the primary button of the homepage and every guide (Decision 51).
+    trial: 'Try it before you buy · No card needed · macOS 14 or later',
     // Outcomes first, then the price (Decision 51, #113).
     title: 'Pay once. Use it on 3 Macs.',
     body: 'See what’s filling your Mac, clean it up safely, and remove apps and plug-ins completely. You check everything first, and your files go to the Trash, so nothing is lost by mistake.',
@@ -64,6 +66,7 @@ export const pricingCopy = {
   },
   fr: {
     eyebrow: 'Tarifs',
+    trial: 'Essayez-le avant d’acheter · Aucune carte requise · macOS 14 ou version ultérieure',
     title: 'Payez une seule fois. Utilisez-le sur 3 Mac.',
     body: 'Voyez ce qui remplit votre Mac, nettoyez-le en toute sécurité et désinstallez complètement applications et plug-ins. Vous vérifiez tout avant, et vos fichiers vont dans la Corbeille, donc rien n’est perdu par erreur.',
     name: 'Licence CacheDrop',
