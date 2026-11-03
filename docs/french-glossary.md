@@ -124,3 +124,4 @@ The target is Quebec French, following the Office québécois de la langue fran�
 | upgrade (paid) | mise à niveau payante | |
 | license, license key | licence, clé de licence | As in the license email (#64). |
 | Resend License Key | Renvoyer la clé de licence | The resend page's button and footer link (Decision 42). |
+| campaign tags (utm_*) | étiquettes de campagne | Privacy page (#93). The utm_ names stay as they are. |
