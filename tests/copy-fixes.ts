@@ -7,6 +7,7 @@
 // The platform claim is the handoff's own again (Decision 46): CacheDrop 1.0.1 is universal, macOS 14 or later.
 import { readFileSync } from 'node:fs';
 import { price, pricingCopy } from '../src/components/pricing';
+import { lastModified } from '../src/components/structured-data';
 
 export type CopyFix = { from: string; to: string; why: string };
 
@@ -98,6 +99,11 @@ export const copyFixes: Record<string, CopyFix[]> = {
       from: '"price": "0",\n    "priceCurrency": "USD"\n   }',
       to: `"price": "${price.offer}", "priceCurrency": "USD", "priceSpecification": { "@type": "UnitPriceSpecification", "priceType": "https://schema.org/StrikethroughPrice", "price": "${price.regular}", "priceCurrency": "USD" } }`,
       why: 'Decision 47: the SoftwareApplication offer is what a buyer pays today, with the regular price struck through.',
+    },
+    {
+      from: '"applicationCategory": "UtilitiesApplication",',
+      to: `"applicationCategory": "UtilitiesApplication", "dateModified": "${lastModified('https://cachedrop.io/')}",`,
+      why: '#94: every page’s JSON-LD carries dateModified, the page’s sitemap lastmod.',
     },
     { from: '<section id="faq"', to: `${pricingSection}<section id="faq"`, why: 'Decision 44: the pricing section sits between “Careful by default” and the FAQ.' },
   ],
