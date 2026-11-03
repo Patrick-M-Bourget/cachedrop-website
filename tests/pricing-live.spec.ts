@@ -92,9 +92,25 @@ for (const lang of ['en', 'fr'] as const) {
   test(`${lang}: the homepage offer carries the price`, async ({ page }) => {
     await page.goto(ui[lang].home);
     const ld = JSON.parse((await page.locator('script[type="application/ld+json"]').textContent())!);
-    expect(ld['@graph'][1].offers).toEqual({ '@type': 'Offer', price: '19.99', priceCurrency: 'USD' });
+    // Decision 47: what a buyer pays today, with the regular price struck through.
+    expect(ld['@graph'][1].offers).toEqual({
+      '@type': 'Offer',
+      price: '19.99',
+      priceCurrency: 'USD',
+      priceSpecification: { '@type': 'UnitPriceSpecification', priceType: 'https://schema.org/StrikethroughPrice', price: '29.99', priceCurrency: 'USD' },
+    });
   });
 }
+
+test('the price answers state the regular price and the discount (Decision 47)', async ({ page }) => {
+  await page.goto('/pricing/');
+  expect(await page.title()).toContain('$29.99');
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /\$29\.99 once, now \$19\.99 with the launch discount/);
+  await page.goto('/');
+  await expect(page.getByText('A license is $29.99 once, now $19.99 with the launch discount, for up to 3 Macs.')).toBeVisible();
+  await page.goto('/fr/');
+  await expect(page.getByText('La licence coûte 29,99\u00a0$ une seule fois, maintenant 19,99\u00a0$ avec le rabais de lancement, pour un maximum de 3 Mac.')).toBeVisible();
+});
 
 test('the sitemap lists /pricing/ and /fr/pricing/', async ({ request }) => {
   const xml = await (await request.get('/sitemap.xml')).text();
