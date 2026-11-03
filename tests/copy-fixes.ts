@@ -14,8 +14,18 @@ export type CopyFix = { from: string; to: string; why: string };
 /** The pricing section as the handoff would write it (tests/fixtures/handoff-pricing-section.html). */
 const pricingSection = readFileSync(new URL('./fixtures/handoff-pricing-section.html', import.meta.url), 'utf8');
 
-/** The guides' closing line (Decision 44). */
-const guideClosing: CopyFix = { from: 'in one scan. Free while in beta.', to: 'in one scan. Free to try.', why: 'Decision 44: the guides’ closing line says “Free to try.”' };
+/** The guides' closing line: the trial is stated once, under the hero button (Decision 51, #112). */
+const guideClosing: CopyFix = { from: 'in one scan. Free while in beta.', to: 'in one scan.', why: 'Decision 51: the trial is stated once, under the primary button, so the closing line drops it (#112).' };
+
+/** The download block under each guide's hero button (#112): the trial line, then the price for up to 3 Macs. */
+const guideDownloadBlock = (note: string, newNote: string): CopyFix => ({
+  from: `${note}</span>\n</div>\n`,
+  to:
+    `${newNote}</span>\n</div>\n` +
+    `<p style="margin: 18px 0 0; font-size: 13px; color: #6E6E73">${pricingCopy.en.trial}</p>\n` +
+    `<p style="margin: 6px 0 0; font-size: 13px; color: #6E6E73">Up to 3 Macs: ${pricingCopy.en.license}.</p>\n`,
+  why: '#112 (Decision 51): every guide has the same download block. The trial line, with macOS 14, sits under the button, so the note beside it drops “macOS 14+”.',
+});
 
 export const copyFixes: Record<string, CopyFix[]> = {
   'index.html': [
@@ -110,8 +120,13 @@ export const copyFixes: Record<string, CopyFix[]> = {
   'clear-mac-developer-caches/index.html': [
     {
       from: 'Reclaim 50GB of forgotten code.',
-      to: 'Reclaim gigabytes of forgotten code.',
-      why: 'No measurement backs 50GB; the owner’s field scan found 3.5 GB of build folders and 17 GB of updater and package caches.',
+      to: 'How to clear Xcode DerivedData, node_modules and Docker caches on Mac',
+      why: '#112 (Decision 51): the H1 and Article headline repeat the search.',
+    },
+    {
+      from: 'If you write code on a Mac, your biggest space hog',
+      to: 'Reclaim gigabytes of forgotten code. If you write code on a Mac, your biggest space hog',
+      why: '#112: the benefit moves to the lede. No measurement backs 50GB; the owner’s field scan found 3.5 GB of build folders and 17 GB of updater and package caches.',
     },
     {
       from: 'Homebrew, npm and Dart package caches',
@@ -139,9 +154,16 @@ export const copyFixes: Record<string, CopyFix[]> = {
       why: '“These caches” included Dart’s .pub-cache, which the app doesn’t clean.',
     },
     { from: '<span>Download CacheDrop (Free)</span>', to: '<span>Download for Mac</span>', why: 'Decision 51: the hero and closing buttons.' },
+    guideDownloadBlock('Developer Mac cleaner · macOS 14+ · Apple Silicon &amp; Intel', 'Developer Mac cleaner · Apple Silicon &amp; Intel'),
     guideClosing,
   ],
   'clear-adobe-media-cache-mac/index.html': [
+    { from: 'Stop buying external drives.', to: 'How to clear the Adobe media cache on Mac', why: '#112 (Decision 51): the H1 and Article headline repeat the search.' },
+    {
+      from: 'Video editing software generates massive, invisible cache files to keep playback smooth. When the project is over, those files stay on your Mac forever. CacheDrop finds them.',
+      to: 'Stop buying external drives. When Premiere Pro or Final Cut Pro says your storage is full, it’s often cache files: video editing software generates massive, invisible caches to keep playback smooth, and when the project is over they stay on your Mac forever. CacheDrop finds them.',
+      why: '#112: the benefit moves to the lede, with the “Final Cut Pro storage full” search in plain words.',
+    },
     {
       from: 'Note: This only deletes caches for the open version of Premiere.',
       to: 'Note: Adobe suggests doing this right after you start Premiere, before you open a project.',
@@ -175,6 +197,7 @@ export const copyFixes: Record<string, CopyFix[]> = {
     },
     { from: '<span>Get Your Space Back (Free)</span>', to: '<span>Download for Mac</span>', why: 'Decision 51: the hero and closing buttons.' },
     { from: 'Get CacheDrop free', to: 'Try CacheDrop', why: 'Decision 51: the inline link to /download/.' },
+    guideDownloadBlock('Premiere Pro · After Effects · Final Cut Pro · macOS 14+', 'Premiere Pro · After Effects · Final Cut Pro'),
     guideClosing,
   ],
   'download/index.html': [
