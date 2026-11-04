@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { billingText, checkedOn, compareDescription, priceText, productName, rows, threeYears, threeYearsText } from './compare';
+import { billingText, checkedOn, maxCheckAgeDays, staleRows, compareDescription, priceText, productName, rows, threeYears, threeYearsText } from './compare';
 import { price, pricingCopy } from './pricing';
 
 // Decision 54: the CleanMyMac alternative page's price table.
@@ -66,5 +66,25 @@ describe('the description', () => {
   it('is built from the price, with the offer as pricing.ts words it', () => {
     expect(compareDescription.en).toContain(pricingCopy.en.license);
     expect(compareDescription.fr).toContain(pricingCopy.fr.license);
+  });
+});
+
+// #90: competitor prices change, so the build fails once any row's check is over 120 days old.
+describe('the price checks', () => {
+  const daysAgo = (n: number) => new Date(Date.now() - n * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const row = (checkedOn: string) => ({ ...rows[1], checkedOn });
+
+  it('are all fresh: recheck every row named here at its source, then update its price and checkedOn', () => {
+    expect(staleRows(new Date())).toEqual([]);
+  });
+
+  it('fail on a row checked 121 days ago, naming the row and its source', () => {
+    expect(staleRows(new Date(), [row(daysAgo(maxCheckAgeDays + 1))])).toEqual([
+      `CleanMyMac (https://macpaw.com/cleanmymac): checked ${daysAgo(maxCheckAgeDays + 1)}, 121 days ago`,
+    ]);
+  });
+
+  it('pass on a row checked exactly 120 days ago', () => {
+    expect(staleRows(new Date(), [row(daysAgo(maxCheckAgeDays))])).toEqual([]);
   });
 });

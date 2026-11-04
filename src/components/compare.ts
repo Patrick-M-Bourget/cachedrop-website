@@ -2,7 +2,7 @@
 // for one license in US dollars, before tax, read from its maker's own page (`source`) on `checkedOn`.
 // The display strings and the 3-year cost are built from the numbers, so they can't disagree.
 // CacheDrop's row reads `price` from pricing.ts at the regular price (Decision 47): the limited-time
-// offer shows only in the offer note. Prices are rechecked quarterly and go stale after 120 days (#90).
+// offer shows only in the offer note. Prices are rechecked quarterly; compare.test.ts fails once a row is over 120 days old (#90).
 import { price, pricingCopy } from './pricing';
 import type { Lang } from '../i18n';
 
@@ -39,6 +39,19 @@ export const productName = (lang: Lang, r: CompareRow) => (r.edition ? `${r.prod
 
 /** The oldest `checkedOn`: the note under the table can't claim a fresher check than every row had. */
 export const checkedOn = () => rows.map((r) => r.checkedOn).sort()[0];
+
+/** How old a price check may get before the check fails (#90): a quarter plus a month to act on it. */
+export const maxCheckAgeDays = 120;
+
+/** The rows checked more than `maxCheckAgeDays` before `today`, each as "Product (source): checked YYYY-MM-DD, N days ago". */
+export function staleRows(today: Date, list: CompareRow[] = rows): string[] {
+  const day = 24 * 60 * 60 * 1000;
+  const todayUtc = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+  return list.flatMap((r) => {
+    const age = Math.round((todayUtc - Date.parse(`${r.checkedOn}T00:00:00Z`)) / day);
+    return age > maxCheckAgeDays ? [`${productName('en', r)} (${r.source}): checked ${r.checkedOn}, ${age} days ago`] : [];
+  });
+}
 
 /** The cheapest way to cover one Mac for three years at list price; 0 for a free tool. */
 export const threeYears = ({ once, yearly, firstYear }: Plan): number => {
