@@ -13,8 +13,9 @@
     "check:html": "html-validate \"dist/**/*.html\"",
     "check:links": "node scripts/check-links.mjs",
     "check:jsonld": "node scripts/check-jsonld.mjs",
+    "check:xml": "node scripts/check-xml.mjs",
     "check": "node scripts/check.mjs",
-    "check:static": "npm run check:html && npm run check:links && npm run check:jsonld",
+    "check:static": "npm run check:html && npm run check:links && npm run check:jsonld && npm run check:xml",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
