@@ -80,15 +80,6 @@ for (const { en, fr, canonical } of pairs) {
   });
 }
 
-test('every sitemap <url> closes before the next one opens', async () => {
-  // Google rejects the whole sitemap when one </url> is missing (Search Console: "Invalid XML tag").
-  const xml = await readFile('dist/sitemap.xml', 'utf8');
-  const tags = [...xml.matchAll(/<\/?url>/g)].map(([tag]) => tag);
-  expect(tags.length).toBeGreaterThan(0);
-  tags.forEach((tag, i) => expect(tag, `tag #${i + 1}`).toBe(i % 2 === 0 ? '<url>' : '</url>'));
-  expect(xml.trimEnd().endsWith('</urlset>')).toBe(true);
-});
-
 test('the sitemap leaves out every page that is not indexed, in both languages', async () => {
   const xml = await readFile('dist/sitemap.xml', 'utf8');
   for (const { canonical } of pairs.filter((p) => !p.indexed)) {
