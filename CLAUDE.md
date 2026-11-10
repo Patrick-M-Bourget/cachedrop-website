@@ -8,7 +8,7 @@ GitHub account: `Patrick-M-Bourget`. Run `gh auth status` before any `git push`.
 
 ## Workflow
 
-- One logical change per commit and about 500 lines or less per PR. Run the tests and build before every commit.
+- One logical change per commit and about 500 lines or less per PR. Run `scripts/check.sh` (the same checks as CI) before every commit.
 - Push a branch, open a PR (`/pr`), and say what to smoke-test on its Vercel preview. Merge only after the user confirms.
 - New or changed screens: attach screenshots at 1440 and 390 px to the PR for the user's approval. Commit no screenshots or evidence reports.
 - Secrets (Supabase service key, Resend key, GitHub token, Turnstile secret) live only in Vercel and `.env.local`. Never commit them and never print them.
