@@ -15,6 +15,7 @@
     "check:jsonld": "node scripts/check-jsonld.mjs",
     "check:xml": "node scripts/check-xml.mjs",
     "check": "node scripts/check.mjs",
+    "indexnow": "node scripts/indexnow.ts",
     "check:static": "npm run check:html && npm run check:links && npm run check:jsonld && npm run check:xml",
     "typecheck": "tsc --noEmit"
   },
