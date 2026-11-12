@@ -5,9 +5,9 @@ import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
 import PricingSection from '../../../components/PricingSection.astro';
 import { pricingCopy } from '../../../components/pricing';
-import { langOf, langPaths } from '../../../i18n';
+import { langOf, langPathsDe } from '../../../i18n';
 
-export const getStaticPaths = langPaths;
+export const getStaticPaths = langPathsDe;
 
 // Outcomes first, then the price (#113); the title names the regular price (Decision 47).
 const copy = {
@@ -18,6 +18,10 @@ const copy = {
   fr: {
     title: `Tarifs de CacheDrop – ${pricingCopy.fr.was} une seule fois, jusqu’à 3 Mac`,
     description: `CacheDrop trouve ce qui remplit votre Mac et le nettoie en toute sécurité. La licence coûte ${pricingCopy.fr.license}, pour un maximum de 3 Mac, avec toutes les mises à jour de la version 1 et le remboursement dans les 30 jours. Rien à annuler.`,
+  },
+  de: {
+    title: `CacheDrop Preise – ${pricingCopy.de.was} einmalig für bis zu 3 Macs`,
+    description: `CacheDrop findet, was den Speicherplatz Ihres Macs füllt, und räumt es sicher auf. Eine Lizenz kostet ${pricingCopy.de.license} als Einmalkauf, gilt für bis zu 3 Macs und enthält alle Updates für Version 1 sowie 30 Tage Geld-zurück-Garantie. Kein Abo, nichts zu kündigen.`,
   },
 };
 const lang = langOf(Astro.url);

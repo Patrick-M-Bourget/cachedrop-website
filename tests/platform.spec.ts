@@ -10,7 +10,7 @@ for (const p of pages) {
     const html = await (await request.get(p.path)).text();
     expect(html).not.toMatch(/macOS 26/);
     // The footer's Platform column is on every page.
-    expect(html).toMatch(/Apple Silicon (&amp;|&|et) Intel/);
+    expect(html).toMatch(/Apple Silicon (&amp;|&|et|und) Intel/);
     expect(html).toContain('macOS 14');
   });
 }

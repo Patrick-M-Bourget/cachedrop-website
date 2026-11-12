@@ -2,7 +2,7 @@
 // api/download. Supabase and the mail sender come in as dependencies, so Vitest can stand in for
 // both at the boundary (Decision 27). The api/ files wire in the real ones.
 import { guard, type Guard } from './bot-check.js';
-import type { Lang } from '../i18n.ts';
+import type { FlowLang as Lang } from '../i18n.ts'; // emails and forms speak English and French
 import { EMAIL, json, type Result } from './shared.js';
 import { downloadEmail, pagesFor } from './download-email.js';
 import { TOKEN, hashToken, newToken } from './tokens.js';

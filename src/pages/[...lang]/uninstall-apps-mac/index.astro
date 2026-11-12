@@ -13,9 +13,9 @@ import Toc from '../../../components/Toc.astro';
 import CodeBlock from '../../../components/CodeBlock.astro';
 import { guideH2, guideP } from '../../../components/guide-styles';
 import { guides } from '../../../components/guides';
-import { langOf, langPaths, localize } from '../../../i18n';
+import { langOf, langPathsDe, localize } from '../../../i18n';
 
-export const getStaticPaths = langPaths;
+export const getStaticPaths = langPathsDe;
 
 const section = 'padding-top: var(--space-22); display: flex; flex-direction: column; gap: var(--space-5)';
 const card = 'padding: var(--space-7); border-radius: var(--radius-2xl); display: flex; flex-direction: column; gap: 14px';
@@ -200,6 +200,91 @@ const copy = {
       p2: 'L’espace revient quand la Corbeille est vidée. Empty from Trash, dans CacheDrop, supprime seulement ce que CacheDrop y a mis, et laisse vos propres fichiers. Une fois un élément supprimé de la Corbeille, il ne peut plus être remis en place.',
     },
     howTo: 'Comment désinstaller complètement une application sur Mac',
+  },
+  de: {
+    guide: {
+      ...guides.apps.de,
+      crumb: 'Anleitung: Apps deinstallieren',
+      headline: 'App auf dem Mac komplett deinstallieren – inklusive aller Reste',
+      lede: 'Ziehen Sie eine App in den Papierkorb, verschwindet nur die App – nicht die Einstellungen, Caches und Daten, die sie in Ihrer Library hinterlassen hat. Hier steht, wo diese Reste liegen, wie Sie sie von Hand entfernen und wie CacheDrop sie für Sie findet.',
+      cta: 'Für Mac herunterladen',
+      ctaNote: 'Apps · Files from deleted apps',
+      updated: 'November 2026',
+      readTime: '6 Min. Lesezeit',
+      faqTitle: 'FAQ: Apps deinstallieren',
+      faq: [
+        ['Wie deinstalliere ich eine App auf dem Mac komplett?', 'Beenden Sie die App, nutzen Sie ihr eigenes Deinstallationsprogramm, falls sie eines hat, ziehen Sie sie dann in den Papierkorb und entfernen Sie die Dateien, die sie in <span class="ic">~/Library</span> hinterlassen hat: ihre Ordner in Application Support, Caches und Containers sowie ihre Einstellungen. Die Seite „Applications“ in CacheDrop erledigt das in einem Schritt, mit jeder Datei, die zur App gehört.'],
+        ['Werden beim Löschen einer App auf dem Mac auch ihre Daten gelöscht?', 'Nein. Wer eine App in den Papierkorb legt, entfernt nur die App. Ihre Einstellungen, Caches und Daten bleiben in Ihrer Library, bis Sie sie entfernen.'],
+        ['Wo liegen App-Reste auf dem Mac?', 'Meist in Ihrem eigenen Ordner „Library“, <span class="ic">~/Library</span>, in Ordnern wie Application Support, Caches, Containers, Group Containers, Preferences und Logs. Apps, die für alle Benutzer installiert wurden, können auch Dateien in <span class="ic">/Library</span> hinterlassen.'],
+        ['Kann ich Dateien in ~/Library bedenkenlos löschen?', 'Dateien einer App, die Sie gelöscht haben, ja. Vorsicht bei Ordnern, die nur den Namen des Herstellers tragen, und bei Group Containers: Andere Apps desselben Herstellers können sie noch verwenden. Entfernen Sie nie Lizenz- oder Aktivierungsdateien, die Sie noch brauchen.'],
+        ['Wie entferne ich Reste von Apps, die ich schon gelöscht habe?', 'Suchen Sie in <span class="ic">~/Library</span> nach dem Namen der App und ihrer Bundle-ID, wie unten beschrieben. CacheDrop listet die Reste unter Files from deleted apps auf, jeden über seine Bundle-ID oder den Installationsbeleg seiner App zugeordnet.'],
+        ['Kann ich eine Deinstallation rückgängig machen?', 'Ja, solange Sie den Papierkorb nicht geleert haben. CacheDrop legt die App und ihre Dateien in den Papierkorb, und Put back (Zurücklegen) in History bringt jedes Objekt an seinen ursprünglichen Platz zurück.'],
+        ['Warum meldet CacheDrop, dass eine App zum Entfernen mein Passwort braucht?', 'macOS lässt nicht zu, dass Sie diese App ohne Administratorpasswort in den Papierkorb legen, zum Beispiel weil ein anderes Benutzerkonto sie installiert hat. CacheDrop fragt dieses Passwort nie ab: Es listet die App mit Reveal in Finder auf, damit Sie sie dort entfernen können.'],
+        ['Kann ich das App-Deinstallationsprogramm vor dem Kauf testen?', 'Sie suchen ein Deinstallationsprogramm für den Mac, das Sie erst testen können? Der Scan und die Liste der Apps sind immer kostenlos. Aufräumen und Deinstallieren sind kostenlos, bis 2\u00a0GB freigegeben sind.'],
+      ] as Array<[string, string]>,
+      other: { eyebrow: 'Sie machen Musik?', title: 'Audio-Plug-ins auf dem Mac deinstallieren', href: '/uninstall-audio-plugins-mac/', link: 'Zur Anleitung für Musikproduktion' },
+      closing: { title: 'Deinstallieren Sie die ganze App, nicht nur ihr Symbol.', body: 'CacheDrop findet die Dateien jeder App und die Reste bereits gelöschter Apps in einem einzigen Scan.' },
+      trademarks: 'Apple, Mac, macOS und Finder sind Marken von Apple Inc. Andere Namen sind Marken ihrer jeweiligen Inhaber.',
+    },
+    toc: ['Warum der Papierkorb Dateien zurücklässt', 'Wo App-Reste auf dem Mac liegen', 'App auf dem Mac von Hand deinstallieren', 'Apps mit CacheDrop deinstallieren', 'Reste bereits gelöschter Apps', 'Anders entschieden? Put back'],
+    why: {
+      p1: 'Eine Mac-App ist ein einzelnes Paket im Ordner „Programme“, ihre Daten legt sie aber nicht dort ab. Solange Sie die App nutzen, schreibt sie Einstellungen, Caches, gesicherte Fenster und manchmal mehrere Gigabyte an Downloads und Daten in Ihren Ordner „Library“. Wenn Sie die App in den Papierkorb legen, geht nur das Paket mit. macOS lässt den Rest, wo er ist.',
+      p2: 'Die meisten Reste sind klein, doch Caches und App-Daten summieren sich über die Jahre, und ein Hilfsprogramm, das die App installiert hat, kann weiter bei jeder Anmeldung starten.',
+    },
+    where: {
+      intro: 'Fast alles, was eine App hinterlässt, liegt in Ihrer eigenen Library, <span class="ic">~/Library</span>. Der Finder blendet den Ordner aus: Wählen Sie Gehe zu › Gehe zum Ordner …, geben Sie <span class="ic">~/Library</span> ein und drücken Sie die Return-Taste. Die Einträge tragen den Namen der App oder ihrer Bundle-ID, etwa <span class="ic">com.maker.AppName</span>.',
+      folder: 'Ordner',
+      holds: 'Was Apps dort ablegen',
+      rows: [
+        'Die Daten der App: Datenbanken, Downloads, Add-ons',
+        'Caches der App, die sie bei Bedarf selbst wieder anlegt',
+        'Alles, was eine App mit Sandbox ablegt, in einem Ordner mit dem Namen ihrer Bundle-ID',
+        'Daten, die sich die Apps eines Herstellers teilen',
+        'Einstellungen als .plist-Dateien, benannt nach der Bundle-ID',
+        'Die Fenster, die macOS wieder öffnet',
+        'Hilfsprogramme, die bei der Anmeldung starten',
+        'Web-Daten, die die App gespeichert hat',
+        'Web-Daten, die die App gespeichert hat',
+        'Protokolle',
+      ],
+      system: 'Apps, die für alle Benutzer installiert wurden, können auch Dateien in <span class="ic">/Library</span> hinterlassen, etwa in Application Support, LaunchAgents, LaunchDaemons und PrivilegedHelperTools. Zum Entfernen brauchen Sie ein Administratorpasswort.',
+    },
+    manual: {
+      intro: 'Prüfen Sie jeden der obigen Ordner auf den Namen der App und ihre Bundle-ID. Die Bundle-ID finden Sie heraus, solange die App noch installiert ist:',
+      label: 'Terminal',
+      title: 'Der manuelle Weg',
+      steps: [
+        'Beenden Sie die App, auch ein Symbol, das sie in der Menüleiste hält.',
+        'Hat die App ein eigenes Deinstallationsprogramm, oder entfernt der Manager ihres Herstellers sie, nutzen Sie zuerst dieses.',
+        'Notieren Sie die Bundle-ID (siehe unten) und ziehen Sie die App dann aus „Programme“ in den Papierkorb.',
+        'Wählen Sie im Finder Gehe zu › Gehe zum Ordner …, öffnen Sie ~/Library und suchen Sie in jedem der obigen Ordner nach Einträgen, die nach der App oder ihrer Bundle-ID benannt sind.',
+        'Legen Sie in den Papierkorb, was zur App gehört. Lassen Sie Ordner stehen, die sich andere Apps desselben Herstellers teilen könnten.',
+        'Leeren Sie den Papierkorb erst, wenn Sie sicher sind, dass nichts davon noch gebraucht wird.',
+      ],
+      p2: 'Terminal kann für Ordner, die macOS schützt, „Operation not permitted“ ausgeben; der Rest der Liste bleibt trotzdem vollständig. Wurde die App über ein Installationspaket installiert, speichert macOS einen Installationsbeleg darüber, was es geschrieben hat:',
+      p3: 'Der Abgleich über den Namen ist die häufigste Fehlerquelle beim manuellen Aufräumen. Ein Ordner mit dem Namen des Herstellers kann zu dessen anderen Apps gehören, und ein kurzer Name kann auf eine völlig andere App passen.',
+    },
+    ours: {
+      intro: 'Die Seite „Applications“ in CacheDrop listet jede App in Ihren Ordnern „Programme“ auf, auf jedem Volume, die größte zuerst. Apps von Apple und System-Apps werden nicht aufgeführt. Jede Zeile zeigt den Hersteller der App und ihre Gesamtgröße samt Dateien.',
+      steps: [
+        'Öffnen Sie Applications und haken Sie eine App an. Die Dateien, die ihre Bundle-ID oder ihr Installationsbeleg ihr zuordnet, werden mit angehakt.',
+        'Ordner, die nur so heißen wie die App, erscheinen als Possibly related, mit Begründung, und Sie haken jeden selbst an.',
+        'Ist die App geöffnet, bittet CacheDrop Sie, sie zuerst zu beenden. Hat sie ein eigenes Deinstallationsprogramm, steht Open an erster Stelle.',
+        'Review zeigt jedes Objekt, bevor etwas verschoben wird. Die App und ihre Dateien kommen in den Papierkorb, und History hält den Vorgang als „Uninstalled“ mit dem Namen der App fest.',
+      ],
+      never: 'CacheDrop bietet nie Apple-Ordner oder Lizenz- und Aktivierungsdateien an und prüft jedes Objekt kurz vor dem Verschieben noch einmal. Eine App, die macOS nicht ohne Passwort verschieben lässt, trägt „Needs your password to remove“ samt Reveal in Finder: CacheDrop fragt nie nach einem Administratorpasswort.',
+      plugins: 'Sie deinstallieren Audio-Plug-ins? Jedes Produkt geht mit allen Formaten und seinen Support-Dateien:',
+      pluginsLink: 'Anleitung zum Deinstallieren von Audio-Plug-ins auf dem Mac',
+    },
+    deleted: {
+      p1: 'Apps, die Sie schon in den Papierkorb gezogen haben, haben ihre Dateien noch in Ihrer Library. CacheDrop durchsucht die obigen Ordner nach Objekten, deren App nicht mehr auf diesem Mac ist, auf jedem Volume, und listet sie unter Files from deleted apps auf, nach App gruppiert.',
+      p2: 'Ein Objekt wird einer App nur zugeordnet, wenn seine Bundle-ID oder ein Installationsbeleg es dorthin bindet. Ein Ordner, der nur einen Namen mit einer gelöschten App teilt, erscheint als Possibly related, mit Begründung, und Smart clean wählt ihn nie aus. Ordner eines Herstellers, von dem noch eine App oder ein Plug-in auf Ihrem Mac liegt, bleiben erhalten, da diese App sie nutzen kann.',
+    },
+    putBack: {
+      p1: 'Beim Deinstallieren kommt alles in den Papierkorb; nichts wird sofort gelöscht. Nach dem Vorgang hat jedes Objekt in den Ergebnissen und in History einen Link „Put back“, der es an seinen ursprünglichen Platz zurückbringt.',
+      p2: 'Der Speicherplatz wird frei, sobald der Papierkorb geleert ist. Empty from Trash in CacheDrop löscht nur, was CacheDrop dorthin verschoben hat, und lässt Ihre eigenen Dateien im Papierkorb unberührt. Ist ein Objekt erst einmal aus dem Papierkorb gelöscht, lässt es sich nicht mehr zurücklegen.',
+    },
+    howTo: 'So deinstallieren Sie eine App auf dem Mac komplett',
   },
 };
 // Uninstalls count toward the 2 GB (Trial.swift, mac-cleaner Decision 135), so the FAQ's last answer never says

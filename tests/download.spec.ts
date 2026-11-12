@@ -13,7 +13,7 @@ test.describe('every Download button leads to the form', () => {
   for (const p of pages.filter((p) => !/^(\/fr)?\/download\//.test(p.path))) {
     test(`on ${p.path}`, async ({ page }) => {
       await page.goto(p.path);
-      const links = page.locator('a', { hasText: /download|télécharg|try cachedrop|essayer cachedrop/i });
+      const links = page.locator('a', { hasText: /download|télécharg|herunterladen|try cachedrop|essayer cachedrop|cachedrop ausprobieren/i });
       const hrefs = await links.evaluateAll((as) => as.map((a) => a.getAttribute('href')));
       expect(hrefs.length).toBeGreaterThan(0);
       for (const href of hrefs) expect(href).toBe(uiOf(p).download);

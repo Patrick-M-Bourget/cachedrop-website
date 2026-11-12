@@ -2,8 +2,8 @@ import { test, expect, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { pairs } from './pages';
 
-// Decision 5: English at /, French at /fr/, each page linking to the other with hreflang
-// and a language switch. The canonical and og:url of a French page are its own /fr/ address.
+// Decision 5: English at /, French at /fr/ and, for the core pages, German at /de/; each page links to
+// its twins with hreflang and a language switch. The canonical and og:url of a page are its own address.
 const SITE = 'https://cachedrop.io';
 
 async function head(page: Page) {
@@ -16,12 +16,13 @@ async function head(page: Page) {
   }));
 }
 
-for (const { en, fr, canonical } of pairs) {
+for (const { en, fr, de, canonical } of pairs) {
   test.describe(`${en} and ${fr}`, () => {
-    // Both pages of a pair list the same alternates, so each points at the other (reciprocal).
+    // All pages of a pair list the same alternates, so each points at the others (reciprocal).
     const alternates = [
       ['en', `${SITE}${canonical.en}`],
       ['fr', `${SITE}${canonical.fr}`],
+      ...(canonical.de ? [['de', `${SITE}${canonical.de}`]] : []),
       ['x-default', `${SITE}${canonical.en}`],
     ];
 
@@ -42,6 +43,26 @@ for (const { en, fr, canonical } of pairs) {
       await page.getByRole('contentinfo').getByRole('link', { name: 'English' }).click();
       await expect(page).toHaveURL(`${baseURL}${canonical.en}`);
     });
+
+    if (de && canonical.de) {
+      test('the German page is in German at its own address and points to its twins', async ({ page }) => {
+        await page.goto(de);
+        expect(await head(page)).toEqual({ lang: 'de-DE', canonical: `${SITE}${canonical.de}`, ogUrl: `${SITE}${canonical.de}`, ogLocale: 'de_DE', alternates });
+      });
+
+      test('the footer switches from English to German and back', async ({ page, baseURL }) => {
+        await page.goto(en);
+        await page.getByRole('contentinfo').getByRole('link', { name: 'Deutsch' }).click();
+        await expect(page).toHaveURL(`${baseURL}${canonical.de}`);
+        await page.getByRole('contentinfo').getByRole('link', { name: 'English' }).click();
+        await expect(page).toHaveURL(`${baseURL}${canonical.en}`);
+      });
+    } else {
+      test('the page has no German twin, so the footer offers none', async ({ page }) => {
+        await page.goto(en);
+        await expect(page.getByRole('contentinfo').getByRole('link', { name: 'Deutsch' })).toHaveCount(0);
+      });
+    }
   });
 }
 
@@ -97,6 +118,17 @@ test('the sitemap lists each indexed page in both languages, with alternates', a
       expect(entry).toContain(`<xhtml:link rel="alternate" hreflang="en" href="${SITE}${canonical.en}"/>`);
       expect(entry).toContain(`<xhtml:link rel="alternate" hreflang="fr" href="${SITE}${canonical.fr}"/>`);
       expect(entry).toContain(`<xhtml:link rel="alternate" hreflang="x-default" href="${SITE}${canonical.en}"/>`);
+    }
+  }
+});
+
+test('the sitemap lists each German page, with all three alternates', async () => {
+  const xml = await readFile('dist/sitemap.xml', 'utf8');
+  for (const { canonical } of pairs.filter((p) => p.indexed && p.canonical.de)) {
+    for (const loc of [canonical.en, canonical.fr, canonical.de!]) {
+      const entry = xml.match(new RegExp(`<url><loc>${SITE}${loc}</loc>[\\s\\S]*?</url>`))?.[0];
+      expect(entry, loc).toBeTruthy();
+      expect(entry).toContain(`<xhtml:link rel="alternate" hreflang="de" href="${SITE}${canonical.de}"/>`);
     }
   }
 });

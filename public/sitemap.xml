@@ -1,74 +1,130 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Each page lists its English and French addresses as alternates of each other (Decision 5). -->
+<!-- Each page lists its English, French and (core pages) German addresses as alternates of each other (Decision 5). -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url><loc>https://cachedrop.io/</loc><lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/"/>
   </url>
   <url><loc>https://cachedrop.io/fr/</loc><lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/"/>
+  </url>
+  <url><loc>https://cachedrop.io/de/</loc><lastmod>2026-11-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/"/>
   </url>
   <url><loc>https://cachedrop.io/clear-mac-developer-caches/</loc><lastmod>2026-10-29</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/clear-mac-developer-caches/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/clear-mac-developer-caches/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/clear-mac-developer-caches/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/clear-mac-developer-caches/"/>
   </url>
   <url><loc>https://cachedrop.io/fr/clear-mac-developer-caches/</loc><lastmod>2026-10-29</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/clear-mac-developer-caches/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/clear-mac-developer-caches/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/clear-mac-developer-caches/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/clear-mac-developer-caches/"/>
+  </url>
+  <url><loc>https://cachedrop.io/de/clear-mac-developer-caches/</loc><lastmod>2026-10-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/clear-mac-developer-caches/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/clear-mac-developer-caches/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/clear-mac-developer-caches/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/clear-mac-developer-caches/"/>
   </url>
   <url><loc>https://cachedrop.io/clear-adobe-media-cache-mac/</loc><lastmod>2026-10-29</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/clear-adobe-media-cache-mac/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/clear-adobe-media-cache-mac/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/clear-adobe-media-cache-mac/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/clear-adobe-media-cache-mac/"/>
   </url>
   <url><loc>https://cachedrop.io/fr/clear-adobe-media-cache-mac/</loc><lastmod>2026-10-29</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/clear-adobe-media-cache-mac/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/clear-adobe-media-cache-mac/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/clear-adobe-media-cache-mac/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/clear-adobe-media-cache-mac/"/>
+  </url>
+  <url><loc>https://cachedrop.io/de/clear-adobe-media-cache-mac/</loc><lastmod>2026-10-29</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/clear-adobe-media-cache-mac/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/clear-adobe-media-cache-mac/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/clear-adobe-media-cache-mac/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/clear-adobe-media-cache-mac/"/>
   </url>
   <url><loc>https://cachedrop.io/uninstall-audio-plugins-mac/</loc><lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/uninstall-audio-plugins-mac/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/uninstall-audio-plugins-mac/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/uninstall-audio-plugins-mac/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/uninstall-audio-plugins-mac/"/>
   </url>
   <url><loc>https://cachedrop.io/fr/uninstall-audio-plugins-mac/</loc><lastmod>2026-11-02</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/uninstall-audio-plugins-mac/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/uninstall-audio-plugins-mac/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/uninstall-audio-plugins-mac/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/uninstall-audio-plugins-mac/"/>
+  </url>
+  <url><loc>https://cachedrop.io/de/uninstall-audio-plugins-mac/</loc><lastmod>2026-11-02</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/uninstall-audio-plugins-mac/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/uninstall-audio-plugins-mac/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/uninstall-audio-plugins-mac/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/uninstall-audio-plugins-mac/"/>
   </url>
   <url><loc>https://cachedrop.io/clear-system-data-mac/</loc><lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/clear-system-data-mac/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/clear-system-data-mac/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/clear-system-data-mac/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/clear-system-data-mac/"/>
   </url>
   <url><loc>https://cachedrop.io/fr/clear-system-data-mac/</loc><lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/clear-system-data-mac/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/clear-system-data-mac/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/clear-system-data-mac/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/clear-system-data-mac/"/>
+  </url>
+  <url><loc>https://cachedrop.io/de/clear-system-data-mac/</loc><lastmod>2026-11-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/clear-system-data-mac/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/clear-system-data-mac/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/clear-system-data-mac/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/clear-system-data-mac/"/>
   </url>
   <url><loc>https://cachedrop.io/uninstall-apps-mac/</loc><lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/uninstall-apps-mac/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/uninstall-apps-mac/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/uninstall-apps-mac/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/uninstall-apps-mac/"/>
   </url>
   <url><loc>https://cachedrop.io/fr/uninstall-apps-mac/</loc><lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/uninstall-apps-mac/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/uninstall-apps-mac/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/uninstall-apps-mac/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/uninstall-apps-mac/"/>
+  </url>
+  <url><loc>https://cachedrop.io/de/uninstall-apps-mac/</loc><lastmod>2026-11-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/uninstall-apps-mac/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/uninstall-apps-mac/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/uninstall-apps-mac/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/uninstall-apps-mac/"/>
   </url>
   <url><loc>https://cachedrop.io/cleanmymac-alternative/</loc><lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/cleanmymac-alternative/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/cleanmymac-alternative/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/cleanmymac-alternative/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/cleanmymac-alternative/"/>
   </url>
   <url><loc>https://cachedrop.io/fr/cleanmymac-alternative/</loc><lastmod>2026-11-03</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/cleanmymac-alternative/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/cleanmymac-alternative/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/cleanmymac-alternative/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/cleanmymac-alternative/"/>
+  </url>
+  <url><loc>https://cachedrop.io/de/cleanmymac-alternative/</loc><lastmod>2026-11-03</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/cleanmymac-alternative/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/cleanmymac-alternative/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/cleanmymac-alternative/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/cleanmymac-alternative/"/>
   </url>
   <url><loc>https://cachedrop.io/privacy/</loc><lastmod>2026-11-03</lastmod>
@@ -114,11 +170,19 @@
   <url><loc>https://cachedrop.io/pricing/</loc><lastmod>2026-11-01</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/pricing/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/pricing/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/pricing/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/pricing/"/>
   </url>
   <url><loc>https://cachedrop.io/fr/pricing/</loc><lastmod>2026-11-01</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/pricing/"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/pricing/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/pricing/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/pricing/"/>
+  </url>
+  <url><loc>https://cachedrop.io/de/pricing/</loc><lastmod>2026-11-01</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cachedrop.io/pricing/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://cachedrop.io/fr/pricing/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://cachedrop.io/de/pricing/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://cachedrop.io/pricing/"/>
   </url>
 </urlset>

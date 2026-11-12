@@ -17,7 +17,7 @@
 // and List-Unsubscribe adds &lang=fr so a GET lands on the French page.
 import { pagesFor } from './download-email.js';
 import type { GateDb } from './gate.ts';
-import type { Lang } from '../i18n.ts';
+import type { FlowLang as Lang } from '../i18n.ts'; // emails and forms speak English and French
 import { TOKEN, hashToken } from './tokens.js';
 
 export const ONE_CLICK = 'List-Unsubscribe=One-Click';

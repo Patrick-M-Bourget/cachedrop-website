@@ -2,13 +2,14 @@
 // The document shell every page shares: the handoff's head tags in the handoff's
 // order, the design tokens, the site-wide styles, the feedback modal, bot-check.js and site.js.
 // Keep the head tags exactly as delivered (HANDOFF.md §2); tests/head.spec.ts diffs them.
-// Decision 5 adds the hreflang alternates after the canonical, and og:locale on French pages.
+// Decision 5 adds the hreflang alternates after the canonical (one per language the page exists in), and
+// og:locale on French and German pages.
 import '../../handoff/design-system/tokens.css';
 import '../styles/tokens.css';
 import '../styles/global.css';
 import FeedbackModal from '../components/FeedbackModal.astro';
 import Analytics from '@vercel/analytics/astro';
-import { htmlLang, langOf, localize } from '../i18n';
+import { htmlLang, langOf, langsOf, localize } from '../i18n';
 
 interface Props {
   title: string;
@@ -30,10 +31,10 @@ const site = Astro.site!.origin; // https://cachedrop.io (astro.config.mjs)
 const lang = langOf(Astro.url);
 const url = new URL(localize(lang, path), site).href;
 const alternates = [
-  ['en', new URL(path, site).href],
-  ['fr', new URL(localize('fr', path), site).href],
+  ...langsOf(path).map((l) => [l, new URL(localize(l, path), site).href]),
   ['x-default', new URL(path, site).href],
 ];
+const ogLocale = { en: null, fr: 'fr_CA', de: 'de_DE' }[lang];
 ---
 <!doctype html>
 <html lang={htmlLang[lang]}>
@@ -50,7 +51,7 @@ const alternates = [
 <meta property="og:title" content={title}>
 <meta property="og:description" content={description}>
 <meta property="og:url" content={url}>
-{lang === 'fr' && <meta property="og:locale" content="fr_CA">}
+{ogLocale && <meta property="og:locale" content={ogLocale}>}
 <meta property="og:image" content={`${site}/assets/og-image.png`}>
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#FFFFFF">

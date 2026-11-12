@@ -10,6 +10,7 @@ import type { Lang } from '../i18n';
 export const compareDescription: Record<Lang, string> = {
   en: `CacheDrop cleans your Mac, uninstalls apps and plug-ins completely, and clears developer and media caches for ${pricingCopy.en.license}, on up to 3 Macs. No subscription.`,
   fr: `CacheDrop nettoie votre Mac, désinstalle complètement applications et plug-ins, et vide les caches de développement et de média pour ${pricingCopy.fr.license}, sur un maximum de 3 Mac. Aucun abonnement.`,
+  de: `CacheDrop räumt Ihren Mac auf, deinstalliert Apps und Plug-ins vollständig und leert Entwickler- und Medien-Caches für ${pricingCopy.de.license}, auf bis zu 3 Macs. Kein Abo. Die App selbst ist derzeit nur auf Englisch verfügbar.`,
 };
 
 export type Plan = {
@@ -68,6 +69,7 @@ export const rows: CompareRow[] = [
     goodFor: {
       en: 'Cleanup, complete app and plug-in uninstalls, and developer and media caches, in one app.',
       fr: 'Le nettoyage, la désinstallation complète d’applications et de plug-ins, et les caches de développement et de média, dans une seule application.',
+      de: 'Aufräumen, vollständiges Deinstallieren von Apps und Plug-ins sowie Entwickler- und Medien-Caches in einer App.',
     },
     source: 'https://cachedrop.io/pricing/',
     checkedOn: '2026-11-03',
@@ -79,6 +81,7 @@ export const rows: CompareRow[] = [
     goodFor: {
       en: 'An all-in-one suite: cleanup, malware scans, an app updater and system monitors.',
       fr: 'Une suite tout-en-un : nettoyage, analyse antimaliciel, mise à jour des applications et moniteurs système.',
+      de: 'Eine Komplettlösung: Aufräumen, Malware-Scans, App-Updater und Systemmonitore.',
     },
     source: 'https://macpaw.com/cleanmymac',
     checkedOn: '2026-11-02',
@@ -90,18 +93,20 @@ export const rows: CompareRow[] = [
     goodFor: {
       en: 'CleanMyMac’s lower-priced plan, with fewer tools.',
       fr: 'L’offre moins chère de CleanMyMac, avec moins d’outils.',
+      de: 'Der günstigere Tarif von CleanMyMac mit weniger Werkzeugen.',
     },
     source: 'https://macpaw.com/cleanmymac',
     checkedOn: '2026-11-02',
   },
   {
     product: 'CleanMyMac',
-    edition: { en: 'one-time', fr: 'licence unique' },
+    edition: { en: 'one-time', fr: 'licence unique', de: 'Einmalkauf' },
     plan: { once: 119.95 },
     macs: 1,
     goodFor: {
       en: 'The same suite, paid once. The next major version is a paid upgrade.',
       fr: 'La même suite, payée une fois. La prochaine version majeure est une mise à niveau payante.',
+      de: 'Dieselbe Suite, einmal bezahlt. Die nächste Hauptversion ist ein kostenpflichtiges Upgrade.',
     },
     source: 'https://macpaw.com/support/cleanmymac/knowledgebase/purchase-options',
     checkedOn: '2026-11-02',
@@ -113,6 +118,7 @@ export const rows: CompareRow[] = [
     goodFor: {
       en: 'Cleanup bundled with antivirus, a VPN and an ad blocker.',
       fr: 'Le nettoyage, avec un antivirus, un RPV et un bloqueur de publicités.',
+      de: 'Aufräumen, kombiniert mit Antivirus, VPN und Werbeblocker.',
     },
     source: 'https://mackeeper.com/pricing',
     checkedOn: '2026-11-02',
@@ -124,6 +130,7 @@ export const rows: CompareRow[] = [
     goodFor: {
       en: 'Cleanup and app uninstalls, yearly or paid once.',
       fr: 'Le nettoyage et la désinstallation d’applications, à l’année ou payés une fois.',
+      de: 'Aufräumen und App-Deinstallation, jährlich oder einmalig bezahlt.',
     },
     source: 'https://www.drbuho.com/buhocleaner/buy',
     checkedOn: '2026-11-02',
@@ -135,6 +142,7 @@ export const rows: CompareRow[] = [
     goodFor: {
       en: 'A bundle of six tools, including a memory cleaner and a duplicate finder.',
       fr: 'Un ensemble de six outils, dont un nettoyeur de mémoire et un chercheur de doublons.',
+      de: 'Ein Paket aus sechs Werkzeugen, darunter ein Arbeitsspeicher-Cleaner und eine Duplikatsuche.',
     },
     source: 'https://nektony.com/store',
     checkedOn: '2026-11-02',
@@ -146,6 +154,7 @@ export const rows: CompareRow[] = [
     goodFor: {
       en: 'Removing apps and the files they leave behind.',
       fr: 'Supprimer des applications et les fichiers qu’elles laissent derrière elles.',
+      de: 'Apps entfernen, einschließlich der Dateien, die sie zurücklassen.',
     },
     source: 'https://nektony.com/mac-app-cleaner/buy2d',
     checkedOn: '2026-11-02',
@@ -157,6 +166,7 @@ export const rows: CompareRow[] = [
     goodFor: {
       en: 'System monitoring and performance tools, with cleanup.',
       fr: 'La surveillance du système et des outils de performance, avec du nettoyage.',
+      de: 'Systemüberwachung und Leistungswerkzeuge, dazu Aufräumen.',
     },
     source: 'https://cindori.com/store/sensei',
     checkedOn: '2026-11-03',
@@ -168,6 +178,7 @@ export const rows: CompareRow[] = [
     goodFor: {
       en: 'Cleanup plus system monitors and fan control, for 2 Macs.',
       fr: 'Le nettoyage, plus des moniteurs système et le contrôle des ventilateurs, pour 2 Mac.',
+      de: 'Aufräumen plus Systemmonitore und Lüftersteuerung, pro Lizenz für zwei Macs.',
     },
     source: 'https://mole.fit/',
     checkedOn: '2026-11-03',
@@ -179,6 +190,7 @@ export const rows: CompareRow[] = [
     goodFor: {
       en: 'A visual map of your disk. You find and delete files yourself.',
       fr: 'Une carte visuelle de votre disque. Vous trouvez et supprimez les fichiers vous-même.',
+      de: 'Eine visuelle Karte Ihres Laufwerks. Dateien suchen und löschen Sie selbst.',
     },
     source: 'https://daisydiskapp.com/',
     checkedOn: '2026-11-02',
@@ -190,6 +202,7 @@ export const rows: CompareRow[] = [
     goodFor: {
       en: 'Maintenance scripts and hidden system settings, at no cost.',
       fr: 'Des scripts d’entretien et des réglages système cachés, sans frais.',
+      de: 'Wartungsskripte und versteckte Systemeinstellungen, ohne Kosten.',
     },
     source: 'https://www.titanium-software.fr/en/onyx.html',
     checkedOn: '2026-11-03',
@@ -201,6 +214,7 @@ export const rows: CompareRow[] = [
     goodFor: {
       en: 'Removing one app and its files at a time, at no cost.',
       fr: 'Supprimer une application et ses fichiers, une à la fois, sans frais.',
+      de: 'Entfernt jeweils eine App samt ihren Dateien, ohne Kosten.',
     },
     source: 'https://freemacsoft.net/appcleaner/',
     checkedOn: '2026-11-03',
@@ -209,12 +223,13 @@ export const rows: CompareRow[] = [
 
 const money = (lang: Lang, n: number) => {
   const s = n.toFixed(2).replace(/\.00$/, '');
-  return lang === 'fr' ? `${s.replace('.', ',')} $` : `$${s}`;
+  return lang === 'en' ? `$${s}` : `${s.replace('.', ',')} $`;
 };
 
 const words = {
   en: { perYear: '/yr', once: 'once', or: 'or', then: 'then', firstYear: 'first year', none: 'No cost', yearly: 'Yearly', oneTime: 'One-time', both: 'Yearly or one-time', any: 'Any' },
   fr: { perYear: '/an', once: 'une fois', or: 'ou', then: 'puis', firstYear: 'la 1re année', none: 'Sans frais', yearly: 'À l’année', oneTime: 'Une fois', both: 'À l’année ou une fois', any: 'Tous' },
+  de: { perYear: '/Jahr', once: 'einmalig', or: 'oder', then: 'danach', firstYear: 'erstes Jahr', none: 'Keine Kosten', yearly: 'Jährlich', oneTime: 'Einmalig', both: 'Jährlich oder einmalig', any: 'Beliebig' },
 } as const;
 
 /** The price cell, e.g. "$39.95/yr or $85.95 once". */

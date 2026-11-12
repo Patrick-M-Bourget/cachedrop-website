@@ -1,9 +1,9 @@
 // The price and the pricing section's copy (Decisions 44 and 47). Pricing is always on: the
 // launch setting that once hid it retired with Decision 52.
-import type { Lang } from '../i18n';
+import { flowLang, type Lang } from '../i18n';
 
-/** Where a page in `lang` sends its Buy links (Decision 41). */
-export const buyHref = (lang: Lang) => (lang === 'fr' ? '/buy?lang=fr' : '/buy');
+/** Where a page in `lang` sends its Buy links (Decision 41). German pages use the English checkout for now. */
+export const buyHref = (lang: Lang) => (flowLang(lang) === 'fr' ? '/buy?lang=fr' : '/buy');
 
 /**
  * The price in each currency's number (Decision 47, amends 44): the regular price is 29.99 and 19.99
@@ -18,13 +18,14 @@ export const price: { readonly regular: string; readonly offer: string } = { reg
  * that page is built and indexed in the language, so the link never leads to a 404 or a draft;
  * tests/pricing.spec.ts fails if this disagrees with the build either way.
  */
-export const compareLive: Readonly<Record<Lang, boolean>> = { en: true, fr: true };
+export const compareLive: Readonly<Record<Lang, boolean>> = { en: true, fr: true, de: true };
 
 /** Whether the limited-time offer is running. */
 export const discounted = price.offer !== price.regular;
 
 const en = (n: string) => `$${n}`;
 const fr = (n: string) => `${n.replace('.', ',')}\u00a0$`;
+const de = fr; // German writes prices as French does: 29,99 $ (german-glossary.md)
 
 //   is a non-breaking space: before the French colon and currency symbol, and between a
 // number and its unit (docs/french-glossary.md).
@@ -96,5 +97,42 @@ export const pricingCopy = {
     download: 'Télécharger pour Mac',
     license: discounted ? `${fr(price.regular)} une seule fois, maintenant ${fr(price.offer)} pour un temps limité` : `${fr(price.regular)} une seule fois`,
     legal: ['Consultez les ', 'conditions de vente', ', la ', 'politique de remboursement', ' et le ', 'contrat de licence', '.'],
+  },
+  de: {
+    eyebrow: 'Preise',
+    // The trial, stated once under the primary button of the homepage and every guide (Decision 51).
+    trial: 'Vor dem Kauf testen · Keine Karte nötig · macOS 14 oder neuer · App auf Englisch',
+    // Outcomes first, then the price (Decision 51, #113).
+    title: 'Einmal zahlen. Auf 3 Macs nutzen.',
+    body: 'Sehen Sie, was Ihren Mac füllt, räumen Sie es sicher auf und entfernen Sie Apps und Plug-ins vollständig. Sie prüfen vorher alles, und Ihre Dateien landen im Papierkorb, sodass nichts versehentlich verloren geht. Die App selbst ist derzeit nur auf Englisch verfügbar.',
+    name: 'CacheDrop-Lizenz',
+    was: de(price.regular),
+    now: de(price.offer),
+    spoken: `Regulär ${de(price.regular)}, jetzt ${de(price.offer)} für begrenzte Zeit, einmalig.`,
+    limited: 'Zeitlich begrenzter Preis',
+    once: 'einmalig',
+    currencies: 'Zahlen Sie in USD, CAD, EUR, GBP oder AUD: derselbe Betrag in jeder Währung.',
+    included: 'Das ist enthalten',
+    items: [
+      'Nutzbar auf bis zu 3 Ihrer Macs.',
+      'Alle Updates für Version 1, bereit für jedes neue macOS, sobald es erscheint.',
+      'Kein Abo. Nichts zu kündigen.',
+      '30 Tage Geld-zurück-Garantie, ohne Angabe von Gründen.',
+      'Der Scan ist immer kostenlos, und Sie können vor dem Kauf bis zu 2\u00a0GB aufräumen.',
+    ],
+    // Shown only while the compare page (#87) is built and indexed in this language (`compareLive`).
+    // The homepage's "Pay once" line (Decision 51): the regular price against CleanMyMac's yearly one.
+    versus: `${de(price.regular)} einmalig für bis zu 3 Macs. CleanMyMac kostet 39,95\u00a0$ pro Jahr, für einen Mac.`,
+    compare: 'CacheDrop mit anderen Mac-Reinigern vergleichen',
+    // The Buy button (Decision 51): "Buy · $29.99 once", with the offer shown as on the card (Decision 47).
+    buy: 'Kaufen',
+    buyOnce: 'einmalig',
+    wasWord: 'regulär',
+    nowWord: 'jetzt',
+    download: 'Für Mac herunterladen',
+    // Odd entries are the links to the terms of sale, refund policy and license agreement, in order.
+    // Prose for meta descriptions and answers: the regular price, then the discount while it runs.
+    license: discounted ? `${de(price.regular)} einmalig, jetzt ${de(price.offer)} für begrenzte Zeit` : `${de(price.regular)} einmalig`,
+    legal: ['Siehe ', 'Verkaufsbedingungen (Englisch)', ', ', 'Rückerstattung (Englisch)', ' und ', 'Lizenzvereinbarung (Englisch)', '.'],
   },
 } satisfies Record<Lang, Record<string, string | string[]>>;

@@ -26,8 +26,8 @@ const pages = {
 
 const competitors = rows.filter((r) => !r.us).map((r) => r.product);
 
-test('the compare page is live in both languages, so the pricing section links to it', () => {
-  expect(compareLive).toEqual({ en: true, fr: true });
+test('the compare page is live in every language, so the pricing section links to it', () => {
+  expect(compareLive).toEqual({ en: true, fr: true, de: true });
 });
 
 for (const [lang, c] of Object.entries(pages) as [keyof typeof pages, (typeof pages)[keyof typeof pages]][]) {
