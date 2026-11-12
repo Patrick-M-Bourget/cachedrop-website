@@ -14,14 +14,14 @@ import { footerCopy } from '../../../components/footer';
 import { discounted, pricingCopy } from '../../../components/pricing';
 import { billingText, checkedOn, compareDescription, productName, macsText, priceText, rows, threeYearsText } from '../../../components/compare';
 import { breadcrumbPage } from '../../../components/structured-data';
-import { langOf, langPaths, localize } from '../../../i18n';
+import { htmlLang, langOf, langPathsDe, localize } from '../../../i18n';
 
-export const getStaticPaths = langPaths;
+export const getStaticPaths = langPathsDe;
 
 const lang = langOf(Astro.url);
 const p = pricingCopy[lang];
 const checked = checkedOn();
-const checkedLabel = new Date(`${checked}T12:00:00Z`).toLocaleDateString(lang === 'fr' ? 'fr-CA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+const checkedLabel = new Date(`${checked}T12:00:00Z`).toLocaleDateString(lang === 'en' ? 'en-US' : htmlLang[lang], { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 
 const copy = {
   en: {
@@ -117,6 +117,53 @@ const copy = {
     trademarks: `${footerCopy.fr.trademarks} Les noms de produits sont des marques de commerce de leurs propriétaires. CacheDrop n’est affilié à aucun d’eux.`,
     closingTitle: 'Voyez ce qu’il trouve sur votre Mac.',
     closingBody: 'Une seule application pour les Mac Apple Silicon et Intel sous macOS 14 ou version ultérieure.',
+  },
+  de: {
+    title: 'CleanMyMac-Alternative mit Einmalkauf | CacheDrop',
+    description: compareDescription.de,
+    crumb: 'CleanMyMac-Alternative',
+    badge: 'Kein Abo · Bis zu 3 Macs',
+    h1: 'Eine CleanMyMac-Alternative, die Sie nur einmal bezahlen.',
+    lede: `Sie suchen eine CleanMyMac-Alternative ohne Abo? CacheDrop räumt Ihren Mac auf, deinstalliert Apps und Plug-ins vollständig und leert Entwickler- und Medien-Caches. ${p.was} einmalig, für bis zu 3 Macs.`,
+    priceEyebrow: 'Preise im Vergleich',
+    priceTitle: 'Einmal zahlen. Nicht jedes Jahr.',
+    priceBody: 'Die meisten Mac-Reiniger sind Abos, die sich von selbst verlängern. Hier steht, was jeder kostet – auch die, die weniger kosten als CacheDrop.',
+    caption: 'Preise von Mac-Reinigern im Vergleich',
+    cols: { product: 'App', price: 'Preis', billing: 'Abrechnung', macs: 'Macs', three: '3 Jahre, 1 Mac', goodFor: 'Geeignet für' },
+    note: `Listenpreise in US-Dollar für eine Lizenz, ohne Steuern, von der Website des jeweiligen Herstellers, geprüft am ${checkedLabel}. „3 Jahre, 1 Mac“ ist der günstigste Weg, einen Mac drei Jahre lang abzudecken.`,
+    offer: `Zeitlich begrenzter Preis: derzeit ${p.now}.`,
+    why: 'Manche Tools kosten weniger und erledigen nur eine Aufgabe. CacheDrop ist eine App für Aufräumen, vollständige Deinstallation und Plug-ins, auf 3 Macs, bereit für jedes neue macOS, sobald es erscheint.',
+    leaveEyebrow: 'Bewusst weggelassen',
+    leaveTitle: 'Kein RAM-Booster. Kein Virenschutz. Nur Ihr Speicherplatz.',
+    leaveBody: 'Viele Mac-Reiniger wachsen zu Werkzeugsammlungen heran, um die sich macOS ohnehin kümmert. CacheDrop lässt sie weg. Jede Funktion von CacheDrop gibt Speicherplatz frei oder zeigt, wohin er verschwunden ist.',
+    leave: [
+      ['RAM-Booster', 'macOS verwaltet den Arbeitsspeicher selbst. Ihn zu leeren zwingt Ihre Apps, gerade Geladenes neu zu laden – das ist langsamer, nicht schneller.'],
+      ['Virenschutz', 'XProtect ist in macOS integriert und aktualisiert sich im Hintergrund selbst.'],
+      ['„Zugriffsrechte reparieren“', 'macOS schützt seine eigenen Systemdateien seit OS X El Capitan. Es gibt nichts mehr zu reparieren.'],
+      ['Systemmonitore', 'Die Aktivitätsanzeige zeigt bereits Prozessor, Arbeitsspeicher, Batterie und Netzwerk.'],
+      ['Newsletter in der App', 'Keine Ankündigungen und keine Verkaufsangebote in der App. Von CacheDrop hören Sie, wenn ein Update bereitsteht.'],
+    ],
+    doesEyebrow: 'Das bekommen Sie',
+    doesTitle: 'Eine App statt drei.',
+    does: [
+      ['Smart clean', 'Ein Scan findet die Caches, alten Projektdateien, Reste und großen Downloads, die Ihren Mac füllen. Sie prüfen sie und räumen sie mit einem Klick auf.'],
+      ['App-Deinstallation, vollständig', 'Entfernen Sie eine App mit allen Dateien, die sie im Ordner „Library“ angelegt hat – nicht nur mit dem Teil, den Sie in den Papierkorb ziehen.'],
+      ['Plug-in-Manager', 'Deinstallieren Sie VST-, AU-, AAX- und CLAP-Plug-ins mit allen zugehörigen Dateien. Ihre Lizenzen bleiben dabei sicher.'],
+      ['Entwickler-Caches', 'Leeren Sie Xcode-DerivedData, vergessene node_modules-Ordner und Docker-Caches sicher.'],
+      ['Medien-Caches', 'Leeren Sie den Adobe-Medien-Cache und Render-Dateien von Final Cut Pro, die Sie nicht mehr brauchen.'],
+      ['Systemdaten, erklärt', 'Sehen Sie, was die Systemdaten unter Systemeinstellungen › Allgemein › Speicher füllt, und räumen Sie die Teile auf, die sich gefahrlos löschen lassen.'],
+    ],
+    faqTitle: 'Der Wechsel, beantwortet.',
+    faq: [
+      ['Ist CacheDrop eine gute CleanMyMac-Alternative?', `Ja, wenn Sie Ihren Speicherplatz zurückhaben möchten. CacheDrop findet Caches, Reste und alte Dateien, deinstalliert Apps und Plug-ins vollständig und kostet ${p.license} statt eines Jahresabos. Virenschutz, RAM-Booster und Systemmonitor gibt es nicht.`],
+      ['Ist CacheDrop ein Abo?', `Nein. Eine Lizenz kostet ${p.license}, gilt für bis zu 3 Macs und enthält alle Updates für Version 1. Nichts verlängert sich, und es gibt nichts zu kündigen.`],
+      ['Kann ich CacheDrop vor dem Kauf testen?', 'Ja. Der Scan ist immer kostenlos. Aufräumen und Deinstallieren sind kostenlos, bis 2\u00a0GB freigegeben sind. Keine Karte nötig. Wenn Sie kaufen und es sich anders überlegen, gibt es 30 Tage lang Ihr Geld zurück, ohne Angabe von Gründen.'],
+      ['Brauche ich auf dem Mac einen RAM-Cleaner oder Virenschutz?', 'Nein. macOS verwaltet den Arbeitsspeicher selbst und hält aktuelle Daten absichtlich im Speicher, und XProtect prüft Apps auf Schadsoftware und aktualisiert sich selbst.'],
+      ['Was geschieht mit meinen Dateien?', 'Sie sehen alles, bevor es entfernt wird. Caches, die Apps selbst neu anlegen, werden gelöscht; Ihre eigenen Dateien kommen in den Papierkorb, und mit History legen Sie sie zurück.'],
+    ],
+    trademarks: `${footerCopy.de.trademarks} Produktnamen sind Marken ihrer jeweiligen Inhaber. CacheDrop steht in keiner Verbindung zu ihnen.`,
+    closingTitle: 'Sehen Sie, was CacheDrop auf Ihrem Mac findet.',
+    closingBody: 'Eine App für Macs mit Apple Silicon und Intel unter macOS 14 oder neuer.',
   },
 };
 const t = copy[lang];

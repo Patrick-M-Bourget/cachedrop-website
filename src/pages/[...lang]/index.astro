@@ -14,9 +14,9 @@ import { discounted, price, pricingCopy } from '../../components/pricing';
 import { card, eyebrow, faqItem, faqQuestion, primaryLg, sectionH2, titleMd } from '../../components/guide-styles';
 import { guides } from '../../components/guides';
 import { lastModified } from '../../components/structured-data';
-import { langOf, langPaths, localize } from '../../i18n';
+import { langOf, langPathsDe, localize } from '../../i18n';
 
-export const getStaticPaths = langPaths;
+export const getStaticPaths = langPathsDe;
 
 const copy = {
   en: {
@@ -142,6 +142,69 @@ const copy = {
     ],
     closingTitle: 'Essayez-le sur votre Mac.',
     closingBody: 'Une seule application pour les Mac Apple Silicon et Intel sous macOS 14 ou version ultérieure.',
+  },
+  de: {
+    title: 'Mac-Reiniger: Speicherplatz freigeben, einmal zahlen | CacheDrop',
+    description: 'CacheDrop findet die Caches, Reste und alten Dateien, die Ihren Mac füllen, und räumt sie sicher auf. Für Musikproduktion, Entwicklung und Videoschnitt.',
+    operatingSystem: 'macOS 14 oder neuer',
+    // Decision 51's proof: the 18 GB of plug-ins on the owner's Mac, until the Smart clean figure (#105).
+    proof: 'CacheDrop fand 18\u00a0GB Plug-ins auf dem Mac eines Musikproduzenten',
+    h1: 'Holen Sie sich den Speicherplatz Ihres Macs zurück.',
+    lede: 'CacheDrop findet die Caches, Reste und alten Dateien, die Ihren Mac füllen, und räumt sie sicher auf. Für Musikproduktion, Entwicklung und Videoschnitt.',
+    download: 'Für Mac herunterladen',
+    valueEyebrow: 'Eine App statt drei',
+    valueTitle: 'Ein Mac-Reiniger, ein App-Deinstallationsprogramm und ein Plug-in-Manager.',
+    values: [
+      ['Sehen, was Ihren Mac füllt', 'Ein Scan zeigt Caches, alte Projektdateien, Reste und große Downloads mit ihrer Größe.'],
+      ['Apps und Plug-ins vollständig entfernen', 'Jede Datei, die sie installiert haben, verschwindet in einem Schritt, und Ihre Lizenzen bleiben unangetastet.'],
+      ['Nichts geht versehentlich verloren', 'Sie prüfen vorher alles. Ihre Dateien landen im Papierkorb, und History legt sie zurück.'],
+    ],
+    workEyebrow: 'Für Ihre Arbeit gemacht',
+    workTitle: 'Musik, Code und Video füllen einen Mac am schnellsten.',
+    workBody: 'CacheDrop weiß, wo Ihre Tools ihre Dateien ablegen, und findet deshalb die Gigabyte, die ein allgemeiner Reiniger übersieht.',
+    producers: {
+      title: 'Für Musikproduktion',
+      body: 'Deinstallieren Sie VST-, AU-, AAX- und CLAP-Plug-ins mit allen Dateien, die sie installiert haben, und leeren Sie den Cache von Ableton Live. Ihre Lizenzen bleiben unangetastet.',
+      chips: ['VST3 / AU', 'AAX / CLAP', 'Ableton-Cache'],
+      link: 'So deinstallieren Sie Audio-Plug-ins',
+    },
+    developers: {
+      title: 'Für die Entwicklung',
+      body: 'Löschen Sie vergessene <span class="mono" style="font-size: 13px">node_modules</span>-Ordner, Xcode DerivedData und Docker-Caches sicher.',
+      chips: ['node_modules', 'DerivedData', 'Docker-Images'],
+      link: 'So leeren Sie Entwickler-Caches',
+    },
+    editors: {
+      title: 'Für den Videoschnitt',
+      body: 'Leeren Sie versteckte Adobe-Medien-Caches und prüfen Sie die Größe von Final Cut Pro Mediatheken voller Render-Dateien, ohne Ihre Timelines zu verlieren.',
+      chips: ['.cfa / .pek', 'Medien-Cache', 'FCPX-Mediatheken'],
+      link: 'So leeren Sie den Adobe-Medien-Cache',
+    },
+    safeEyebrow: 'Von Grund auf sicher',
+    safeTitle: 'Sie entscheiden, was verschwindet.',
+    safeBody: 'CacheDrop zeigt, was es gefunden hat, wo es liegt und wie viel Platz Sie zurückbekommen. Dann wartet es auf Sie.',
+    steps: [
+      ['Sie prüfen zuerst', 'Jeder Eintrag zeigt Größe und Speicherort, bevor etwas verschoben wird.'],
+      ['Gelöscht wird nur, was Apps selbst wieder anlegen', 'Caches und Build-Dateien werden gelöscht, weil Ihre Apps sie wieder anlegen. Ihre eigenen Dateien landen im Papierkorb.'],
+      ['Put back (Zurücklegen)', 'History listet jede Bereinigung auf und legt Ihre Dateien an ihren ursprünglichen Ort zurück.'],
+      ['Ihre Lizenzen bleiben sicher', 'CacheDrop berührt nie die Lizenzdaten Ihrer Apps und Plug-ins.'],
+      ['macOS öffnet es ohne Warnung', 'Jede Version wird vor der Veröffentlichung signiert und geprüft, damit macOS sie ohne Warnung öffnet.'],
+    ],
+    faqTitle: 'Mac-Speicher, kurz erklärt.',
+    faqAsk: 'Noch eine Frage? <a class="textlink" href="#feedback" data-feedback style="color: var(--accent-text)">Fragen Sie uns direkt</a>.',
+    // One list feeds both the visible FAQ and the FAQPage JSON-LD, so they can't drift apart.
+    faq: [
+      ['Was ist CacheDrop?', 'CacheDrop ist eine Mac-App, die die Caches, Reste und alten Dateien findet, die Ihren Mac füllen, und sie sicher bereinigt. Sie entfernt außerdem Apps und Audio-Plug-ins mit allen Dateien, die sie installiert haben. Gemacht ist sie für Musikproduktion, Entwicklung und Videoschnitt.'],
+      ['Wie kann ich auf meinem Mac Speicherplatz freigeben?', 'Beginnen Sie bei den Dateien, die Sie nicht sehen. Caches, Build-Dateien und App-Reste können Dutzende Gigabyte belegen, und macOS versteckt sie unter „Systemdaten“. CacheDrop scannt danach, zeigt, was es gefunden hat und wie groß jeder Eintrag ist, und leert, was Sie freigeben.'],
+      ['Was sind Systemdaten auf dem Mac, und kann ich sie löschen?', 'Unter „Systemdaten“ zählt macOS Dateien, die in keine andere Kategorie passen, darunter App-Caches, Protokolle und Entwicklerdateien. Vieles davon lässt sich bedenkenlos entfernen, weil Apps diese Dateien wieder anlegen. CacheDrop nimmt sich nur diese Teile vor.'],
+      ['Kann ich Caches auf dem Mac bedenkenlos löschen?', 'Ja, wenn es Caches sind, die Apps wieder anlegen: Die App erzeugt sie beim nächsten Bedarf einfach erneut. CacheDrop zeigt Ihnen jeden Eintrag, bevor etwas geleert wird.'],
+      ['Wie deinstalliere ich eine App oder ein Plug-in auf dem Mac vollständig?', 'Wenn Sie eine App in den Papierkorb ziehen, bleiben ihre Einstellungen, Caches und Support-Dateien zurück, und Plug-ins legen Dateien in mehreren Ordnern ab. CacheDrop findet jede Datei, die eine App oder ein Plug-in installiert hat, und entfernt sie in einem Schritt, ohne Ihre Lizenzen anzutasten.'],
+      ['Wie räume ich meinen Mac auf, ohne Dateien zu verlieren?', 'Leeren Sie Caches und Build-Dateien, nicht Dokumente. CacheDrop löscht nur Dateien, die Apps wieder anlegen. Ihre eigenen Dateien landen im Papierkorb, und History legt sie zurück.'],
+      ['Ist CacheDrop ein Abo?', `Nein. Sie zahlen einmal: Eine Lizenz kostet ${pricingCopy.de.license}, gilt für bis zu 3 Macs und enthält alle Updates für Version 1. Kein Abo, nichts zu kündigen.`],
+      ['Was kostet CacheDrop, und welche Macs werden unterstützt?', `Eine Lizenz kostet ${pricingCopy.de.license}, gilt für bis zu 3 Macs und kommt mit 30 Tagen Geld-zurück-Garantie. Sie können vor dem Kauf testen: Der Scan ist immer kostenlos, und bis zu 2\u00a0GB können Sie vorab aufräumen. Es ist eine Universal-App für Apple Silicon und Intel Macs mit macOS 14 oder neuer.`],
+    ],
+    closingTitle: 'Probieren Sie es auf Ihrem Mac aus.',
+    closingBody: 'Eine App für Apple Silicon und Intel Macs mit macOS 14 oder neuer. Die App selbst ist derzeit nur auf Englisch verfügbar.',
   },
 };
 const lang = langOf(Astro.url);

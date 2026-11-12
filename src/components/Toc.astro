@@ -6,7 +6,7 @@ interface Props {
   items: Array<[href: string, label: string]>;
 }
 const { items } = Astro.props;
-const title = { en: 'On this page', fr: 'Sur cette page' }[langOf(Astro.url)];
+const title = { en: 'On this page', fr: 'Sur cette page', de: 'Auf dieser Seite' }[langOf(Astro.url)];
 ---
 <nav class="toc" aria-label={title} style="padding: var(--space-6) var(--space-7); border: 1px solid var(--line); border-radius: var(--radius-2xl)">
 <p style="margin: 0 0 var(--space-3); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-secondary)">{title}</p>

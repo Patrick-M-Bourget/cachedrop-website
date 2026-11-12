@@ -8,12 +8,12 @@ import { withHandoffChanges } from './handoff-changes';
 // The other changes in handoff-changes.ts are body-only, so they don't touch the head.
 const toProductionDomain = (html: string) => html.replaceAll('cachedrop.app', 'cachedrop.io');
 
-/** Decision 5: a page with a French twin lists both languages as alternates, after its canonical. */
+/** Decision 5: a page with a French (and German) twin lists every language as an alternate, after its canonical. */
 function withAlternates(html: string, path: string) {
   const pair = pairs.find((p) => p.en === path);
   if (!pair) return html;
   const link = (lang: string, to: string) => `<link rel="alternate" hreflang="${lang}" href="https://cachedrop.io${to}">`;
-  const alternates = [link('en', pair.canonical.en), link('fr', pair.canonical.fr), link('x-default', pair.canonical.en)].join('');
+  const alternates = [link('en', pair.canonical.en), link('fr', pair.canonical.fr), ...(pair.canonical.de ? [link('de', pair.canonical.de)] : []), link('x-default', pair.canonical.en)].join('');
   return html.replace(/(<link rel="canonical"[^>]*>)/, `$1${alternates}`);
 }
 

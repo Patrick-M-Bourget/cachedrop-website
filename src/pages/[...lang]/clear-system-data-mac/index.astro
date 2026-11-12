@@ -15,9 +15,9 @@ import CodeBlock from '../../../components/CodeBlock.astro';
 import Kicker from '../../../components/Kicker.astro';
 import { guideH2, guideP } from '../../../components/guide-styles';
 import { guides } from '../../../components/guides';
-import { langOf, langPaths } from '../../../i18n';
+import { langOf, langPathsDe, localize } from '../../../i18n';
 
-export const getStaticPaths = langPaths;
+export const getStaticPaths = langPathsDe;
 
 const section = 'padding-top: var(--space-22); display: flex; flex-direction: column; gap: var(--space-5)';
 const pair = 'margin-top: var(--space-4); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: var(--space-4)';
@@ -259,10 +259,121 @@ const copy = {
     },
     howTo: 'Comment vider les Données système sur Mac',
   },
+  de: {
+    guide: {
+      ...guides.systemData.de,
+      crumb: 'Systemdaten-Ratgeber',
+      headline: 'Systemdaten auf dem Mac löschen',
+      lede: 'Systemdaten sind der graue Balken in den Speichereinstellungen, den macOS nicht erklärt. Hier steht, was darin steckt, was Sie bedenkenlos entfernen können und was Sie in Ruhe lassen sollten.',
+      cta: 'Für Mac herunterladen',
+      ctaNote: 'Caches · Protokolle · Entwicklerdateien',
+      updated: 'November 2026',
+      readTime: '8 Min. Lesezeit',
+      faqTitle: 'FAQ zu Systemdaten',
+      faq: [
+        ['Was sind Systemdaten auf dem Mac?', 'Das ist der Speicherplatz, den macOS keiner seiner anderen Kategorien wie Programme, Dokumente oder Fotos zurechnet. Dazu gehören Caches, Protokolle, temporäre Dateien, lokale Time-Machine-Snapshots und Dateien, die macOS selbst benötigt.'],
+        ['Warum sind die Systemdaten auf meinem Mac so groß?', 'Meist sind es App- und Entwickler-Caches, die über Monate gewachsen sind, dazu lokale Snapshots, solange Time Machine eingeschaltet ist. macOS legt temporäre Dateien und Snapshots außerdem selbst an und entfernt sie wieder, die Anzeige kann daher von Tag zu Tag steigen und sinken.'],
+        ['Kann ich Systemdaten bedenkenlos löschen?', 'Nicht als Ganzes, und macOS bietet dafür keine Schaltfläche. Teile davon lassen sich bedenkenlos entfernen: die Caches und Protokolle in Ihrem eigenen Ordner „Library“, bei beendeten Apps. Lassen Sie <span class="ic">/System</span>, <span class="ic">/Library</span> und <span class="ic">/private/var</span> unangetastet.'],
+        ['Verringert ein Neustart die Systemdaten?', 'Oft ein wenig. Ein Neustart entfernt die Auslagerungsdateien, die macOS bei knappem Arbeitsspeicher schreibt, sowie einige temporäre Dateien. Caches und Snapshots bleiben bestehen.'],
+        ['Wie lösche ich lokale Time-Machine-Snapshots?', 'Das ist selten nötig: macOS löscht sie nach etwa 24 Stunden oder früher, wenn der Speicherplatz knapp wird. Wenn Sie einen selbst löschen möchten, lassen Sie sich die Snapshots mit <span class="ic">tmutil listlocalsnapshots /</span> auflisten und löschen einen anhand seines Datums mit <span class="ic">sudo tmutil deletelocalsnapshots</span>. Backups auf Ihrem Time-Machine-Datenträger sind davon nicht betroffen.'],
+        ['Warum kommen die Systemdaten zurück, nachdem ich sie gelöscht habe?', 'Caches und Protokolle füllen sich wieder, sobald Sie Ihre Apps nutzen: Das ist ihre Aufgabe. Das Leeren lohnt sich, wenn sie über Monate gewachsen sind, nicht als tägliche Gewohnheit.'],
+        ['Räumt CacheDrop die Systemdaten auf?', 'Es bereinigt die Teile, die in Ihrem eigenen Benutzerkonto liegen: App-Caches, alte temporäre Dateien, Protokolle und Absturzberichte sowie Entwickler-Caches und Build-Dateien. Lokale Time-Machine-Snapshots und Gerätebackups zeigt es an, mit dem Hinweis, wo Sie sie verwalten. Systemdateien fasst es nie an, und nach Ihrem Passwort fragt es nicht.'],
+        ['Kann ich CacheDrop vor dem Kauf ausprobieren?', 'Ja. Der Scan ist immer kostenlos, und Aufräumen ist kostenlos, bis 2\u00a0GB freigegeben sind.'],
+      ] as Array<[string, string]>,
+      other: { eyebrow: 'Sie entwickeln Software?', title: 'Xcode-DerivedData, node_modules und Docker-Caches löschen', href: '/clear-mac-developer-caches/', link: 'Zum Ratgeber für die Entwicklung' },
+      closing: { title: 'Sehen Sie, woraus Ihre Systemdaten bestehen.', body: 'CacheDrop benennt die Caches, Protokolle und Entwicklerdateien dahinter in einem einzigen Scan, jeweils mit der Größe.' },
+      trademarks: 'Apple, Mac, macOS, Finder, iCloud, Time Machine und Xcode sind Marken von Apple Inc.',
+    },
+    toc: ['Was sind Systemdaten auf dem Mac?', 'Warum sind die Systemdaten so groß?', 'Was lässt sich aus den Systemdaten bedenkenlos entfernen?', 'Systemdaten auf dem Mac löschen', 'Lokale Time-Machine-Snapshots löschen', 'Was CacheDrop bereinigt und was es Ihnen überlässt'],
+    what: {
+      p1: 'Systemdaten sind der Speicherplatz, den macOS keiner seiner anderen Speicherkategorien wie Programme, Dokumente oder Fotos zurechnet. Das meiste davon sind Caches, Protokolle, temporäre Dateien und Snapshots sowie Dateien, die macOS zum Laufen braucht.',
+      p2: 'Öffnen Sie dazu Systemeinstellungen › Allgemein › Speicher und warten Sie, bis alle Größen berechnet sind. macOS schlüsselt die Systemdaten nicht weiter auf, deshalb zeigt der Rest dieses Ratgebers, wo Sie nachsehen können.',
+    },
+    why: {
+      p1: 'Systemdaten wachsen, weil Apps, Entwicklerwerkzeuge und macOS Kopien von Dingen behalten, um später Zeit zu sparen, und selten hinter sich aufräumen. Über Monate können aus ein paar Gigabyte an Caches und Protokollen Dutzende Gigabyte werden.',
+      items: [
+        'Caches: Apps und Browser legen heruntergeladene und erzeugte Dateien in <span class="ic">~/Library/Caches</span> ab, damit sie schneller starten. Bei Bedarf legen sie diese neu an.',
+        'Protokolle, Absturzberichte und temporäre Dateien: <span class="ic">~/Library/Logs</span> und Ihr eigener Ordner für temporäre Dateien füllen sich, während Apps laufen.',
+        'Entwicklerdateien: Xcode-DerivedData, Simulatoren, Docker- und Paket-Caches können allein schon Dutzende Gigabyte erreichen.',
+        'iCloud-Kopien: iCloud-Drive-Dateien, die Sie geöffnet haben, bleiben auf diesem Mac geladen. macOS zählt sie meist zu iCloud Drive, doch Daten, die Apps synchronisieren und in Ihrem Ordner „Library“ ablegen, können als Systemdaten erscheinen.',
+        'Lokale Time-Machine-Snapshots: Solange Time Machine eingeschaltet ist, legt macOS Snapshots Ihres Datenträgers auf dem Datenträger selbst ab, damit Sie Dateien wiederherstellen können, wenn Ihr Backup-Datenträger nicht angeschlossen ist.',
+      ],
+    },
+    safe: {
+      p1: 'Caches und Protokolle in Ihrem eigenen Ordner „Library“ lassen sich bei beendeten Apps bedenkenlos entfernen, weil Apps sie bei Bedarf neu anlegen. Alles, was macOS in Systemordnern ablegt, und die Daten, die Apps in Application Support speichern, sollten dort bleiben, wo sie sind.',
+      what: 'Was',
+      todo: 'Was zu tun ist',
+      rows: [
+        ['App-Caches', '~/Library/Caches', 'Bei beendeter App bedenkenlos löschbar. Die App legt sie neu an, daher kann sie beim ersten Mal etwas langsamer sein.'],
+        ['Protokolle und Absturzberichte', '~/Library/Logs', 'Bedenkenlos löschbar. Apps schreiben beim Laufen neue.'],
+        ['Entwickler-Caches und Build-Dateien', '~/Library/Developer', 'Bei beendeten Werkzeugen bedenkenlos löschbar; siehe den <a class="textlink" href="{dev}" style="color: var(--accent-text); font-weight: 500">Ratgeber für die Entwicklung</a>.'],
+        ['Heruntergeladene iCloud-Dateien', 'iCloud Drive', 'Entfernen Sie den Download im Finder. Die Datei bleibt in iCloud und wird erneut geladen, wenn Sie sie öffnen.'],
+        ['iPhone- und iPad-Backups', '~/Library/Application Support/MobileSync/Backup', 'Löschen Sie alte Backups im Finder: das angeschlossene Gerät auswählen, dann „Backups verwalten …“.'],
+        ['Lokale Time-Machine-Snapshots', 'tmutil listlocalsnapshots /', 'macOS löscht sie selbstständig. Löschen Sie einen nur selbst, wenn Sie den Speicherplatz sofort brauchen (siehe unten).'],
+        ['App-Daten und Einstellungen', '~/Library/Application Support, ~/Library/Containers', 'Nicht anfassen. Dort liegen Ihre Einstellungen, Dokumente und Anmeldungen.'],
+        ['Systemdateien', '/System, /Library, /private/var', 'Nicht anfassen. macOS braucht sie, und wenn Sie sie löschen, können Apps oder macOS nicht mehr funktionieren.'],
+      ] as Array<[string, string, string]>,
+    },
+    clear: {
+      p1: 'Systemdaten löschen Sie von Hand, indem Sie die Caches, Protokolle und Entwicklerdateien in Ihrem eigenen Ordner „Library“ entfernen und danach neu starten. Beenden Sie zuerst die Apps und legen Sie die Dinge in den Papierkorb, statt sie zu löschen, damit Sie mit „Zurücklegen“ wiederherstellen können, was Ihnen fehlt.',
+      manualTitle: 'Der manuelle Weg',
+      manual: [
+        'Öffnen Sie Systemeinstellungen › Allgemein › Speicher und warten Sie, bis die Größen angezeigt werden, damit Sie wissen, wo Sie stehen.',
+        'Beenden Sie Ihre Apps. Wählen Sie im Finder Gehe zu › Gehe zum Ordner …, geben Sie ~/Library/Caches ein und legen Sie die Ordner von Apps, die Sie kennen, in den Papierkorb.',
+        'Gehen Sie in ~/Library/Logs genauso vor, um alte Protokolle und Absturzberichte zu entfernen.',
+        'Entfernen Sie Entwicklerdateien, die Sie nicht brauchen, etwa Xcode-DerivedData, mit dem Ratgeber für die Entwicklung.',
+        'Klicken Sie in iCloud Drive bei gedrückter Control-Taste auf Dateien, die Sie auf diesem Mac nicht brauchen, und wählen Sie „Download entfernen“. Sie bleiben in iCloud.',
+        'Leeren Sie den Papierkorb und starten Sie dann Ihren Mac neu; dabei werden auch die Auslagerungsdateien geleert.',
+        'Prüfen Sie den Speicher noch einmal.',
+      ],
+      oursTitle: 'Der Weg mit CacheDrop',
+      ours: [
+        'Starten Sie einen Scan. Overview listet jede Kategorie mit ihrer Größe auf, und Smart clean wählt aus, was sich bedenkenlos bereinigen lässt – alles ist angehakt.',
+        'Entfernen Sie den Haken bei allem, was Sie behalten möchten, unter App caches, Logs and crash reports und Developer caches and build files.',
+        'Prüfen Sie die Auswahl und klicken Sie dann auf Clean up. Caches und Protokolle, die Apps neu anlegen, werden gelöscht; Ihre Dateien kommen in den Papierkorb. Eine geöffnete App behält ihre Caches, bis Sie sie beenden.',
+        'Bei Downloaded iCloud files behält Remove local copies die Originale in iCloud.',
+      ],
+      sizesKicker: 'Sehen, was den Platz belegt',
+      sizesP: 'Diese Befehle lesen nur Größen und ändern nichts. Sie listen die 15 größten Ordner in Ihrem Ordner „Library“ auf, danach die in dessen Ordner „Caches“. macOS fragt möglicherweise, ob Terminal auf Daten anderer Apps zugreifen darf: Beide Antworten sind in Ordnung, die Liste lässt diese Ordner dann nur aus.',
+      label: 'Terminal',
+    },
+    snapshots: {
+      p1: 'Lokale Time-Machine-Snapshots müssen Sie in der Regel nicht löschen: macOS behält sie etwa 24 Stunden und entfernt die ältesten selbstständig, wenn der Speicherplatz knapp wird. Brauchen Sie den Platz sofort, können Sie im Terminal einen Snapshot anhand seines Datums löschen.',
+      listP: 'Lassen Sie sich die Snapshots zuerst auflisten. Das liest nur und braucht kein Passwort:',
+      listNote: 'Jede Zeile wie <span class="ic">com.apple.TimeMachine.2026-11-03-101112.local</span> ist ein Time-Machine-Snapshot, benannt nach Datum und Uhrzeit. Lassen Sie jeden anderen Snapshot in Ruhe: Er stammt von einer anderen Backup-App oder von einem macOS-Update.',
+      warnTitle: 'Bevor Sie einen Snapshot löschen',
+      warn: [
+        'Das lässt sich nicht rückgängig machen, und Sie können Dateien aus diesem Moment auf diesem Mac nicht mehr wiederherstellen.',
+        'Backups auf Ihrem Time-Machine-Datenträger bleiben unberührt.',
+        'macOS gibt nicht an, wie viel Speicherplatz ein Snapshot belegt, Sie wissen also vorher nicht, wie viel Sie zurückbekommen.',
+        'Löschen Sie Snapshots oder andere Dateien in /System oder /private/var niemals von Hand.',
+      ],
+      deleteP: 'Setzen Sie zum Löschen das Datum aus der Liste anstelle des Beispiels ein. Terminal fragt nach dem Passwort Ihres Macs und zeigt bei der Eingabe nichts an:',
+      label: 'Terminal',
+    },
+    cachedrop: {
+      p1: 'CacheDrop räumt die Teile der Systemdaten auf, die in Ihrem eigenen Benutzerkonto liegen und die Apps neu anlegen: App-Caches, alte temporäre Dateien, Protokolle und Absturzberichte sowie Entwickler-Caches und Build-Dateien. Lokale Time-Machine-Snapshots löscht es nie, und Systemdateien fasst es nicht an.',
+      doesTitle: 'Was es bereinigt',
+      does: [
+        'App caches: die Caches jeder App, bei beendeter App, und Old temporary files, die Apps in Ihrem Ordner für temporäre Dateien hinterlassen haben und die seit 3 Tagen unverändert sind.',
+        'Protokolle und Absturzberichte in Ihrem eigenen Ordner „Library“.',
+        'Developer caches and build files: Xcode-DerivedData, nicht verfügbare Simulatoren, alte Gerätesupport-Dateien, Paket-Caches sowie nicht verwendete Docker-Images und der Docker-Build-Cache.',
+        'Downloaded iCloud files: Remove local copies gibt Speicherplatz frei und behält die Originale in iCloud.',
+      ],
+      leavesTitle: 'Was es Ihnen überlässt',
+      leaves: [
+        'Lokale Time-Machine-Snapshots: Es zeigt an, wie viele es gibt, mit Open Storage Settings. macOS meldet ihre Größe nicht.',
+        'iPhone- und iPad-Backups, Anhänge von Mail und Nachrichten sowie Fotos-Mediatheken: ihre Größe und die App, die sie verwaltet.',
+        'System-Caches und -Protokolle in /Library und /System, für die ein Administratorpasswort nötig wäre. CacheDrop fragt nie danach.',
+      ],
+      p2: 'Bevor etwas bereinigt wird, prüft CacheDrop jeden Eintrag noch einmal, überspringt, was eine geöffnete App gerade verwendet, und zeigt anschließend den Speicherplatz an, den es als freigegeben gemessen hat.',
+    },
+    howTo: 'Systemdaten auf dem Mac löschen',
+  },
 };
 const lang = langOf(Astro.url);
 const t = copy[lang];
-const dev = lang === 'fr' ? '/fr/clear-mac-developer-caches/' : '/clear-mac-developer-caches/';
+const dev = localize(lang, '/clear-mac-developer-caches/');
 const ids = ['what', 'why', 'safe', 'clear', 'snapshots', 'cachedrop'];
 const howTo = { name: t.howTo, steps: t.clear.manual };
 ---

@@ -12,9 +12,9 @@ import Toc from '../../../components/Toc.astro';
 import CodeBlock from '../../../components/CodeBlock.astro';
 import { guideH2, guideP } from '../../../components/guide-styles';
 import { guides } from '../../../components/guides';
-import { langOf, langPaths, localize } from '../../../i18n';
+import { langOf, langPathsDe, localize } from '../../../i18n';
 
-export const getStaticPaths = langPaths;
+export const getStaticPaths = langPathsDe;
 
 const section = 'padding-top: var(--space-22); display: flex; flex-direction: column; gap: var(--space-5)';
 const pair = 'margin-top: var(--space-4); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: var(--space-4)';
@@ -173,6 +173,74 @@ const copy = {
       appsLink: 'comment désinstaller complètement une application sur Mac',
     },
     howTo: 'Comment désinstaller un plug-in audio sur Mac',
+  },
+  de: {
+    guide: {
+      ...guides.producer.de,
+      crumb: 'Speicher-Guide für Musikproduktion',
+      headline: 'Audio-Plug-ins auf dem Mac deinstallieren – samt aller Dateien, die sie hinterlassen.',
+      lede: 'Plug-ins, die Sie nicht mehr nutzen, Caches, die Ihre DAW neu aufbaut, Dateien von Apps, die Sie schon gelöscht haben. CacheDrop listet jedes Format jedes Plug-ins an einer Stelle auf. Deinstallierte Plug-ins und Reste gelöschter Apps landen im Papierkorb, Caches werden gelöscht.',
+      cta: 'Für Mac herunterladen',
+      ctaNote: 'AU · VST · VST3 · AAX · CLAP',
+      updated: 'November 2026',
+      readTime: '7 Min. Lesezeit',
+      faqTitle: 'FAQ zu Plug-ins und Speicherplatz für die Musikproduktion',
+      faq: [
+        ['Wie deinstalliere ich ein VST-Plug-in auf dem Mac vollständig?', 'Beenden Sie Ihre DAW, löschen Sie das Plug-in dann aus jedem Format-Ordner, in den es installiert wurde (VST, VST3, AU und AAX haben jeweils einen eigenen), und entfernen Sie die Support-Dateien, die sein Installer hinzugefügt hat. <span class="ic">pkgutil --files</span> zeigt, was ein Installer geschrieben hat. CacheDrop erledigt das in einer Liste pro Produkt.'],
+        ['Wie entferne ich AAX-Plug-ins aus Pro Tools auf dem Mac?', 'Beenden Sie Pro Tools und löschen Sie die Datei <span class="ic">.aaxplugin</span> aus <span class="ic">/Library/Application Support/Avid/Audio/Plug-Ins</span>. Wurde dasselbe Plug-in auch in anderen Formaten installiert, bleiben diese zurück, solange Sie sie nicht ebenfalls entfernen.'],
+        ['Kann ich den Ableton-Cache-Ordner bedenkenlos löschen?', 'Ja, bei geschlossenem Live. Er enthält decodierte Kopien komprimierter Samples, und Live decodiert sie erneut, wenn ein Set sie das nächste Mal braucht. Der Cleanup-Button von Live unter Settings › File &amp; Folder › Decoding Cache löscht, was das geöffnete Set nicht verwendet.'],
+        ['Kann ich die Soundbibliothek von Logic Pro löschen, um Speicherplatz freizugeben?', 'Verwalten Sie sie über Logic Pro › Sound Library, wo Sound-Packs installiert und entfernt werden; außerdem lässt Apple Sie die Bibliothek auf ein externes Laufwerk verschieben. CacheDrop zeigt ihre Größe an, entfernt Apples Soundbibliothek aber nie.'],
+        ['Löscht das Deinstallieren von Plug-ins meine iLok-Lizenzen?', 'Nicht mit CacheDrop: iLok-, PACE-, eLicenser- und CodeMeter-Dateien sowie alles, was nach Lizenz, Aktivierung oder Seriennummer benannt ist, wird nie angeboten. Eine Aktivierung bleibt in Ihrem iLok-Konto; deaktivieren Sie sie daher zuerst im iLok License Manager, wenn Sie sie auf einem anderen Mac nutzen möchten.'],
+        ['Wie deinstalliere ich Plug-ins von Waves, UAD oder Native Instruments auf dem Mac?', 'Deren eigene Manager – Waves Central, UA Connect und Native Access – entfernen die jeweiligen Produkte. CacheDrop listet sie wie jedes andere Plug-in nach Produkt auf, mit jedem Format und den Dateien, die ihre Installer aufführen.'],
+        ['Welche Dateien hinterlassen Plug-ins, nachdem ich sie gelöscht habe?', 'Meist die anderen Formate, Presets und Support-Dateien in Application Support, Einstellungen und den Installationsbeleg des Installers. CacheDrop fasst sie mit dem Plug-in zusammen und führt Dateien von bereits gelöschten Apps gesondert auf.'],
+        ['Kann ich den Plug-in-Deinstaller vor dem Kauf testen?', 'Der Scan und die Plug-in-Liste sind immer kostenlos. Aufräumen und Deinstallieren sind kostenlos, bis 2\u00a0GB freigegeben sind.'],
+      ] as Array<[string, string]>,
+      other: { eyebrow: 'Schneiden Sie auch Videos?', title: 'So leeren Sie den Adobe-Medien-Cache und die Render-Dateien von Final Cut Pro', href: '/clear-adobe-media-cache-mac/', link: 'Zum Guide für Kreative' },
+      closing: { title: 'Schaffen Sie Platz für die nächste Session.', body: 'CacheDrop findet Ihre Plug-ins, den Cache von Ableton und Dateien gelöschter Apps in einem einzigen Scan.' },
+      trademarks: 'Ableton und Live sind Marken der Ableton AG. Pro Tools und AAX sind Marken von Avid Technology. VST ist eine Marke der Steinberg Media Technologies GmbH. iLok ist eine Marke von PACE Anti-Piracy. Logic Pro, GarageBand, MainStage, Apple, Mac und macOS sind Marken von Apple Inc. Andere Namen sind Marken ihrer jeweiligen Inhaber.',
+    },
+    toc: ['So deinstallieren Sie Audio-Plug-ins auf dem Mac', 'Wo werden VST-, AU-, AAX- und CLAP-Plug-ins gespeichert?', 'Warum das Löschen der .vst3 nicht reicht', 'Gehen dabei meine Lizenzen verloren?', 'So leeren Sie den Cache von Ableton Live', 'Sample-Bibliotheken und Sound-Packs', 'Dateien gelöschter Apps'],
+    uninstall: {
+      intro: 'Ein Plug-in besteht selten aus einer einzigen Datei. Die meisten Installer legen dasselbe Plug-in in zwei bis vier Formaten in verschiedenen Ordnern ab, dazu Presets und Support-Dateien an anderen Stellen. Wer nur ein Bundle löscht, lässt den Rest zurück.',
+      manualTitle: 'Von Hand',
+      manual: ['Beenden Sie Ihre DAW und jede App, die Plug-ins lädt.', 'Nutzen Sie den Uninstaller oder Manager des Herstellers, falls es einen gibt.', 'Löschen Sie das Plug-in sonst aus jedem Format-Ordner weiter unten. Die AU- und VST-Ordner in /Library verlangen meist Ihr Passwort.', 'Entfernen Sie seine Support-Dateien in Application Support und seine Einstellungen.', 'Prüfen Sie den Installationsbeleg des Installers auf weitere Dateien (siehe unten).'],
+      oursTitle: 'Mit CacheDrop',
+      ours: ['Öffnen Sie Applications › Plug-ins: jedes Produkt mit seinen Formaten und seiner Größe.', 'Haken Sie ein Produkt an. Seine Formate und die Support-Dateien, die der Installationsbeleg seines Installers aufführt, werden mit angehakt.', `CacheDrop bittet Sie zuerst, jede geöffnete Host-App zu beenden: ${hosts}.`, 'Alles, was macOS ihm zu verschieben erlaubt, landet im Papierkorb, und Put back (Zurücklegen) stellt es wieder her. Dateien, für die Ihr Passwort nötig ist, werden mit Reveal in Finder aufgeführt.'],
+      never: 'Es liest Plug-ins, ohne sie zu laden, und bewertet nie, welches Sie behalten sollten: Sie entscheiden, was verschwindet.',
+    },
+    where: {
+      intro: 'macOS hat pro Format einen Ordner: für alle Benutzer unter /Library, für Sie allein in Ihrem Home-Ordner. AUv3-Plug-ins liegen innerhalb ihrer App und verschwinden, wenn Sie die App löschen.',
+      format: 'Format',
+      folders: 'Ordner',
+      system: 'Alle Benutzer',
+      user: 'Nur Ihr Home-Ordner',
+    },
+    receipts: {
+      p1: 'Installer schreiben außerdem Presets, Handbücher, Sound-Inhalte und Hilfsdateien nach Application Support, und macOS führt einen Installationsbeleg darüber, was jedes Installer-Paket geschrieben hat. So sehen Sie ihn im Terminal:',
+      label: 'Terminal',
+      p2: 'CacheDrop liest dieselben Installationsbelege, damit die Support-Dateien mit ihrem Plug-in verschwinden: nur das, was der Beleg dieses Produkts aufführt, nie einen Hersteller-Ordner, den sich mehrere Produkte teilen, und nur Dateitypen, von denen es weiß, dass sie sich bedenkenlos verschieben lassen.',
+    },
+    licences: {
+      p1: 'Kopierschutz speichert seine Daten getrennt von den Plug-ins. CacheDrop bietet iLok- und PACE-, eLicenser- oder CodeMeter-Dateien nie an, ebenso nichts, was nach Lizenz, Aktivierung oder Seriennummer benannt ist, und prüft unmittelbar vor dem Verschieben noch einmal.',
+      p2: 'Das Deinstallieren gibt keine Aktivierung zurück. Ist ein Plug-in auf diesem Mac aktiviert und möchten Sie es auf einem anderen nutzen, deaktivieren Sie es zuerst im iLok License Manager oder im Manager des Herstellers.',
+    },
+    ableton: {
+      p1: 'Wenn Sie komprimierte Samples wie MP3 oder FLAC verwenden, decodiert Live sie in einen Cache. Er wächst mit jedem Projekt, und Live baut ihn bei Bedarf neu auf.',
+      label: 'Pfad',
+      p2: 'Das Smart clean von CacheDrop löscht ihn und lässt ihn abgewählt, solange Live läuft. Die Caches, die andere Musik-Apps in ~/Library/Caches ablegen, werden genauso geleert, als App caches.',
+    },
+    libraries: {
+      p1: 'Sample-Bibliotheken sind bei der Musikproduktion oft die größten Ordner, und sie gehören Ihnen. CacheDrop zeigt ihre Größe und den Ort, an dem Sie sie verwalten, und entfernt sie nie von sich aus:',
+      items: ['Soundbibliothek von Logic Pro und GarageBand: Logic Pro › Sound Library.', 'Ableton Packs: im Browser von Live unter Packs.', 'Splice-Samples: die Splice-App.', 'Die User Library von Ableton und Ihre eigenen Apple Loops: als Ihre gekennzeichnet.'],
+      p2: 'Wenn Sie ein Plug-in deinstallieren, können Sound-Banks, die der Hersteller dafür installiert hat, ebenfalls verschwinden, einzeln angehakt. Apples Ordner, Ihre User Library und Splice nie.',
+    },
+    deleted: {
+      p1: 'Löschen Sie eine App aus dem Ordner „Programme“, bleiben ihre Einstellungen, Caches und Daten in Ihrem Ordner „Library“ zurück. CacheDrop listet sie unter Files from deleted apps auf, jeweils über Bundle-ID oder Installationsbeleg mit ihrer App verknüpft, und verschiebt, was Sie auswählen, in den Papierkorb.',
+      p2: 'Ein Ordner, der nur denselben Namen wie eine gelöschte App trägt, wird als möglicherweise zugehörig mit Begründung angezeigt, und Smart clean wählt ihn nie aus.',
+      apps: 'Möchten Sie auch ganze Apps entfernen? Lesen Sie,',
+      appsLink: 'wie Sie Apps auf dem Mac vollständig deinstallieren',
+    },
+    howTo: 'So deinstallieren Sie ein Audio-Plug-in auf dem Mac',
   },
 };
 // Uninstalls count toward the 2 GB (Trial.swift), so the FAQ's last answer never says uninstalling is free.

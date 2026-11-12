@@ -31,6 +31,14 @@ export const botCheckCopy = {
     minute: 'une minute',
     minutes: '{n}\u00a0minutes',
   },
+  de: {
+    /** The function refused the token, or Turnstile couldn't run in this browser. */
+    failed: 'Wir konnten nicht bestätigen, dass die Anfrage von einer Person stammt. Laden Sie die Seite neu und versuchen Sie es erneut.',
+    /** Too many sends from one place; {wait} is `minute` or `minutes`. */
+    limited: 'Von Ihrem Netzwerk kamen sehr viele Versuche. Versuchen Sie es in {wait} erneut.',
+    minute: 'einer Minute',
+    minutes: '{n}\u00a0Minuten',
+  },
 } as const satisfies Record<Lang, Record<'failed' | 'limited' | 'minute' | 'minutes', string>>;
 
 export type { Lang };

@@ -6,7 +6,8 @@
 // - each page's copy fixes in copy-fixes.ts (Decision 23: claims match the app).
 import { withCopyFixes } from './copy-fixes';
 
-export type HandoffChange = { decision: number; why: string; find: string; replace: string };
+/** `only`: the handoff files the change applies to; omitted means every page. */
+export type HandoffChange = { decision: number; why: string; find: string; replace: string; only?: string[] };
 
 export const handoffChanges: HandoffChange[] = [
   {
@@ -26,6 +27,13 @@ export const handoffChanges: HandoffChange[] = [
     why: 'The footer switches to the page in French. Applied after the Decision 19 change, so it ends the same row.',
     find: '<span>Public beta</span>',
     replace: '<span>Public beta</span><a class="flink" href="/fr/" hreflang="fr" lang="fr">Français</a>',
+  },
+  {
+    decision: 5,
+    why: 'German (amends Decision 5): the core pages also switch to the page in German, after French.',
+    find: 'lang="fr">Français</a>',
+    replace: 'lang="fr">Français</a><a class="flink" href="/de/" hreflang="de" lang="de">Deutsch</a>',
+    only: ['clear-mac-developer-caches/index.html', 'clear-adobe-media-cache-mac/index.html'],
   },
   {
     decision: 42,
@@ -104,6 +112,7 @@ export const handoffChanges: HandoffChange[] = [
 /** Returns the handoff page's HTML with every decided change applied. */
 export function applyHandoffChanges(html: string, page: string) {
   for (const c of handoffChanges) {
+    if (c.only && !c.only.includes(page)) continue;
     const count = html.split(c.find).length - 1;
     if (count !== 1) throw new Error(`Decision ${c.decision} change expects "${c.find}" once in ${page}, found ${count}`);
     html = html.replace(c.find, c.replace);

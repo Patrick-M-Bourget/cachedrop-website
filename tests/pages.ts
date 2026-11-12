@@ -11,7 +11,7 @@ export type PageUnderTest = {
   /** Base name of the reference renders: `desktop-<name>.png` (1440 px) and `mobile-<name>.png` (390 px). */
   screenshots?: string;
   /** Omitted means English. */
-  lang?: 'fr';
+  lang?: 'fr' | 'de';
 };
 
 export const pages: PageUnderTest[] = [
@@ -50,26 +50,37 @@ export const pages: PageUnderTest[] = [
   { path: '/fr/refund-policy/', lang: 'fr' },
   { path: '/fr/license-agreement/', lang: 'fr' },
   { path: '/fr/resend-license-key/', lang: 'fr' },
+  // German: the core pages only (dePages in src/i18n.ts). No handoff originals.
+  { path: '/de/', lang: 'de' },
+  { path: '/de/pricing/', lang: 'de' },
+  { path: '/de/clear-mac-developer-caches/', lang: 'de' },
+  { path: '/de/clear-adobe-media-cache-mac/', lang: 'de' },
+  { path: '/de/uninstall-audio-plugins-mac/', lang: 'de' },
+  { path: '/de/clear-system-data-mac/', lang: 'de' },
+  { path: '/de/uninstall-apps-mac/', lang: 'de' },
+  { path: '/de/cleanmymac-alternative/', lang: 'de' },
 ];
 
-/** Each English page and its French twin: where each is built and its canonical address. */
-export type Pair = { en: string; fr: string; canonical: { en: string; fr: string }; indexed: boolean };
+/** Each English page and its French twin (and German twin for the core pages): where each is built and its canonical address. */
+export type Pair = { en: string; fr: string; de?: string; canonical: { en: string; fr: string; de?: string }; indexed: boolean };
 
-const pair = (en: string, indexed: boolean, canonical = en): Pair => ({
+const pair = (en: string, indexed: boolean, canonical = en, de = false): Pair => ({
   en,
   fr: `/fr${en}`,
-  canonical: { en: canonical, fr: `/fr${canonical}` },
+  ...(de ? { de: `/de${en}` } : {}),
+  canonical: { en: canonical, fr: `/fr${canonical}`, ...(de ? { de: `/de${canonical}` } : {}) },
   indexed,
 });
 
 export const pairs: Pair[] = [
-  pair('/', true),
-  pair('/clear-mac-developer-caches/', true),
-  pair('/clear-adobe-media-cache-mac/', true),
-  pair('/uninstall-audio-plugins-mac/', true),
-  pair('/clear-system-data-mac/', true),
-  pair('/uninstall-apps-mac/', true),
-  pair('/cleanmymac-alternative/', true),
+  pair('/', true, '/', true),
+  pair('/pricing/', true, '/pricing/', true),
+  pair('/clear-mac-developer-caches/', true, '/clear-mac-developer-caches/', true),
+  pair('/clear-adobe-media-cache-mac/', true, '/clear-adobe-media-cache-mac/', true),
+  pair('/uninstall-audio-plugins-mac/', true, '/uninstall-audio-plugins-mac/', true),
+  pair('/clear-system-data-mac/', true, '/clear-system-data-mac/', true),
+  pair('/uninstall-apps-mac/', true, '/uninstall-apps-mac/', true),
+  pair('/cleanmymac-alternative/', true, '/cleanmymac-alternative/', true),
   pair('/privacy/', true),
   pair('/download/', false),
   pair('/download/link/', false, '/download/'),
@@ -113,6 +124,23 @@ export const ui = {
     close: 'Fermer',
     submit: 'Envoyer mon avis',
     rating: 'Votre note',
+  },
+  // German pages link to the English legal, download and resend pages (headquarters-app plan Q26).
+  de: {
+    home: '/de/',
+    download: '/download/',
+    privacy: ['Datenschutz (Englisch)', '/privacy/'],
+    legal: [
+      ['Verkaufsbedingungen (Englisch)', '/terms-of-sale/'],
+      ['Rückerstattung (Englisch)', '/refund-policy/'],
+      ['Lizenzvereinbarung (Englisch)', '/license-agreement/'],
+    ],
+    resendKey: ['Lizenzschlüssel erneut senden', '/resend-license-key/'],
+    dialog: 'Schnelles Feedback geben',
+    veryUnhappy: 'Sehr unzufrieden',
+    close: 'Feedback schließen',
+    submit: 'Feedback senden',
+    rating: 'Ihre Bewertung',
   },
 } as const;
 

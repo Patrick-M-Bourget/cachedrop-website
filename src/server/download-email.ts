@@ -5,7 +5,7 @@
 // in the language the person signed up in (Decision 5); the French ships as Claude drafted it
 // (Decision 34).
 import type { Email } from './gate.ts';
-import type { Lang } from '../i18n.ts';
+import type { FlowLang as Lang } from '../i18n.ts'; // emails and forms speak English and French
 
 const COPY = {
   en: {

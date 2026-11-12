@@ -5,7 +5,7 @@ import { guides } from '../src/components/guides';
 
 // Pricing (Decisions 44 and 47) on every build: the launch setting retired with Decision 52.
 const withPricing = [...pages, { path: '/pricing/' }, { path: '/fr/pricing/', lang: 'fr' as const }];
-const langOf = (p: { lang?: 'fr' }) => p.lang ?? 'en';
+const langOf = (p: { lang?: 'fr' | 'de' }) => p.lang ?? 'en';
 
 const copy = {
   en: {
@@ -52,9 +52,34 @@ const copy = {
     legal: [['conditions de vente', '/fr/terms-of-sale/'], ['politique de remboursement', '/fr/refund-policy/'], ['contrat de licence', '/fr/license-agreement/']],
     tried: ['Vous l’avez déjà essayé?', 'Achetez une licence'],
   },
+  // German (core pages only): Buy and Download go to the English checkout and form for now.
+  de: {
+    pricing: ['Preise', '/de/pricing/'],
+    download: 'Für Mac herunterladen',
+    title: 'Einmal zahlen. Auf 3 Macs nutzen.',
+    body: 'Sehen Sie, was Ihren Mac füllt, räumen Sie es sicher auf und entfernen Sie Apps und Plug-ins vollständig.',
+    spoken: 'Regulär 29,99\u00a0$, jetzt 19,99\u00a0$ für begrenzte Zeit, einmalig.',
+    shown: ['29,99\u00a0$', '19,99\u00a0$', 'einmalig'],
+    currencies: 'Zahlen Sie in USD, CAD, EUR, GBP oder AUD: derselbe Betrag in jeder Währung.',
+    items: [
+      'Nutzbar auf bis zu 3 Ihrer Macs.',
+      'Alle Updates für Version 1, bereit für jedes neue macOS, sobald es erscheint.',
+      'Kein Abo. Nichts zu kündigen.',
+      '30 Tage Geld-zurück-Garantie, ohne Angabe von Gründen.',
+      'Der Scan ist immer kostenlos, und Sie können vor dem Kauf bis zu 2\u00a0GB aufräumen.',
+    ],
+    compare: 'CacheDrop mit anderen Mac-Reinigern vergleichen',
+    buy: ['Kaufen · regulär 29,99\u00a0$ jetzt 19,99\u00a0$ einmalig', '/buy'],
+    legal: [['Verkaufsbedingungen (Englisch)', '/terms-of-sale/'], ['Rückerstattung (Englisch)', '/refund-policy/'], ['Lizenzvereinbarung (Englisch)', '/license-agreement/']],
+  },
 } as const;
+const navLinks = {
+  en: ['For Developers', 'For Creators', 'For Music Producers', 'Pricing'],
+  fr: ['Pour les développeurs', 'Pour les créateurs', 'Pour les producteurs de musique', 'Tarifs'],
+  de: ['Für Entwickler', 'Für Kreative', 'Für Musikproduzenten', 'Preise'],
+};
 
-async function expectPricing(page: Page, lang: 'en' | 'fr', level: 1 | 2) {
+async function expectPricing(page: Page, lang: 'en' | 'fr' | 'de', level: 1 | 2) {
   const c = copy[lang];
   const section = page.getByRole('region', { name: c.title });
   await expect(section.getByRole('heading', { level, name: c.title })).toBeVisible();
@@ -82,7 +107,7 @@ async function expectPricing(page: Page, lang: 'en' | 'fr', level: 1 | 2) {
   for (const [name, href] of c.legal) await expect(section.getByRole('link', { name, exact: true })).toHaveAttribute('href', href);
 }
 
-for (const lang of ['en', 'fr'] as const) {
+for (const lang of ['en', 'fr', 'de'] as const) {
   test(`${lang}: the homepage has the pricing section, between "Safe by design" and the FAQ`, async ({ page }) => {
     await page.goto(ui[lang].home);
     await expectPricing(page, lang, 2);
@@ -100,6 +125,9 @@ for (const lang of ['en', 'fr'] as const) {
     await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
     await expect(page.getByRole('banner').getByRole('link', { name: copy[lang].pricing[0] })).toHaveAttribute('aria-current', 'page');
   });
+}
+
+for (const lang of ['en', 'fr'] as const) {
 
   test(`${lang}: the news box no longer mentions the paid launch`, async ({ page }) => {
     await page.goto(lang === 'en' ? '/download/' : '/fr/download/');
@@ -192,7 +220,7 @@ for (const p of withPricing) {
     await expect(nav.getByText(/^(BETA|BÊTA)$/)).toHaveCount(0);
     const primary = nav.getByRole('navigation');
     const links = await primary.getByRole('link').allTextContents();
-    expect(links.slice(0, 4)).toEqual(lang === 'en' ? ['For Developers', 'For Creators', 'For Music Producers', 'Pricing'] : ['Pour les développeurs', 'Pour les créateurs', 'Pour les producteurs de musique', 'Tarifs']);
+    expect(links.slice(0, 4)).toEqual(navLinks[lang]);
     await expect(primary.getByRole('link', { name: c.pricing[0], exact: true })).toHaveAttribute('href', c.pricing[1]);
     await expect(nav.getByRole('link', { name: c.download, exact: true })).toHaveAttribute('href', ui[lang].download);
     await expect(nav.locator('a[href^="/buy"]')).toHaveCount(0);
@@ -205,9 +233,9 @@ for (const p of withPricing) {
 
 // Every guide has the same download block (#112, Decision 51): the trial line once, under the hero
 // button, and the price for up to 3 Macs. No Buy link, and no "Free to try" left in the closing line.
-for (const path of Object.values(guides).flatMap((g) => [g.path, `/fr${g.path}`])) {
+for (const path of Object.values(guides).flatMap((g) => [g.path, `/fr${g.path}`, `/de${g.path}`])) {
   test(`${path}: the download block states the trial once and the price, with no Buy link`, async ({ page }) => {
-    const lang = path.startsWith('/fr/') ? 'fr' : 'en';
+    const lang = path.startsWith('/fr/') ? 'fr' : path.startsWith('/de/') ? 'de' : 'en';
     await page.goto(path);
     await expect(page.locator('a[href^="/buy"]')).toHaveCount(0);
     await expect(page.getByText(pricingCopy[lang].trial, { exact: true })).toHaveCount(1);
@@ -221,7 +249,7 @@ for (const path of Object.values(guides).flatMap((g) => [g.path, `/fr${g.path}`]
 for (const p of withPricing.filter((p) => !/^(\/fr)?\/download\//.test(p.path))) {
   test(`${p.path}: every Download link goes to the email form`, async ({ page }) => {
     await page.goto(p.path);
-    const hrefs = await page.locator('a', { hasText: /download|télécharg|try cachedrop|essayer cachedrop/i }).evaluateAll((as) => as.map((a) => a.getAttribute('href')));
+    const hrefs = await page.locator('a', { hasText: /download|télécharg|herunterladen|try cachedrop|essayer cachedrop|cachedrop ausprobieren/i }).evaluateAll((as) => as.map((a) => a.getAttribute('href')));
     expect(hrefs.length).toBeGreaterThan(0);
     for (const href of hrefs) expect(href).toBe(ui[langOf(p)].download);
   });

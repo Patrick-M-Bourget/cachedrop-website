@@ -3,14 +3,14 @@
 // purpose (HANDOFF.md §4); don't rename them.
 // The "Privacy Policy" link in the bottom row is Decision 19; the handoff has none.
 // The terms of sale, refund policy and license agreement links after it are Decision 43; the row wraps.
-// The language switch at the end of that row is Decision 5: it opens this page in the other language.
+// The language switch at the end of that row is Decision 5: it opens this page in each other language it exists in.
 // "Resend License Key" at the end of Product is Decision 42; "Compare to CleanMyMac" after it is Decision 54.
 // The producer page's link after the two guides is Decision 48.
 // The System Data guide's link after it is #110.
 // The app uninstall guide's link after it is #111 (Decision 51).
 import BrandMark from './BrandMark.astro';
 import { footerCopy as copy } from './footer';
-import { langOf, localize, other } from '../i18n';
+import { langName, langOf, langsOf, localize } from '../i18n';
 
 interface Props {
   /** Root-relative English path of this page (as Base's `path`); the language switch goes to its twin. */
@@ -23,7 +23,6 @@ interface Props {
 
 const lang = langOf(Astro.url);
 const t = copy[lang];
-const to = other(lang);
 const href = (english: string) => localize(lang, english);
 const { path, overview = false, trademarks = t.trademarks } = Astro.props;
 ---
@@ -61,7 +60,7 @@ const { path, overview = false, trademarks = t.trademarks } = Astro.props;
 </div>
 <div style="margin-top: var(--space-14); padding-top: var(--space-6); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3); font-size: 12px; color: var(--ink-secondary)">
 <span>© 2026 CacheDrop. {trademarks}</span>
-<span style="display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4)"><a class="flink" href={href('/privacy/')}>{t.privacy}</a><a class="flink" href={href('/terms-of-sale/')}>{t.terms}</a><a class="flink" href={href('/refund-policy/')}>{t.refunds}</a><a class="flink" href={href('/license-agreement/')}>{t.license}</a><a class="flink" href={localize(to, path)} hreflang={to} lang={to}>{t.switchTo}</a></span>
+<span style="display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4)"><a class="flink" href={href('/privacy/')}>{t.privacy}</a><a class="flink" href={href('/terms-of-sale/')}>{t.terms}</a><a class="flink" href={href('/refund-policy/')}>{t.refunds}</a><a class="flink" href={href('/license-agreement/')}>{t.license}</a>{langsOf(path).filter((l) => l !== lang).map((l) => <a class="flink" href={localize(l, path)} hreflang={l} lang={l}>{langName[l]}</a>)}</span>
 </div>
 </div>
 </footer>

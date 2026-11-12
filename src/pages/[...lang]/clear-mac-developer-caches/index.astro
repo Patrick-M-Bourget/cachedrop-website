@@ -7,9 +7,9 @@ import CodeBlock from '../../../components/CodeBlock.astro';
 import Kicker from '../../../components/Kicker.astro';
 import { guideH2, guideP, guideSection } from '../../../components/guide-styles';
 import { guides } from '../../../components/guides';
-import { langOf, langPaths } from '../../../i18n';
+import { langOf, langPathsDe } from '../../../i18n';
 
-export const getStaticPaths = langPaths;
+export const getStaticPaths = langPathsDe;
 
 const h3 = 'margin: 0; font-size: 24px; line-height: 30px; font-weight: 600; letter-spacing: -0.015em';
 const cell = 'padding: var(--space-3) var(--space-4)';
@@ -131,6 +131,62 @@ const copy = {
       ours: 'CacheDrop regroupe les caches Docker, Homebrew et npm sous Developer caches and build files, affiche le total et les vide ensemble. Aucune commande à retenir.',
     },
     withUs: 'Avec CacheDrop',
+  },
+  de: {
+    guide: {
+      ...guides.developer.de,
+      crumb: 'Speicher-Guide für Entwickler',
+      headline: 'Xcode DerivedData, node_modules und Docker-Caches auf dem Mac löschen',
+      lede: 'Holen Sie Gigabyte an vergessenem Code zurück. Wer auf dem Mac programmiert, findet den größten Platzfresser nicht in den eigenen Dateien, sondern in den Build-Artefakten, die über alte Projekte verstreut liegen.',
+      cta: 'Für Mac herunterladen',
+      ctaNote: 'Mac-Reiniger für Entwickler · Apple Silicon & Intel',
+      updated: 'Oktober 2026',
+      readTime: '6 Min. Lesezeit',
+      faqTitle: 'FAQ zum Speicher für Entwickler',
+      // One list feeds both the visible FAQ and the FAQPage JSON-LD (answers lose their tags there).
+      faq: [
+        ['Kann ich Xcode DerivedData bedenkenlos löschen?', 'Ja. DerivedData enthält Build-Produkte, Protokolle und Indizes, die Xcode automatisch neu anlegt. Der nächste Build und die Indizierung des Codes dauern einmal länger, bis Xcode alles neu aufgebaut hat.'],
+        ['Macht das Löschen von node_modules mein Projekt kaputt?', 'Nein. Solange package.json und Ihr Lockfile noch vorhanden sind, stellt <span class="ic">npm install</span> (oder yarn bzw. pnpm) dieselben Abhängigkeiten wieder her.'],
+        ['Löscht docker system prune meine Volumes?', 'Standardmäßig nicht. Volumes werden nur entfernt, wenn Sie die Option <span class="ic">--volumes</span> angeben.'],
+        ['Warum zeigt mein Mac Dateien aus der Entwicklung als „Systemdaten“ an?', 'Die Speichereinstellungen von macOS schlüsseln Caches in Ihrem Ordner „Library“ oder in Projektordnern nicht auf. Deshalb werden die meisten Build-Dateien aus der Entwicklung zu den Systemdaten gezählt. Ein Mac-Reiniger für Entwickler wie CacheDrop benennt jeden einzelnen Eintrag und zeigt seine Größe.'],
+        ['Was bereinigt CacheDrop für Entwickler?', 'Xcode DerivedData, alte node_modules-Ordner, nicht verwendete Docker-Images und Build-Cache sowie die Paket-Caches von Homebrew, npm und Yarn. Sie prüfen jeden Eintrag, bevor er geleert wird.'],
+      ] as Array<[string, string]>,
+      other: { eyebrow: 'Auch Videoschnitt?', title: 'Adobe-Medien-Cache und Render-Dateien von Final Cut Pro löschen', href: '/clear-adobe-media-cache-mac/', link: 'Den Guide für Kreative lesen' },
+      closing: { title: 'Das Terminal können Sie sich sparen.', body: 'CacheDrop findet DerivedData, node_modules und Docker-Caches in einem einzigen Scan. Die App selbst ist derzeit nur auf Englisch verfügbar.' },
+      trademarks: 'Apple, Mac, macOS und Xcode sind Marken von Apple Inc.',
+    },
+    toc: ['Xcode DerivedData löschen', 'Alte node_modules-Ordner auf dem Mac löschen', 'Docker- und Paketmanager-Caches leeren'],
+    what: {
+      title: 'Was belegt den Speicher Ihres Macs?',
+      intro: 'Wenn Sie den Speicher in macOS prüfen, landen Entwicklungsumgebungen meist in einem riesigen, wenig aussagekräftigen Block „Systemdaten“. CacheDrop erfasst gezielt:',
+      items: ['Xcode DerivedData: Zwischenergebnisse und Indizes aus Builds', 'Vergessene <span class="ic">node_modules</span>-Ordner in alten Projekten', 'Docker-Images und Build-Cache sowie die Paket-Caches von Homebrew, npm und Yarn'],
+      outro: 'Alle drei legen Ihre Tools beim nächsten Build oder bei der nächsten Installation von selbst wieder an. Wenn Sie sie löschen, wird Speicherplatz frei, ohne dass Ihr Quellcode angetastet wird.',
+    },
+    derived: {
+      title: '1. Xcode DerivedData',
+      intro: 'Xcode erzeugt große Mengen an Build-Zwischendaten. CacheDrop leert <span class="ic">~/Library/Developer/Xcode/DerivedData</span> sicher, ohne Ihren eigentlichen Code anzufassen.',
+      manual: 'DerivedData manuell löschen',
+      how: 'Beenden Sie zuerst Xcode und führen Sie dann dies im Terminal aus. Alternativ öffnen Sie Xcode › Settings › Locations, klicken auf den Pfeil neben Derived Data und legen die Ordner in den Papierkorb.',
+      ours: 'CacheDrop zeigt die Größe von DerivedData unter Developer caches and build files an. So sehen Sie sie und können sie nach Ihrer Bestätigung leeren.',
+    },
+    node: {
+      title: '2. Vergessene node_modules-Ordner',
+      intro: 'Vermutlich liegen bei Ihnen Dutzende alter React- oder Node-Projekte, die Sie seit einem Jahr nicht angefasst haben. Ein <span class="ic">node_modules</span>-Ordner kann 500\u00a0MB und mehr belegen. CacheDrop findet sie in den Ordnern, die Sie auswählen, und lässt Sie entscheiden, welche entfernt werden.',
+      manual: 'node_modules manuell finden und löschen',
+      list: 'Listen Sie alle node_modules-Ordner unterhalb eines Verzeichnisses mit ihrer Größe auf. Ersetzen Sie den Pfad durch den Ordner, in dem Sie Ihre Projekte ablegen:',
+      remove: 'Löschen Sie die Ordner, die Sie nicht brauchen, mit <span class="ic">rm -rf path/to/project/node_modules</span>. Wenn Sie zu einem Projekt zurückkehren, stellt <span class="ic">npm install</span> sie wieder her.',
+      ours: 'CacheDrop durchsucht die Ordner, die Sie auswählen, und listet jeden node_modules-Ordner mit seiner Größe auf, damit Sie die zu entfernenden auswählen können. Projekte, die Sie in dieser Woche geändert haben, überspringt es. Die gewählten Ordner werden gelöscht und nicht in den Papierkorb verschoben; npm install legt sie bei Bedarf wieder an.',
+    },
+    docker: {
+      title: '3. Docker-Caches &amp; Paketmanager',
+      intro: 'Räumen Sie nicht verwendete Docker-Images, Homebrew-Caches, <span class="ic">.pub-cache</span> und Reste von <span class="ic">npm</span> auf, die unbemerkt Ihre SSD füllen.',
+      manual: 'Docker-Cache manuell leeren',
+      how: 'Dieser Befehl entfernt gestoppte Container, nicht verwendete Netzwerke, verwaiste Images (dangling) und Build-Cache. Mit <span class="ic">-a</span> entfernen Sie zusätzlich jedes Image, das kein Container verwendet. Volumes bleiben erhalten, solange Sie nicht <span class="ic">--volumes</span> angeben.',
+      packages: 'Caches von Paketmanagern',
+      head: ['Tool', 'Cache-Speicherort', 'Leeren mit'],
+      ours: 'CacheDrop fasst die Caches von Docker, Homebrew und npm unter Developer caches and build files zusammen, zeigt die Gesamtgröße an und leert sie gemeinsam. Sie müssen sich keine Befehle merken.',
+    },
+    withUs: 'Mit CacheDrop',
   },
 };
 const t = copy[langOf(Astro.url)];

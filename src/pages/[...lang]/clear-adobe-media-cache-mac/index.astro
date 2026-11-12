@@ -6,9 +6,9 @@ import Toc from '../../../components/Toc.astro';
 import CodeBlock from '../../../components/CodeBlock.astro';
 import { guideH2, guideP, arrowLink } from '../../../components/guide-styles';
 import { guides } from '../../../components/guides';
-import { langOf, langPaths, localize } from '../../../i18n';
+import { langOf, langPathsDe, localize } from '../../../i18n';
 
-export const getStaticPaths = langPaths;
+export const getStaticPaths = langPathsDe;
 
 const section = 'padding-top: var(--space-22); display: flex; flex-direction: column; gap: var(--space-5)';
 const pair = 'margin-top: var(--space-4); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: var(--space-4)';
@@ -115,6 +115,53 @@ const copy = {
       ours: 'CacheDrop liste chaque bibliothèque Final Cut Pro qu’il trouve, avec sa taille, pour que vous sachiez lesquelles nettoyer dans Final Cut. Il ne modifie jamais une bibliothèque lui-même.',
     },
     get: 'Essayer CacheDrop',
+  },
+  de: {
+    guide: {
+      ...guides.creator.de,
+      crumb: 'Speicher-Guide für Kreative',
+      headline: 'So leeren Sie den Adobe-Medien-Cache auf dem Mac',
+      lede: 'Schluss mit dem Kauf externer Festplatten. Meldet Premiere Pro oder Final Cut Pro, dass der Speicher voll ist, sind es oft Cache-Dateien: Videoschnitt-Software legt riesige, unsichtbare Caches an, damit die Wiedergabe flüssig bleibt, und nach Projektende bleiben sie für immer auf Ihrem Mac. CacheDrop findet sie.',
+      cta: 'Für Mac herunterladen',
+      ctaNote: 'Premiere Pro · After Effects · Final Cut Pro',
+      updated: 'Oktober 2026',
+      readTime: '5 Min. Lesezeit',
+      faqTitle: 'FAQ zum Speicher für Kreative',
+      // One list feeds both the visible FAQ and the FAQPage JSON-LD (answers lose their tags there).
+      faq: [
+        ['Ist es sicher, den Medien-Cache von Premiere Pro zu leeren?', 'Ja. Die Dateien im Medien-Cache sind Kopien, die Premiere für eine schnellere Wiedergabe anlegt. Beim nächsten Öffnen eines Projekts erzeugt Premiere sie erneut, deshalb kann die erste Wiedergabe etwas länger dauern, während Wellenformen und konformiertes Audio neu aufgebaut werden.'],
+        ['Was sind .cfa- und .pek-Dateien?', '<span class="ic">.cfa</span>-Dateien sind konformiertes Audio: Versionen des Tons Ihrer Clips, die Adobe-Apps schnell abspielen können. In <span class="ic">.pek</span>-Dateien stehen Spitzenwerte, aus denen die Audio-Wellenformen gezeichnet werden. Beide lassen sich bedenkenlos löschen.'],
+        ['Gehen beim Löschen der Render-Dateien von Final Cut Pro auch meine Schnitte verloren?', 'Nein. Ihre Projekte, Timelines und Originalmedien bleiben in der Mediathek. Final Cut Pro rendert Effekte und Übergänge erneut, sobald es sie wieder braucht.'],
+        ['Warum ist mein Mac nach dem Löschen alter Projekte noch voll?', 'Beim Löschen eines Projekts werden die Caches, die es angelegt hat, nicht mit entfernt. Dateien des Medien-Cache, der Disk-Cache von After Effects und Render-Dateien bleiben im Ordner „Library“ liegen, bis Sie sie leeren.'],
+        ['Für welche Apps leert CacheDrop Caches?', 'Für Adobe Premiere Pro, After Effects und Media Encoder, die sich einen Medien-Cache teilen. Bei Final Cut Pro zeigt CacheDrop die Größe jeder Mediathek und wie Sie deren Render-Dateien in Final Cut löschen. Sie prüfen jeden Eintrag, bevor etwas geleert wird.'],
+      ] as Array<[string, string]>,
+      other: { eyebrow: 'Sie schreiben auch Code?', title: 'Xcode DerivedData und alte node_modules-Ordner löschen', href: '/clear-mac-developer-caches/', link: 'Den Entwickler-Guide lesen' },
+      closing: { title: 'Behalten Sie das Laufwerk, das Sie haben.', body: 'CacheDrop findet den Adobe-Medien-Cache und Ihre Final-Cut-Pro-Mediatheken in einem einzigen Scan.' },
+      trademarks: 'Adobe, Premiere Pro, After Effects und Photoshop sind Marken von Adobe. Final Cut Pro, Apple, Mac und macOS sind Marken von Apple Inc.',
+    },
+    toc: ['Adobe Premiere: Medien-Cache leeren', 'Final Cut Pro: Render-Dateien löschen'],
+    premiere: {
+      title: 'Medien-Cache von Adobe Premiere leeren',
+      intro: 'Adobe Premiere Pro erzeugt <span class="ic">.cfa</span>- und <span class="ic">.pek</span>-Dateien, um die Audio- und Videowiedergabe zu optimieren. Innerhalb weniger Monate kann dieser versteckte Ordner auf über 100\u00a0GB anwachsen.',
+      where: 'Auf dem Mac liegt der Medien-Cache standardmäßig hier:',
+      path: 'Pfad',
+      manualTitle: 'So geht es manuell:',
+      manualSteps: ['Öffnen Sie Premiere Pro.', 'Gehen Sie zu Settings › Media Cache (in älteren Versionen Preferences › Media Cache).', 'Klicken Sie auf „Delete“.'],
+      manualNote: 'Hinweis: Adobe empfiehlt, das direkt nach dem Start von Premiere zu tun, bevor Sie ein Projekt öffnen.',
+      oursTitle: 'So geht es mit CacheDrop:',
+      ours: 'CacheDrop findet den Medien-Cache, den sich Premiere Pro, After Effects und Media Encoder teilen, und leert ihn, wenn Sie bestätigen. Premiere müssen Sie dafür nicht öffnen.',
+    },
+    fcpx: {
+      title: 'Render-Dateien von Final Cut Pro',
+      intro: 'FCPX legt Render-Dateien direkt im Mediathek-Paket ab. CacheDrop findet Ihre FCPX-Mediatheken, zeigt, wie viel Speicherplatz jede belegt, und verweist Sie auf den Befehl in Final Cut, der die Render-Dateien entfernt.',
+      why: 'Deshalb kann eine abgeschlossene Final-Cut-Pro-Mediathek weit mehr Platz belegen als ihre Quellmedien. Die Render-Dateien liegen im <span class="ic">.fcpbundle</span>, wo der Finder sie nicht anzeigt.',
+      manualTitle: 'Render-Dateien in Final Cut Pro löschen',
+      manualSteps: ['Wählen Sie die Mediathek in der Seitenleiste „Libraries“ aus.', 'Wählen Sie File › Delete Generated Library Files.', 'Wählen Sie Delete Render Files, dann Unused Only oder All, und klicken Sie auf OK.'],
+      manualNote: 'Immer nur eine Mediathek, und nur Mediatheken, die Sie öffnen.',
+      oursTitle: 'Mit CacheDrop finden',
+      ours: 'CacheDrop listet jede gefundene Final-Cut-Pro-Mediathek mit ihrer Größe auf, damit Sie wissen, welche Sie in Final Cut bereinigen sollten. Eine Mediathek verändert CacheDrop nie selbst.',
+    },
+    get: 'CacheDrop ausprobieren',
   },
 };
 const lang = langOf(Astro.url);
